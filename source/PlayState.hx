@@ -1899,7 +1899,6 @@ class PlayState extends MusicBeatState
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
-						sustainNote.cameras = [camSus];
 						unspawnNotes.push(sustainNote);
 
 						if (sustainNote.mustPress)
@@ -2525,6 +2524,15 @@ class PlayState extends MusicBeatState
 				strumY += daNote.offsetY;
 				strumAngle += daNote.offsetAngle;
 				strumAlpha *= daNote.multAlpha;
+
+				if (daNote.isSustainNote)
+				{
+					daNote.cameras = [camSus, /*noteCamArray[daNote.noteData % mania]*/];
+				}
+				else
+				{
+					daNote.cameras = [camHUD, /*noteCamArray[daNote.noteData % mania]*/];
+				}
 
 				if (strumScroll) //Downscroll
 				{
