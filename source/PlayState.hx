@@ -926,6 +926,23 @@ class PlayState extends MusicBeatState
 		grpNoteSplashes.add(splash);
 		splash.alpha = 0.0;
 
+		// le wiggle
+		wiggleShit.waveAmplitude = 0.07;
+		wiggleShit.effectType = WiggleEffect.WiggleEffectType.DREAMY;
+		wiggleShit.waveFrequency = 0;
+		wiggleShit.waveSpeed = 1.8; // fasto
+		wiggleShit.shader.uTime.value = [(strumLine.y - Note.swagWidth * 4) / FlxG.height]; // from 4mbr0s3 2
+		susWiggle = new ShaderFilter(wiggleShit.shader);
+		// le wiggle 2
+		var wiggleShit2:WiggleEffect = new WiggleEffect();
+		wiggleShit2.waveAmplitude = 0.10;
+		wiggleShit2.effectType = WiggleEffect.WiggleEffectType.HEAT_WAVE_VERTICAL;
+		wiggleShit2.waveFrequency = 0;
+		wiggleShit2.waveSpeed = 1.8; // fasto
+		wiggleShit2.shader.uTime.value = [(strumLine.y - Note.swagWidth * 4) / FlxG.height]; // from 4mbr0s3 2
+		var susWiggle2 = new ShaderFilter(wiggleShit2.shader);
+		camSus.setFilters([susWiggle]); // only enable it for snake notes
+
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
