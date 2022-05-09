@@ -1899,6 +1899,7 @@ class PlayState extends MusicBeatState
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
+						sustainNote.cameras = [camSus];
 						unspawnNotes.push(sustainNote);
 
 						if (sustainNote.mustPress)
