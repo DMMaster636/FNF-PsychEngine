@@ -2332,8 +2332,8 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		wiggleShit.waveAmplitude = FlxMath.lerp(wiggleShit.waveAmplitude, 0, 0.035 / (_variables.fps / 60));
-		wiggleShit.waveFrequency = FlxMath.lerp(wiggleShit.waveFrequency, 0, 0.035 / (_variables.fps / 60));
+		wiggleShit.waveAmplitude = FlxMath.lerp(wiggleShit.waveAmplitude, 0, 0.035 / (ClientPrefs.framerate / 60));
+		wiggleShit.waveFrequency = FlxMath.lerp(wiggleShit.waveFrequency, 0, 0.035 / (ClientPrefs.framerate / 60));
 
 		wiggleShit.update(elapsed);
 
