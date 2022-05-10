@@ -934,6 +934,7 @@ class PlayState extends MusicBeatState
 		grpNoteSplashes.add(splash);
 		splash.alpha = 0.0;
 
+		// credits to mic'd up engine
 		// le wiggle
 		wiggleShit.waveAmplitude = 0.07;
 		wiggleShit.effectType = WiggleEffect.WiggleEffectType.DREAMY;
@@ -949,7 +950,7 @@ class PlayState extends MusicBeatState
 		wiggleShit2.waveSpeed = 1.8; // fasto
 		wiggleShit2.shader.uTime.value = [(strumLine.y - Note.swagWidth * 4) / FlxG.height]; // from 4mbr0s3 2
 		var susWiggle2 = new ShaderFilter(wiggleShit2.shader);
-		camSus.setFilters([susWiggle]); // only enable it for snake notes
+		camSus.setFilters([susWiggle]); // only enable it for sustain notes
 
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
@@ -2527,11 +2528,11 @@ class PlayState extends MusicBeatState
 
 				if (daNote.isSustainNote)
 				{
-					daNote.cameras = [camSus, /*noteCamArray[daNote.noteData % mania]*/];
+					daNote.cameras = [camSus];
 				}
 				else
 				{
-					daNote.cameras = [camHUD, /*noteCamArray[daNote.noteData % mania]*/];
+					daNote.cameras = [camHUD];
 				}
 
 				if (strumScroll) //Downscroll
