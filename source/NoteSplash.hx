@@ -26,7 +26,11 @@ class NoteSplash extends FlxSprite
 	}
 
 	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0) {
-		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
+		if(PlayState.isPixelStage) {
+			setPosition(x + 25, (y + Note.swagWidth) / 2);
+		} else {
+			setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
+		}
 		alpha = 0.6;
 
 		if(texture == null) {
@@ -50,8 +54,8 @@ class NoteSplash extends FlxSprite
 	function loadAnims(skin:String) {
 		if(PlayState.isPixelStage) {
 			loadGraphic(Paths.image('pixelUI/' + skin));
-			width = width / 50;
-			height = height / 50;
+			width = width / 8;
+			height = height / 4;
 			loadGraphic(Paths.image('pixelUI/' + skin), true, Math.floor(width), Math.floor(height));
 
 			antialiasing = false;
