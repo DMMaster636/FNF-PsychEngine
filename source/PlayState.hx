@@ -3184,7 +3184,7 @@ class PlayState extends MusicBeatState
 
 				if(ClientPrefs.wigglySustain && daNote.isSustainNote)
 				{
-					daNote.cameras = [camSus];F
+					daNote.cameras = [camSus];
 				}
 				else
 				{
