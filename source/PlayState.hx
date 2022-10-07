@@ -489,7 +489,7 @@ class PlayState extends MusicBeatState
 		Conductor.changeBPM(SONG.bpm);
 
 		freestyleSound = FlxG.sound.load(Paths.sound('freestyle/defaultfree'));
-FlxG.sound.play(Paths.sound('Lights_Turn_On'));
+
 		FlxG.sound.cache(Paths.sound('gradeup'));
 		FlxG.sound.cache(Paths.sound('gradedown'));
 		FlxG.sound.cache(Paths.sound('phrasegood'));

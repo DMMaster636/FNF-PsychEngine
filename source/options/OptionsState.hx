@@ -36,7 +36,7 @@ class OptionsState extends MusicBeatState
 
 	function openSelectedSubstate(label:String) {
 		switch(label) {
-			case 'Note Colors':
+			case 'Parappa Settings':
 				openSubState(new options.ParappaSettingsSubState());
 			case 'Note Colors':
 				openSubState(new options.NotesSubState());
