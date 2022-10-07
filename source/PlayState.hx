@@ -27,6 +27,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
+import flixel.system.FlxAssets;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
@@ -43,6 +44,8 @@ import openfl.Lib;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.BitmapFilter;
+import openfl.filters.ColorMatrixFilter;
+import openfl.filters.BlurFilter;
 import openfl.utils.Assets as OpenFlAssets;
 import editors.ChartingState;
 import editors.CharacterEditorState;
@@ -149,6 +152,7 @@ class PlayState extends MusicBeatState
 	public var spawnTime:Float = 2000;
 
 	public var vocals:FlxSound;
+	public var freestyleSound:FlxSound;
 
 	public var dad:Character = null;
 	public var gf:Character = null;
@@ -324,6 +328,43 @@ class PlayState extends MusicBeatState
 	// stores the last combo score objects in an array
 	public static var lastScore:Array<FlxSprite> = [];
 
+	// parappa shit
+	var filters:Array<BitmapFilter> = [];
+	var filterMap:Map<String, {filter:BitmapFilter, ?onUpdate:Void->Void}>;
+	var gradeLevel:Int = 0;
+	var playerGrade:Int = 0;
+	// var gradeup:FlxSound;
+	// var gradedown:FlxSound;
+	// var phrasegood:FlxSound;
+	// var phrasebad:FlxSound;
+	var gradeTxtCool:FlxText;
+	var gradeTxtGood:FlxText;
+	var gradeTxtBad:FlxText;
+	var gradeTxtAwful:FlxText;
+	var gradeTxtMarker:FlxText;
+	var gradingDone:Bool = true;
+	var gradeHealth:Float = 0;
+	var nextGradeHealth:Float = 0;
+	var prevGradeHealth:Float = 0;
+	var flickerTick:Int = 0;
+	var flickerText:FlxText = null;
+	var doFlicker:Bool = false;
+
+	var isSilence:Bool = false;
+	var dalastStep:Float = 0;
+	var curStepTime:Float = 0;
+	var daphraseFrames:Int = 0;
+	var nonSilentFrames:Int = 0;
+	var freestyleHealth:Float = 0;
+	var lastFreestyleHit:Float = -6000;
+	public var freestyleSoundsL:Array<FlxSound> = [];
+	public var freestyleSoundsR:Array<FlxSound> = [];
+	public var freestyleSoundsU:Array<FlxSound> = [];
+	public var freestyleSoundsD:Array<FlxSound> = [];
+	var freestyleSoundIndex:Int = 0;
+	var freestylePrevArrow:Int = -1;
+	var coolSong:FlxSoundAsset;
+
 	override public function create()
 	{
 		//trace('Playback Rate: ' + playbackRate);
@@ -348,6 +389,36 @@ class PlayState extends MusicBeatState
 			'NOTE_DOWN',
 			'NOTE_UP',
 			'NOTE_RIGHT'
+		];
+
+		//Enable filters
+		filterMap = [
+			"BlurBad" => {
+				filter: new BlurFilter(2, 2),
+			},
+			"BlurAwful" => {
+				filter: new BlurFilter(4, 4),
+			},
+			"Bad" => {
+				var matrix:Array<Float> = [
+					0.7,  0.1,  0.1, 0, 0,
+					 0.1, 0.7,  0.1, 0, 0,
+					 0.1,  0.1, 0.7, 0, 0,
+					 0,  0,  0, 1,   0,
+				];
+
+				{filter: new ColorMatrixFilter(matrix)}
+			},
+			"Awful" => {
+				var matrix:Array<Float> = [
+					0.4,  0.3,  0.3, 0, 0,
+					 0.3, 0.4,  0.3, 0, 0,
+					 0.3,  0.3, 0.4, 0, 0,
+					 0,  0,  0, 1,   0,
+				];
+
+				{filter: new ColorMatrixFilter(matrix)}
+			}
 		];
 
 		//Ratings
@@ -402,6 +473,12 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		CustomFadeTransition.nextCamera = camOther;
 
+		if (ClientPrefs.flashing)
+		{
+			camGame.setFilters(filters);
+			camGame.filtersEnabled = true;
+		}
+
 		persistentUpdate = true;
 		persistentDraw = true;
 
@@ -410,6 +487,81 @@ class PlayState extends MusicBeatState
 
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
+
+		freestyleSound = FlxG.sound.load(Paths.sound('freestyle/defaultfree'));
+FlxG.sound.play(Paths.sound('Lights_Turn_On'));
+		FlxG.sound.cache(Paths.sound('gradeup'));
+		FlxG.sound.cache(Paths.sound('gradedown'));
+		FlxG.sound.cache(Paths.sound('phrasegood'));
+		FlxG.sound.cache(Paths.sound('phrasebad'));
+
+		//#if desktop
+		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
+			FlxG.sound.cache(Paths.formatToSongPath(SONG.song + "/Inst_Awful"));
+		}
+		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Bad"))) {
+			FlxG.sound.cache(Paths.formatToSongPath(SONG.song + "/Inst_Bad"));
+		}
+		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool"))) {
+			coolSong = openfl.media.Sound.fromFile(Paths.formatToSongPath(SONG.song + "/Inst_Cool"));
+		}
+		/*#else
+		if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
+			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
+		}
+		if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt)){
+			FlxG.sound.cache("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
+		}
+		if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
+			coolSong = openfl.media.Sound.fromFile("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+		}
+		#end*/
+
+		var checkFreestyleFiles:Int = 1;
+		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
+		for (i in checkFreestyleArrows){
+			var checkFileExists:Bool = false;
+			#if desktop
+			while (FileSystem.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
+				//FlxG.sound.cache("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt);
+
+				if (i == "L")
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+				else if (i == "R")
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+				else if (i == "U")
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+				else if (i == "D")
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+
+				checkFreestyleFiles++;
+			}
+			checkFreestyleFiles = 1;
+			#else
+			while (Assets.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
+				if (i == "L")
+					freestyleSoundsL.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "R")
+					freestyleSoundsR.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "U")
+					freestyleSoundsU.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "D")
+					freestyleSoundsD.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+
+				checkFreestyleFiles++;
+			}
+			checkFreestyleFiles = 1;
+			#end
+		}
+
+		if (freestyleSoundsL.length == 0)
+			freestyleSoundsL.push(freestyleSound);
+		if (freestyleSoundsR.length == 0)
+			freestyleSoundsR.push(freestyleSound);
+		if (freestyleSoundsD.length == 0)
+			freestyleSoundsD.push(freestyleSound);
+		if (freestyleSoundsU.length == 0)
+			freestyleSoundsU.push(freestyleSound);
 
 		#if desktop
 		storyDifficultyText = CoolUtil.difficulties[storyDifficulty];

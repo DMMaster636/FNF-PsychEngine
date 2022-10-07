@@ -33,6 +33,10 @@ class ClientPrefs {
 	public static var pauseMusic:String = 'Tea Time';
 	public static var checkForUpdates:Bool = true;
 	public static var comboStacking = true;
+	public static var auditoryFeedback:Bool = false;
+	public static var requireGood:Bool = true;
+	public static var freestyling:Bool = true;
+	public static var gradingStyle:String = 'Break Based';
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'scrolltype' => 'multiplicative', 
@@ -130,6 +134,11 @@ class ClientPrefs {
 		FlxG.save.data.pauseMusic = pauseMusic;
 		FlxG.save.data.checkForUpdates = checkForUpdates;
 		FlxG.save.data.comboStacking = comboStacking;
+
+		FlxG.save.data.auditoryFeedback = auditoryFeedback;
+		FlxG.save.data.requireGood = requireGood;
+		FlxG.save.data.freestyling = freestyling;
+		FlxG.save.data.gradingStyle = gradingStyle;
 	
 		FlxG.save.flush();
 
@@ -217,7 +226,6 @@ class ClientPrefs {
 		if(FlxG.save.data.comboOffset != null) {
 			comboOffset = FlxG.save.data.comboOffset;
 		}
-		
 		if(FlxG.save.data.ratingOffset != null) {
 			ratingOffset = FlxG.save.data.ratingOffset;
 		}
@@ -242,30 +250,38 @@ class ClientPrefs {
 		if(FlxG.save.data.pauseMusic != null) {
 			pauseMusic = FlxG.save.data.pauseMusic;
 		}
-		if(FlxG.save.data.gameplaySettings != null)
-		{
+		if(FlxG.save.data.gameplaySettings != null) {
 			var savedMap:Map<String, Dynamic> = FlxG.save.data.gameplaySettings;
-			for (name => value in savedMap)
-			{
+			for (name => value in savedMap) {
 				gameplaySettings.set(name, value);
 			}
 		}
 		
 		// flixel automatically saves your volume!
-		if(FlxG.save.data.volume != null)
-		{
+		if(FlxG.save.data.volume != null) {
 			FlxG.sound.volume = FlxG.save.data.volume;
 		}
-		if (FlxG.save.data.mute != null)
-		{
+		if (FlxG.save.data.mute != null) {
 			FlxG.sound.muted = FlxG.save.data.mute;
 		}
-		if (FlxG.save.data.checkForUpdates != null)
-		{
+		if (FlxG.save.data.checkForUpdates != null) {
 			checkForUpdates = FlxG.save.data.checkForUpdates;
 		}
-		if (FlxG.save.data.comboStacking != null)
+		if (FlxG.save.data.comboStacking != null) {
 			comboStacking = FlxG.save.data.comboStacking;
+		}
+		if (FlxG.save.data.auditoryFeedback != null) {
+			auditoryFeedback = FlxG.save.data.auditoryFeedback;
+		}
+		if (FlxG.save.data.requireGood != null) {
+			requireGood = FlxG.save.data.requireGood;
+		}
+		if (FlxG.save.data.freestyling != null) {
+			freestyling = FlxG.save.data.freestyling;
+		}
+		if (FlxG.save.data.gradingStyle != null) {
+			gradingStyle = FlxG.save.data.gradingStyle;
+		}
 
 		var save:FlxSave = new FlxSave();
 		save.bind('controls_v2', 'ninjamuffin99');
