@@ -27,7 +27,6 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-import flixel.system.FlxAssets;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
@@ -488,65 +487,63 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		freestyleSound = FlxG.sound.load(Paths.sound('freestyle/defaultfree'));
+		freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
 
-		FlxG.sound.cache(Paths.sound('gradeup'));
-		FlxG.sound.cache(Paths.sound('gradedown'));
-		FlxG.sound.cache(Paths.sound('phrasegood'));
-		FlxG.sound.cache(Paths.sound('phrasebad'));
+		precacheList.set(Paths.sound('gradeup'), 'sound');
+		precacheList.set(Paths.sound('gradedown'), 'sound');
+		precacheList.set(Paths.sound('phrasegood'), 'sound');
+		precacheList.set(Paths.sound('phrasebad'), 'sound');
 
-		//#if desktop
+		#if MODS_ALLOWED
 		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
-			FlxG.sound.cache(Paths.formatToSongPath(SONG.song + "/Inst_Awful"));
+			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Awful"), "music");
 		}
 		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Bad"))) {
-			FlxG.sound.cache(Paths.formatToSongPath(SONG.song + "/Inst_Bad"));
+			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Bad"), "music");
 		}
 		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool"))) {
-			coolSong = openfl.media.Sound.fromFile(Paths.formatToSongPath(SONG.song + "/Inst_Cool"));
+			coolSong = Paths.formatToSongPath(SONG.song + "/Inst_Cool");
 		}
-		/*#else
-		if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
-			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
+		#else
+		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
+			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Awful"), "music");
 		}
-		if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt)){
-			FlxG.sound.cache("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
+		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Bad"))) {
+			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Bad"), "music");
 		}
-		if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
-			coolSong = openfl.media.Sound.fromFile("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool"))) {
+			coolSong = Paths.formatToSongPath(SONG.song + "/Inst_Cool");
 		}
-		#end*/
+		#end
 
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
-		for (i in checkFreestyleArrows){
+		for (i in checkFreestyleArrows) {
 			var checkFileExists:Bool = false;
-			#if desktop
-			while (FileSystem.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
-				//FlxG.sound.cache("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt);
-
+			#if MODS_ALLOWED
+			while (FileSystem.exists(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles))) {
 				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 
 				checkFreestyleFiles++;
 			}
 			checkFreestyleFiles = 1;
 			#else
-			while (Assets.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
+			while (OpenFlAssets.exists(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles))) {
 				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 
 				checkFreestyleFiles++;
 			}
@@ -1313,6 +1310,43 @@ class PlayState extends MusicBeatState
 			botplayTxt.y = timeBarBG.y - 78;
 		}
 
+		if(ClientPrefs.freestyling) {
+			gradeTxtCool = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 64, FlxG.width, "            Cool", 20);
+			gradeTxtCool.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			gradeTxtCool.scrollFactor.set();
+			gradeTxtCool.borderSize = 3;
+			gradeTxtCool.visible = !ClientPrefs.hideHud;
+			add(gradeTxtCool);
+		}
+
+		gradeTxtGood = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 48, FlxG.width, "            Good", 20);
+		gradeTxtGood.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtGood.scrollFactor.set();
+		gradeTxtGood.borderSize = 3;
+		gradeTxtGood.visible = !ClientPrefs.hideHud;
+		add(gradeTxtGood);
+
+		gradeTxtBad = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 32, FlxG.width, "            Bad", 20);
+		gradeTxtBad.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtBad.scrollFactor.set();
+		gradeTxtBad.borderSize = 3;
+		gradeTxtBad.visible = !ClientPrefs.hideHud;
+		add(gradeTxtBad);
+
+		gradeTxtAwful = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 16, FlxG.width, "            Awful", 20);
+		gradeTxtAwful.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtAwful.scrollFactor.set();
+		gradeTxtAwful.borderSize = 3;
+		gradeTxtAwful.visible = !ClientPrefs.hideHud;
+		add(gradeTxtAwful);
+
+		gradeTxtMarker = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 32, FlxG.width, "U Rappin': >", 20);
+		gradeTxtMarker.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtMarker.scrollFactor.set();
+		gradeTxtMarker.borderSize = 3;
+		gradeTxtMarker.visible = !ClientPrefs.hideHud;
+		add(gradeTxtMarker);
+
 		strumLineNotes.cameras = [camHUD];
 		grpNoteSplashes.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -1326,6 +1360,11 @@ class PlayState extends MusicBeatState
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
+		gradeTxtCool.cameras = [camHUD];
+		gradeTxtGood.cameras = [camHUD];
+		gradeTxtBad.cameras = [camHUD];
+		gradeTxtAwful.cameras = [camHUD];
+		gradeTxtMarker.cameras = [camHUD];
 
 		// if (SONG.song == 'South')
 		// FlxG.camera.alpha = 0.7;
@@ -2526,6 +2565,48 @@ class PlayState extends MusicBeatState
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
 			vocals.pause();
+		} else {
+			#if desktop
+			switch (playerGrade) {
+				case -1:
+					if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
+						FlxG.sound.playMusic(coolSong, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 0:
+					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 1:
+					if (FileSystem.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 2:
+					if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+			}
+			#else
+			switch (playerGrade) {
+				case -1:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 0:
+					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 1:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 2:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+			}
+			#end
 		}
 
 		// Song duration in a float, useful for the time left feature
@@ -3018,6 +3099,8 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var limoSpeed:Float = 0;
+
+	var changedSongGrade:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
