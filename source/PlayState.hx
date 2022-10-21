@@ -474,7 +474,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		CustomFadeTransition.nextCamera = camOther;
 
-		if (ClientPrefs.flashing)
+		if (ClientPrefs.flashing && ClientPrefs.shaders)
 		{
 			camGame.setFilters(filters);
 			camGame.filtersEnabled = true;
@@ -496,7 +496,7 @@ class PlayState extends MusicBeatState
 		precacheList.set(Paths.sound('phrasegood'), 'sound');
 		precacheList.set(Paths.sound('phrasebad'), 'sound');
 
-		#if MODS_ALLOWED
+		#if desktop
 		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
 			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Awful"), "music");
 		}
@@ -522,7 +522,7 @@ class PlayState extends MusicBeatState
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows) {
 			var checkFileExists:Bool = false;
-			#if MODS_ALLOWED
+			#if desktop
 			while (FileSystem.exists(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles))) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
@@ -2573,10 +2573,10 @@ class PlayState extends MusicBeatState
 			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
+					if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool")))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, 1, false));
 				case 0:
 					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
 				case 1:
