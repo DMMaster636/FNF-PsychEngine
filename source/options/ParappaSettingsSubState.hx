@@ -36,13 +36,6 @@ class ParappaSettingsSubState extends BaseOptionsMenu
 		title = 'Parappa';
 		rpcTitle = 'Parappa Settings Menu'; //for Discord Rich Presence
 
-		var option:Option = new Option('Auditory Feedback', //Name
-			'If checked, wip.', //Description
-			'auditoryFeedback', //Save data variable name
-			'bool', //Variable type
-			false); //Default value
-		addOption(option);
-
 		var option:Option = new Option('Require Good Rank',
 			'If checked, requires you to beat a song with the Good rank.',
 			'requireGood',
