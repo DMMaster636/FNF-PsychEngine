@@ -474,7 +474,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		CustomFadeTransition.nextCamera = camOther;
 
-		if (ClientPrefs.flashing && ClientPrefs.shaders)
+		if(ClientPrefs.flashing && ClientPrefs.shaders)
 		{
 			camGame.setFilters(filters);
 			camGame.filtersEnabled = true;
@@ -497,24 +497,24 @@ class PlayState extends MusicBeatState
 		precacheList.set(Paths.sound('phrasebad'), 'sound');
 
 		#if desktop
-		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
-			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Awful"), "music");
+		if (FileSystem.exists(Paths.inst(SONG.song) + "_Awful")) {
+			precacheList.set(Paths.inst(SONG.song) + "_Awful", "music");
 		}
-		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Bad"))) {
-			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Bad"), "music");
+		if (FileSystem.exists(Paths.inst(SONG.song) + "_Bad")) {
+			precacheList.set(Paths.inst(SONG.song) + "_Bad", "music");
 		}
-		if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool"))) {
-			coolSong = Paths.formatToSongPath(SONG.song + "/Inst_Cool");
+		if (FileSystem.exists(Paths.inst(SONG.song) + "_Cool")) {
+			coolSong = Paths.inst(SONG.song) + "_Cool";
 		}
 		#else
-		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Awful"))) {
-			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Awful"), "music");
+		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful")) {
+			precacheList.set(Paths.inst(SONG.song) + "_Awful", "music");
 		}
-		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Bad"))) {
-			precacheList.set(Paths.formatToSongPath(SONG.song + "/Inst_Bad"), "music");
+		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad")) {
+			precacheList.set(Paths.inst(SONG.song) + "_Bad", "music");
 		}
-		if (OpenFlAssets.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool"))) {
-			coolSong = Paths.formatToSongPath(SONG.song + "/Inst_Cool");
+		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool")) {
+			coolSong = Paths.inst(SONG.song) + "_Cool";
 		}
 		#end
 
@@ -2573,42 +2573,42 @@ class PlayState extends MusicBeatState
 			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists(Paths.formatToSongPath(SONG.song + "/Inst_Cool")))
+					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, 1, false));
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
-					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (FileSystem.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt))
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
+					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
+						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Bad", 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt))
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
+					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
+						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Awful", 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
 			#else
 			switch (playerGrade) {
 				case -1:
-					if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt, 1, false);
+					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
+						FlxG.sound.playMusic(coolSong, 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
-					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt))
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
+					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
+						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Bad", 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt))
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
+					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
+						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Awful", 1, false);
 					else
-						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
 			#end
 		}
@@ -3280,6 +3280,26 @@ class PlayState extends MusicBeatState
 			openChartEditor();
 		}
 
+		if (!ClientPrefs.oldTiming && playerGrade != -1) {
+			isSilence = true;
+			notes.forEachExists(function(daNote:Note)
+			{
+				if (daNote.mustPress && daNote.y < FlxG.height*0.9)
+				{
+					isSilence = false;
+					gradingDone = false;
+				}
+			});
+		}
+
+		if (dalastStep != curStep) {
+			dalastStep == curStep;
+			curStepTime = Conductor.songPosition;
+		}
+
+		if (!startingSong)
+			daphraseFrames++;
+
 		// FlxG.watch.addQuick('VOL', vocals.amplitudeLeft);
 		// FlxG.watch.addQuick('VOLRight', vocals.amplitudeRight);
 
@@ -3308,6 +3328,36 @@ class PlayState extends MusicBeatState
 			iconP2.animation.curAnim.curFrame = 1;
 		else
 			iconP2.animation.curAnim.curFrame = 0;
+
+		if ((ClientPrefs.oldTiming || playerGrade == -1) && !startingSong)
+		{
+			if (curBeat % 8 == 0 && !gradingDone)
+				doParappaGrading();
+			else if (curBeat % 8 == 1)
+				gradingDone = false;
+		}
+		else if (playerGrade > -1 && !startingSong && isSilence && !gradingDone && nonSilentFrames > 6) 
+		{
+			doParappaGrading();
+		}
+
+		flickerTick++;
+		if (flickerTick % 5 == 0 && doFlicker){
+			if (flickerText != null){
+				if (flickerTick % 10 == 0) {
+					flickerText.color = FlxColor.WHITE;
+					flickerTick = 0;
+				} else {
+					flickerText.color = FlxColor.GRAY;
+				}
+			}
+
+		}
+
+		if (!startingSong && !isSilence)
+			nonSilentFrames++;
+		else if (!startingSong && isSilence && nonSilentFrames != 0)
+			nonSilentFrames = 0;
 
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene) {
 			persistentUpdate = false;
@@ -3377,6 +3427,7 @@ class PlayState extends MusicBeatState
 		if (!ClientPrefs.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
 		{
 			health = 0;
+			filters.resize(0);
 			trace("RESET = True");
 		}
 		doDeathCheck();
@@ -3557,6 +3608,289 @@ class PlayState extends MusicBeatState
 		setOnLuas('cameraY', camFollowPos.y);
 		setOnLuas('botPlay', cpuControlled);
 		callOnLuas('onUpdatePost', [elapsed]);
+
+		for (filter in filterMap)
+		{
+			if (filter.onUpdate != null)
+				filter.onUpdate();
+		}
+
+		for (sndarray in [freestyleSoundsL, freestyleSoundsR, freestyleSoundsU, freestyleSoundsD])
+			for (snd in sndarray)
+				snd.update(FlxG.elapsed);
+
+	}
+
+	function startFlicker():Void
+	{
+		switch (playerGrade)
+		{
+			case -1:
+				switch (gradeLevel)
+				{
+					case -1:
+						flickerText = gradeTxtGood;
+				}
+			case 0:
+				switch (gradeLevel)
+				{
+					case -1:
+						flickerText = gradeTxtCool;
+					case 1:
+						flickerText = gradeTxtBad;
+				}
+			case 1:
+				switch (gradeLevel)
+				{
+					case 1:
+						flickerText = gradeTxtGood;
+					case 3:
+						flickerText = gradeTxtAwful;
+				}
+			case 2:
+				switch (gradeLevel)
+				{
+					case 3:
+						flickerText = gradeTxtBad;
+					case 5:
+						flickerText = gradeTxtAwful;
+				}
+		}
+		doFlicker = true;
+	}
+
+	function endFlicker():Void
+	{
+		doFlicker = false;
+		gradeTxtCool.color = FlxColor.GRAY;
+		gradeTxtGood.color = FlxColor.GRAY;
+		gradeTxtBad.color = FlxColor.GRAY;
+		gradeTxtAwful.color = FlxColor.GRAY;
+		switch (playerGrade)
+		{
+			case -1:
+				gradeTxtCool.color = FlxColor.WHITE;
+			case 0:
+				gradeTxtGood.color = FlxColor.WHITE;
+			case 1:
+				gradeTxtBad.color = FlxColor.WHITE;
+			case 2:
+				gradeTxtAwful.color = FlxColor.WHITE;
+		}
+	}
+
+	function isGoodFreestyle():Bool
+	{
+		var freestyleSwag:Float = freestyleHealth/daphraseFrames*1000;
+		var freestyleMin:Int = 16;
+		if (playerGrade == -1)
+			freestyleMin = 22;
+		if (freestyleSwag > freestyleMin)
+			return true;
+		return false;
+	}
+
+	function doParappaGrading():Void
+	{
+		gradingDone = true;
+		prevGradeHealth = gradeHealth;
+		if (playerGrade == -1) {
+			if (isGoodFreestyle()) {
+				FlxG.sound.play(Paths.sound('phrasegood'));
+				gradeLevel = -2;
+			} else {
+				FlxG.sound.play(Paths.sound('phrasebad'));
+				gradeLevel++;
+
+				if (gradeLevel == -1)
+					FlxG.log.add('GRADE -1');
+				if (gradeLevel == -2)
+					FlxG.log.add('GRADE -2');
+
+				if (gradeLevel == 0)
+				{
+					FlxG.sound.play(Paths.sound('gradedown'));
+					goGood();
+				}
+			}
+		} else if (prevGradeHealth > 0) {
+			switch (gradeLevel)
+			{
+				case 0:
+					if (playerGrade == 0 && isGoodFreestyle() && ClientPrefs.enableCool)
+						gradeLevel--;
+				case -1:
+					if (playerGrade == 0 && TitleState.enableCool) {
+						if (isGoodFreestyle()) {
+							FlxG.sound.play(Paths.sound('gradeup'));
+							goCool();
+							gradeLevel--;
+						}
+						else
+							gradeLevel++;
+					}
+				case 1:
+					if (playerGrade > 0) {
+						FlxG.sound.play(Paths.sound('gradeup'));
+						goGood();
+					}
+				case 3:
+					if (playerGrade > 1) {
+						FlxG.sound.play(Paths.sound('gradeup'));
+						goBad();
+					}
+			}
+			if (gradeLevel > 0)
+				gradeLevel--;
+			FlxG.sound.play(Paths.sound('phrasegood'));
+		} else if (prevGradeHealth < 0) {
+			switch (gradeLevel)
+			{
+				case 1:
+					if (playerGrade == 0) {
+						FlxG.sound.play(Paths.sound('gradedown'));
+						goBad();
+					}
+				case 3:
+					if (playerGrade < 2) {
+						FlxG.sound.play(Paths.sound('gradedown'));
+						goAwful();
+					}
+				case 5:
+					health = 0;
+			}
+			if (gradeLevel < 6)
+				gradeLevel++;
+			FlxG.sound.play(Paths.sound('phrasebad'));
+		}
+		if (!doFlicker && gradeLevel % 2 == 1)
+			startFlicker();
+		else if (!doFlicker && gradeLevel == -1)
+			startFlicker();
+		else if (doFlicker && gradeLevel % 2 == 0)
+			endFlicker();
+		else if (doFlicker && gradeLevel == -2)
+			endFlicker();
+		gradeHealth = nextGradeHealth;
+		nextGradeHealth = 0;
+		freestyleHealth = 0;
+		daphraseFrames = 0;
+	}
+
+	function goCool():Void
+	{
+		changedSongGrade = false;
+		filters.resize(0);
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Cool");
+		#else
+		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool");
+		#end
+		if (checkFileExists) 
+		{
+			if (!startingSong)
+			{
+				FlxG.sound.playMusic(coolSong, 1, false);
+				FlxG.sound.music.time = Conductor.songPosition;
+				resyncVocals();
+				FlxG.sound.music.onComplete = endSong();
+			}
+			changedSongGrade = true;
+		}
+		gradeTxtCool.color = FlxColor.WHITE;
+		gradeTxtGood.color = FlxColor.GRAY;
+		gradeTxtBad.color = FlxColor.GRAY;
+		gradeTxtAwful.color = FlxColor.GRAY;
+		gradeTxtMarker.y = gradeTxtCool.y;
+		strumLineNotes.visible = false;
+		notes.visible = false;
+		vocals.volume = 0;
+		playerGrade = -1;
+	}
+
+	function goGood():Void
+	{
+		filters.resize(0);
+		var checkFileExists:Bool = false;
+		if (changedSongGrade)
+		{
+			if (!startingSong)
+			{
+				FlxG.sound.playMusic(Paths.inst(SONG.song), 1, false);
+				FlxG.sound.music.time = Conductor.songPosition;
+				resyncVocals();
+				FlxG.sound.music.onComplete = endSong;
+			}
+		}
+		gradeTxtCool.color = FlxColor.GRAY;
+		gradeTxtGood.color = FlxColor.WHITE;
+		gradeTxtBad.color = FlxColor.GRAY;
+		gradeTxtAwful.color = FlxColor.GRAY;
+		gradeTxtMarker.y = gradeTxtGood.y;
+		strumLineNotes.visible = true;
+		notes.visible = true;
+		vocals.volume = 0;
+		playerGrade = 0;
+	}
+
+	function goBad():Void
+	{
+		filters.resize(0);
+		filters.push(filterMap.get("BlurBad").filter);
+		filters.push(filterMap.get("Bad").filter);
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Bad");
+		#else
+		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad");
+		#end
+		if (checkFileExists){
+
+			if (!startingSong){
+				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
+				FlxG.sound.music.time = Conductor.songPosition;
+				resyncVocals();
+				FlxG.sound.music.onComplete = endSong;
+			}
+			changedSongGrade = true;	
+		}
+		gradeTxtCool.color = FlxColor.GRAY;
+		gradeTxtGood.color = FlxColor.GRAY;
+		gradeTxtBad.color = FlxColor.WHITE;
+		gradeTxtAwful.color = FlxColor.GRAY;
+		gradeTxtMarker.y = gradeTxtBad.y;
+		playerGrade = 1;
+	}
+
+	function goAwful():Void\
+	{
+		filters.resize(0);
+		filters.push(filterMap.get("BlurAwful").filter);
+		filters.push(filterMap.get("Awful").filter);
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Awful");
+		#else
+		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful");
+		#end
+		if (checkFileExists)
+		{
+			if (!startingSong)
+			{
+				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Awful", 1, false);
+				FlxG.sound.music.time = Conductor.songPosition;
+				resyncVocals();
+				FlxG.sound.music.onComplete = endSong;
+			}
+			changedSongGrade = true;
+		}
+		gradeTxtCool.color = FlxColor.GRAY;
+		gradeTxtGood.color = FlxColor.GRAY;
+		gradeTxtBad.color = FlxColor.GRAY;
+		gradeTxtAwful.color = FlxColor.WHITE;
+		gradeTxtMarker.y = gradeTxtAwful.y;
+		playerGrade = 2;
 	}
 
 	function openPauseMenu()
@@ -4132,6 +4466,14 @@ class PlayState extends MusicBeatState
 	public var transitioning = false;
 	public function endSong():Void
 	{
+		endingSong = true;
+		if (TitleState.oldTiming)
+			doParappaGrading();
+		if (playerGrade > 0 && ClientPrefs.requireGood) {
+			health = 0;
+			return;
+		}
+
 		//Should kill you if you tried to cheat
 		if(!startingSong) {
 			notes.forEach(function(daNote:Note) {
@@ -4347,7 +4689,8 @@ class PlayState extends MusicBeatState
 		//trace(noteDiff, ' ' + Math.abs(note.strumTime - Conductor.songPosition));
 
 		// boyfriend.playAnim('hey');
-		vocals.volume = 1;
+		if (playerGrade > -1)
+			vocals.volume = 1;
 
 		var placement:String = Std.string(combo);
 
@@ -4594,8 +4937,7 @@ class PlayState extends MusicBeatState
 						}
 
 					}
-				}
-				else{
+				} else {
 					callOnLuas('onGhostTap', [key]);
 					if (canMiss) {
 						noteMissPress(key);
@@ -4690,7 +5032,7 @@ class PlayState extends MusicBeatState
 		}
 
 		// FlxG.watch.addQuick('asdfa', upP);
-		if (startedCountdown && !boyfriend.stunned && generatedMusic)
+		if (startedCountdown && !boyfriend.stunned && generatedMusic && playerGrade != -1)
 		{
 			// rewritten inputs???
 			notes.forEachAlive(function(daNote:Note)
@@ -4742,7 +5084,8 @@ class PlayState extends MusicBeatState
 		return ret;
 	}
 
-	function noteMiss(daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	function noteMiss(daNote:Note):Void //You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	{
 		//Dupe note remove
 		notes.forEachAlive(function(note:Note) {
 			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1) {
@@ -4753,6 +5096,7 @@ class PlayState extends MusicBeatState
 		});
 		combo = 0;
 		health -= daNote.missHealth * healthLoss;
+		gradeHealth  -= daNote.missHealth * healthLoss;
 		
 		if(instakillOnMiss)
 		{
@@ -4790,6 +5134,7 @@ class PlayState extends MusicBeatState
 		if (!boyfriend.stunned)
 		{
 			health -= 0.05 * healthLoss;
+			gradeHealth -= 0.05 * healthLoss;
 			if(instakillOnMiss)
 			{
 				vocals.volume = 0;
@@ -4856,12 +5201,14 @@ class PlayState extends MusicBeatState
 
 			if(char != null)
 			{
-				char.playAnim(animToPlay, true);
-				char.holdTimer = 0;
+				if (playerGrade > -1) {
+					char.playAnim(animToPlay, true);
+					char.holdTimer = 0;
+				}
 			}
 		}
 
-		if (SONG.needsVoices)
+		if (SONG.needsVoices && playerGrade > -1)
 			vocals.volume = 1;
 
 		var time:Float = 0.15;
@@ -4927,6 +5274,44 @@ class PlayState extends MusicBeatState
 			}
 			health += note.hitHealth * healthGain;
 
+			var noteStep:Int = 0;
+			var noteBeat:Int = 0;
+			var noteGradeSection: Int = 0;
+			var curGradeSection: Int = 0;
+			var lastChange:BPMChangeEvent = {
+				stepTime: 0,
+				songTime: 0,
+				bpm: 0
+			}
+
+			for (i in 0...Conductor.bpmChangeMap.length)
+			{
+				if (note.strumTime >= Conductor.bpmChangeMap[i].songTime)
+					lastChange = Conductor.bpmChangeMap[i];
+			}
+
+			noteStep = lastChange.stepTime + Math.floor((note.strumTime - lastChange.songTime) / Conductor.stepCrochet);
+			noteBeat = Math.floor(noteStep / 4);
+			noteGradeSection = Math.floor(noteBeat / 8);
+			curGradeSection = Math.floor(curBeat / 8);
+
+			if (note.noteData >= 0) {
+				if (!ClientPrefs.oldTiming)
+					gradeHealth += 0.023;
+				else if (noteGradeSection == curGradeSection)
+					gradeHealth += 0.023;
+				else if (noteGradeSection == curGradeSection + 1)
+					nextGradeHealth += 0.023;
+
+			} else {
+				if (!ClientPrefs.oldTiming)
+					gradeHealth += 0.004;
+				else if (noteGradeSection == curGradeSection)
+					gradeHealth += 0.004;
+				else if (noteGradeSection == curGradeSection + 1)
+					nextGradeHealth += 0.004;
+			}
+
 			if(!note.noAnimation) {
 				var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
 
@@ -4973,7 +5358,9 @@ class PlayState extends MusicBeatState
 				}
 			}
 			note.wasGoodHit = true;
-			vocals.volume = 1;
+
+			if (playerGrade > -1)
+				vocals.volume = 1;
 
 			var isSus:Bool = note.isSustainNote; //GET OUT OF MY HEAD, GET OUT OF MY HEAD, GET OUT OF MY HEAD
 			var leData:Int = Math.round(Math.abs(note.noteData));
@@ -5021,6 +5408,85 @@ class PlayState extends MusicBeatState
 		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.setupNoteSplash(x, y, data, skin, hue, sat, brt);
 		grpNoteSplashes.add(splash);
+	}
+
+	function freestyleHandler():Void
+	{
+		var upP = controls.UP_P;
+		var rightP = controls.RIGHT_P;
+		var downP = controls.DOWN_P;
+		var leftP = controls.LEFT_P;
+
+		var holdIndex = FlxG.keys.pressed.J;
+		var restartIndex = FlxG.keys.pressed.K;
+
+		var noteDiff:Float = Math.abs(curStepTime - Conductor.songPosition);
+		var noteDiff2:Float = Math.abs(curStepTime + Conductor.stepCrochet - Conductor.songPosition);
+		if (noteDiff <= Conductor.safeZoneOffset * 0.104 || noteDiff2 <= Conductor.safeZoneOffset * 0.104){
+			if (lastFreestyleHit != -6000) {
+				if (Conductor.songPosition - lastFreestyleHit < Conductor.stepCrochet*0.9) {
+					freestyleHealth -= 2;
+					gradeHealth -= 0.02;
+					songScore -= 10;
+				} else {
+					freestyleHealth += 1;
+					//gradeHealth += 0.01;
+					if (playerGrade == -1)
+						songScore += 200;
+				}
+			}
+			lastFreestyleHit = Conductor.songPosition;
+		} else {
+			if (playerGrade > -1) {
+				freestyleHealth -= 2;
+				gradeHealth -= 0.02;
+				songScore -= 10;
+			}
+		}
+
+		var daFreestyleArray:Array<FlxSound> = freestyleSoundsL;
+		var freestyleCurrentArrow:Int = 0;
+
+		if (leftP){
+			boyfriend.playAnim('singLEFT', true);
+			daFreestyleArray = freestyleSoundsL;
+			freestyleCurrentArrow = 0;
+		}
+		else if (downP){
+			boyfriend.playAnim('singDOWN', true);
+			daFreestyleArray = freestyleSoundsD;
+			freestyleCurrentArrow = 1;
+		}
+		else if (upP){
+			boyfriend.playAnim('singUP', true);
+			daFreestyleArray = freestyleSoundsU;
+			freestyleCurrentArrow = 2;
+		}
+		else if (rightP){
+			boyfriend.playAnim('singRIGHT', true);
+			daFreestyleArray = freestyleSoundsR;
+			freestyleCurrentArrow = 3;
+		}
+
+		freestyleSound.stop();
+
+		if (freestyleCurrentArrow != freestylePrevArrow || restartIndex)
+			freestyleSoundIndex = 0;
+		if (playerGrade == -1 && holdIndex && freestyleCurrentArrow == freestylePrevArrow)
+		{
+			if (freestyleSoundIndex == 0)
+				freestyleSoundIndex = daFreestyleArray.length-1;
+			else
+				freestyleSoundIndex--;
+		}
+		freestyleSound = daFreestyleArray[freestyleSoundIndex];
+		if (playerGrade == -1)
+			freestyleSoundIndex++;
+		if (freestyleSoundIndex > daFreestyleArray.length-1)
+			freestyleSoundIndex = 0;
+		freestylePrevArrow = freestyleCurrentArrow;
+
+		freestyleSound.play(true);
 	}
 
 	var fastCarCanDrive:Bool = true;
