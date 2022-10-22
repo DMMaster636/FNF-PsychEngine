@@ -33,7 +33,6 @@ class ClientPrefs {
 	public static var pauseMusic:String = 'Tea Time';
 	public static var checkForUpdates:Bool = true;
 	public static var comboStacking = true;
-	public static var auditoryFeedback:Bool = false;
 	public static var requireGood:Bool = true;
 	public static var freestyling:Bool = true;
 	public static var gradingStyle:String = 'Break Based';
@@ -135,7 +134,6 @@ class ClientPrefs {
 		FlxG.save.data.checkForUpdates = checkForUpdates;
 		FlxG.save.data.comboStacking = comboStacking;
 
-		FlxG.save.data.auditoryFeedback = auditoryFeedback;
 		FlxG.save.data.requireGood = requireGood;
 		FlxG.save.data.freestyling = freestyling;
 		FlxG.save.data.gradingStyle = gradingStyle;
@@ -269,9 +267,6 @@ class ClientPrefs {
 		}
 		if (FlxG.save.data.comboStacking != null) {
 			comboStacking = FlxG.save.data.comboStacking;
-		}
-		if (FlxG.save.data.auditoryFeedback != null) {
-			auditoryFeedback = FlxG.save.data.auditoryFeedback;
 		}
 		if (FlxG.save.data.requireGood != null) {
 			requireGood = FlxG.save.data.requireGood;
