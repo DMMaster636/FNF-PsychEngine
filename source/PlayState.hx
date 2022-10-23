@@ -333,10 +333,6 @@ class PlayState extends MusicBeatState
 	var filterMap:Map<String, {filter:BitmapFilter, ?onUpdate:Void->Void}>;
 	var gradeLevel:Int = 0;
 	var playerGrade:Int = 0;
-	// var gradeup:FlxSound;
-	// var gradedown:FlxSound;
-	// var phrasegood:FlxSound;
-	// var phrasebad:FlxSound;
 	var gradeTxtCool:FlxText;
 	var gradeTxtGood:FlxText;
 	var gradeTxtBad:FlxText;
@@ -363,7 +359,7 @@ class PlayState extends MusicBeatState
 	public var freestyleSoundsD:Array<FlxSound> = [];
 	var freestyleSoundIndex:Int = 0;
 	var freestylePrevArrow:Int = -1;
-	var coolSong:FlxSoundAsset;
+	var coolSong:FlxSound;
 
 	override public function create()
 	{
