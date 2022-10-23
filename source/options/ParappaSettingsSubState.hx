@@ -50,12 +50,11 @@ class ParappaSettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Grading Style: ',
-			"How should it be graded?\n(Break Based is recommended in most cases)",
+		var option:Option = new Option('Grading Style',
+			'If unchecked, Interval Based\n(Break Based is recommended in most cases)',
 			'gradingStyle',
-			'string',
-			'Break Based',
-			['Interval Based', 'Break Based']);
+			'bool',
+			true);
 		addOption(option);
 
 		super();

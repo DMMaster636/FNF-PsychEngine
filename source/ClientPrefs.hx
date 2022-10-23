@@ -35,7 +35,7 @@ class ClientPrefs {
 	public static var comboStacking = true;
 	public static var requireGood:Bool = true;
 	public static var freestyling:Bool = true;
-	public static var gradingStyle:String = 'Break Based';
+	public static var gradingStyle:Bool = true;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'scrolltype' => 'multiplicative', 

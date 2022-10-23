@@ -3280,11 +3280,11 @@ class PlayState extends MusicBeatState
 			openChartEditor();
 		}
 
-		if (!ClientPrefs.oldTiming && playerGrade != -1) {
+		if (!ClientPrefs.gradingStyle && playerGrade != -1) {
 			isSilence = true;
 			notes.forEachExists(function(daNote:Note)
 			{
-				if (daNote.mustPress && daNote.y < FlxG.height*0.9)
+				if (daNote.mustPress && daNote.y < FlxG.height * 0.9)
 				{
 					isSilence = false;
 					gradingDone = false;
@@ -3329,7 +3329,7 @@ class PlayState extends MusicBeatState
 		else
 			iconP2.animation.curAnim.curFrame = 0;
 
-		if ((ClientPrefs.oldTiming || playerGrade == -1) && !startingSong)
+		if ((ClientPrefs.gradingStyle || playerGrade == -1) && !startingSong)
 		{
 			if (curBeat % 8 == 0 && !gradingDone)
 				doParappaGrading();
@@ -3717,10 +3717,10 @@ class PlayState extends MusicBeatState
 			switch (gradeLevel)
 			{
 				case 0:
-					if (playerGrade == 0 && isGoodFreestyle() && ClientPrefs.enableCool)
+					if (playerGrade == 0 && isGoodFreestyle() && ClientPrefs.freestyling)
 						gradeLevel--;
 				case -1:
-					if (playerGrade == 0 && TitleState.enableCool) {
+					if (playerGrade == 0 && ClientPrefs.freestyling) {
 						if (isGoodFreestyle()) {
 							FlxG.sound.play(Paths.sound('gradeup'));
 							goCool();
@@ -4467,7 +4467,7 @@ class PlayState extends MusicBeatState
 	public function endSong():Void
 	{
 		endingSong = true;
-		if (TitleState.oldTiming)
+		if (ClientPrefs.gradingStyle)
 			doParappaGrading();
 		if (playerGrade > 0 && ClientPrefs.requireGood) {
 			health = 0;
@@ -4890,13 +4890,13 @@ class PlayState extends MusicBeatState
 
 		if (!cpuControlled && startedCountdown && !paused && key > -1 && (FlxG.keys.checkStatus(eventKey, JUST_PRESSED) || ClientPrefs.controllerMode))
 		{
-			if(!boyfriend.stunned && generatedMusic && !endingSong)
+			if(!boyfriend.stunned && generatedMusic && !endingSong && playerGrade != -1)
 			{
 				//more accurate hit time for the ratings?
 				var lastTime:Float = Conductor.songPosition;
 				Conductor.songPosition = FlxG.sound.music.time;
 
-				var canMiss:Bool = !ClientPrefs.ghostTapping;
+				var canMiss:Bool = (!ClientPrefs.ghostTapping);
 
 				// heavily based on my own code LOL if it aint broke dont fix it
 				var pressNotes:Array<Note> = [];
@@ -5027,6 +5027,8 @@ class PlayState extends MusicBeatState
 				{
 					if(parsedArray[i] && strumsBlocked[i] != true)
 						onKeyPress(new KeyboardEvent(KeyboardEvent.KEY_DOWN, true, true, -1, keysArray[i][0]));
+						// idfk where this has to go -DM
+						freestyleHandler();
 				}
 			}
 		}
@@ -5129,49 +5131,53 @@ class PlayState extends MusicBeatState
 
 	function noteMissPress(direction:Int = 1):Void //You pressed a key when there was no notes to press for this key
 	{
-		if(ClientPrefs.ghostTapping) return; //fuck it
+		if(ClientPrefs.freestyling)
+			freestyleHandler();
+		else {
+			if(ClientPrefs.ghostTapping) return; //fuck it
 
-		if (!boyfriend.stunned)
-		{
-			health -= 0.05 * healthLoss;
-			gradeHealth -= 0.05 * healthLoss;
-			if(instakillOnMiss)
+			if (!boyfriend.stunned)
 			{
+				health -= 0.05 * healthLoss;
+				gradeHealth -= 0.05 * healthLoss;
+				if(instakillOnMiss)
+				{
+					vocals.volume = 0;
+					doDeathCheck(true);
+				}
+
+				if (combo > 5 && gf != null && gf.animOffsets.exists('sad'))
+				{
+					gf.playAnim('sad');
+				}
+				combo = 0;
+
+				if(!practiceMode) songScore -= 10;
+				if(!endingSong) {
+					songMisses++;
+				}
+				totalPlayed++;
+				RecalculateRating(true);
+
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+				// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
+				// FlxG.log.add('played imss note');
+
+				/*boyfriend.stunned = true;
+
+				// get stunned for 1/60 of a second, makes you able to
+				new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
+				{
+					boyfriend.stunned = false;
+				});*/
+
+				if(boyfriend.hasMissAnimations) {
+					boyfriend.playAnim(singAnimations[Std.int(Math.abs(direction))] + 'miss', true);
+				}
 				vocals.volume = 0;
-				doDeathCheck(true);
 			}
-
-			if (combo > 5 && gf != null && gf.animOffsets.exists('sad'))
-			{
-				gf.playAnim('sad');
-			}
-			combo = 0;
-
-			if(!practiceMode) songScore -= 10;
-			if(!endingSong) {
-				songMisses++;
-			}
-			totalPlayed++;
-			RecalculateRating(true);
-
-			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
-			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
-			// FlxG.log.add('played imss note');
-
-			/*boyfriend.stunned = true;
-
-			// get stunned for 1/60 of a second, makes you able to
-			new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
-			{
-				boyfriend.stunned = false;
-			});*/
-
-			if(boyfriend.hasMissAnimations) {
-				boyfriend.playAnim(singAnimations[Std.int(Math.abs(direction))] + 'miss', true);
-			}
-			vocals.volume = 0;
+			callOnLuas('noteMissPress', [direction]);
 		}
-		callOnLuas('noteMissPress', [direction]);
 	}
 
 	function opponentNoteHit(note:Note):Void
@@ -5296,7 +5302,7 @@ class PlayState extends MusicBeatState
 			curGradeSection = Math.floor(curBeat / 8);
 
 			if (note.noteData >= 0) {
-				if (!ClientPrefs.oldTiming)
+				if (!ClientPrefs.gradingStyle)
 					gradeHealth += 0.023;
 				else if (noteGradeSection == curGradeSection)
 					gradeHealth += 0.023;
@@ -5304,7 +5310,7 @@ class PlayState extends MusicBeatState
 					nextGradeHealth += 0.023;
 
 			} else {
-				if (!ClientPrefs.oldTiming)
+				if (!ClientPrefs.gradingStyle)
 					gradeHealth += 0.004;
 				else if (noteGradeSection == curGradeSection)
 					gradeHealth += 0.004;
