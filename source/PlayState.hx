@@ -28,6 +28,7 @@ import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxSound;
+import flixel.system.FlxSoundAsset;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -62,6 +63,7 @@ import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
 import Conductor.Rating;
+import Conductor.BPMChangeEvent;
 
 #if !flash 
 import flixel.addons.display.FlxRuntimeShader;
@@ -359,7 +361,7 @@ class PlayState extends MusicBeatState
 	public var freestyleSoundsD:Array<FlxSound> = [];
 	var freestyleSoundIndex:Int = 0;
 	var freestylePrevArrow:Int = -1;
-	var coolSong:FlxSound;
+	var coolSong:FlxSoundAsset;
 
 	override public function create()
 	{
@@ -2577,12 +2579,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Bad", 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Awful", 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -2597,12 +2599,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Bad", 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayStateSONG.song) + "_Awful", 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
