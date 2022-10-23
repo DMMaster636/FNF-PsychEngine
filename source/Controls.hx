@@ -103,8 +103,8 @@ enum Device
  */
 enum Control
 {
-	HOLD_NOTE
-	RESET_COMBO
+	HOLD_NOTE;
+	RESET_COMBO;
 	UI_UP;
 	UI_LEFT;
 	UI_RIGHT;
