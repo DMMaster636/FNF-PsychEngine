@@ -44,6 +44,9 @@ class ParappaPause extends MusicBeatState
 		super.create();
 	}
 
+	var cpuControlled:Bool = ClientPrefs.getGameplaySetting('botplay', false);
+	var practiceMode:Bool = ClientPrefs.getGameplaySetting('practice', false);
+
 	override function update(elapsed:Float)
 	{
 		if (controls.UI_LEFT_P || controls.UI_RIGHT_P)
@@ -57,11 +60,11 @@ class ParappaPause extends MusicBeatState
 			}
 			else
 			{
-				PlayState.usedPractice = false;
+				practiceMode = false;
+				cpuControlled = false;
 				PlayState.changedDifficulty = false;
 				PlayState.seenCutscene = false;
 				PlayState.deathCounter = 0;
-				PlayState.cpuControlled = false;
 				MusicBeatState.switchState(new MainMenuState());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
