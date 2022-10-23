@@ -3863,7 +3863,7 @@ class PlayState extends MusicBeatState
 		playerGrade = 1;
 	}
 
-	function goAwful():Void\
+	function goAwful():Void
 	{
 		filters.resize(0);
 		filters.push(filterMap.get("BlurAwful").filter);
