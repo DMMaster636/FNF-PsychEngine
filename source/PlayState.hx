@@ -3339,8 +3339,8 @@ class PlayState extends MusicBeatState
 		}
 
 		flickerTick++;
-		if (flickerTick % 5 == 0 && doFlicker){
-			if (flickerText != null){
+		if (flickerTick % 5 == 0 && doFlicker) {
+			if (flickerText != null) {
 				if (flickerTick % 10 == 0) {
 					flickerText.color = FlxColor.WHITE;
 					flickerTick = 0;
@@ -3348,7 +3348,6 @@ class PlayState extends MusicBeatState
 					flickerText.color = FlxColor.GRAY;
 				}
 			}
-
 		}
 
 		if (!startingSong && !isSilence)
@@ -3601,11 +3600,6 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		setOnLuas('cameraX', camFollowPos.x);
-		setOnLuas('cameraY', camFollowPos.y);
-		setOnLuas('botPlay', cpuControlled);
-		callOnLuas('onUpdatePost', [elapsed]);
-
 		for (filter in filterMap)
 		{
 			if (filter.onUpdate != null)
@@ -3616,6 +3610,10 @@ class PlayState extends MusicBeatState
 			for (snd in sndarray)
 				snd.update(FlxG.elapsed);
 
+		setOnLuas('cameraX', camFollowPos.x);
+		setOnLuas('cameraY', camFollowPos.y);
+		setOnLuas('botPlay', cpuControlled);
+		callOnLuas('onUpdatePost', [elapsed]);
 	}
 
 	function startFlicker():Void
@@ -3678,7 +3676,7 @@ class PlayState extends MusicBeatState
 
 	function isGoodFreestyle():Bool
 	{
-		var freestyleSwag:Float = freestyleHealth/daphraseFrames*1000;
+		var freestyleSwag:Float = freestyleHealth/daphraseFrames * 1000;
 		var freestyleMin:Int = 16;
 		if (playerGrade == -1)
 			freestyleMin = 22;
@@ -3722,8 +3720,7 @@ class PlayState extends MusicBeatState
 							FlxG.sound.play(Paths.sound('gradeup'));
 							goCool();
 							gradeLevel--;
-						}
-						else
+						} else
 							gradeLevel++;
 					}
 				case 1:
@@ -3842,9 +3839,10 @@ class PlayState extends MusicBeatState
 		#else
 		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad");
 		#end
-		if (checkFileExists){
-
-			if (!startingSong){
+		if (checkFileExists)
+		{
+			if (!startingSong)
+			{
 				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
@@ -3896,20 +3894,19 @@ class PlayState extends MusicBeatState
 		persistentDraw = true;
 		paused = true;
 
-		// 1 / 1000 chance for Gitaroo Man easter egg
-		/*if (FlxG.random.bool(0.1))
+		// 1 / 1000 chance for Parappa easter egg
+		if (FlxG.random.bool(0.1))
 		{
-			// gitaroo man easter egg
+			// parappa easter egg
 			cancelMusicFadeTween();
-			MusicBeatState.switchState(new GitarooPause());
+			MusicBeatState.switchState(new ParappaPause());
+		} else {
+			if(FlxG.sound.music != null) {
+				FlxG.sound.music.pause();
+				vocals.pause();
+			}
+			openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 		}
-		else {*/
-		if(FlxG.sound.music != null) {
-			FlxG.sound.music.pause();
-			vocals.pause();
-		}
-		openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-		//}
 
 		#if desktop
 		DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
@@ -4402,7 +4399,7 @@ class PlayState extends MusicBeatState
 	var cameraTwn:FlxTween;
 	public function moveCamera(isDad:Bool)
 	{
-		if(isDad)
+		if(isDad && playerGrade != -1)
 		{
 			camFollow.set(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
 			camFollow.x += dad.cameraPosition[0] + opponentCameraOffset[0];
@@ -4463,7 +4460,6 @@ class PlayState extends MusicBeatState
 	public var transitioning = false;
 	public function endSong():Void
 	{
-		endingSong = true;
 		if (ClientPrefs.gradingStyle)
 			doParappaGrading();
 		if (playerGrade > 0 && ClientPrefs.requireGood) {
@@ -5425,9 +5421,10 @@ class PlayState extends MusicBeatState
 
 		var noteDiff:Float = Math.abs(curStepTime - Conductor.songPosition);
 		var noteDiff2:Float = Math.abs(curStepTime + Conductor.stepCrochet - Conductor.songPosition);
-		if (noteDiff <= Conductor.safeZoneOffset * 0.104 || noteDiff2 <= Conductor.safeZoneOffset * 0.104){
+		if (noteDiff <= Conductor.safeZoneOffset * 0.104 || noteDiff2 <= Conductor.safeZoneOffset * 0.104)
+		{
 			if (lastFreestyleHit != -6000) {
-				if (Conductor.songPosition - lastFreestyleHit < Conductor.stepCrochet*0.9) {
+				if (Conductor.songPosition - lastFreestyleHit < Conductor.stepCrochet * 0.9) {
 					freestyleHealth -= 2;
 					gradeHealth -= 0.02;
 					songScore -= 10;
@@ -5449,22 +5446,19 @@ class PlayState extends MusicBeatState
 		var daFreestyleArray:Array<FlxSound> = freestyleSoundsL;
 		var freestyleCurrentArrow:Int = 0;
 
-		if (leftP){
+		if (leftP) {
 			boyfriend.playAnim('singLEFT', true);
 			daFreestyleArray = freestyleSoundsL;
 			freestyleCurrentArrow = 0;
-		}
-		else if (downP){
+		} else if (downP) {
 			boyfriend.playAnim('singDOWN', true);
 			daFreestyleArray = freestyleSoundsD;
 			freestyleCurrentArrow = 1;
-		}
-		else if (upP){
+		} else if (upP) {
 			boyfriend.playAnim('singUP', true);
 			daFreestyleArray = freestyleSoundsU;
 			freestyleCurrentArrow = 2;
-		}
-		else if (rightP){
+		} else if (rightP) {
 			boyfriend.playAnim('singRIGHT', true);
 			daFreestyleArray = freestyleSoundsR;
 			freestyleCurrentArrow = 3;
