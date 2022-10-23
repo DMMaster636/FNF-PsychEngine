@@ -361,7 +361,7 @@ class PlayState extends MusicBeatState
 	public var freestyleSoundsD:Array<FlxSound> = [];
 	var freestyleSoundIndex:Int = 0;
 	var freestylePrevArrow:Int = -1;
-	var coolSong:FlxSoundAsset;
+	public var coolSong:FlxSoundAsset;
 
 	override public function create()
 	{
@@ -489,27 +489,27 @@ class PlayState extends MusicBeatState
 
 		freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
 
-		precacheList.set(Paths.sound('gradeup'), 'sound');
-		precacheList.set(Paths.sound('gradedown'), 'sound');
-		precacheList.set(Paths.sound('phrasegood'), 'sound');
-		precacheList.set(Paths.sound('phrasebad'), 'sound');
+		precacheList.set('gradeup', 'sound');
+		precacheList.set('gradedown', 'sound');
+		precacheList.set('phrasegood', 'sound');
+		precacheList.set('phrasebad', 'sound');
 
 		#if desktop
 		if (FileSystem.exists(Paths.inst(SONG.song) + "_Awful")) {
-			precacheList.set(Paths.inst(SONG.song) + "_Awful", "music");
+			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
 		}
 		if (FileSystem.exists(Paths.inst(SONG.song) + "_Bad")) {
-			precacheList.set(Paths.inst(SONG.song) + "_Bad", "music");
+			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
 		}
 		if (FileSystem.exists(Paths.inst(SONG.song) + "_Cool")) {
 			coolSong = Paths.inst(SONG.song) + "_Cool";
 		}
 		#else
 		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful")) {
-			precacheList.set(Paths.inst(SONG.song) + "_Awful", "music");
+			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
 		}
 		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad")) {
-			precacheList.set(Paths.inst(SONG.song) + "_Bad", "music");
+			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
 		}
 		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool")) {
 			coolSong = Paths.inst(SONG.song) + "_Cool";
@@ -519,9 +519,8 @@ class PlayState extends MusicBeatState
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows) {
-			var checkFileExists:Bool = false;
 			#if desktop
-			while (FileSystem.exists(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles))) {
+			while (FileSystem.exists(Paths.sound("freestyle/") + SONG.song + "_" + i + checkFreestyleFiles)) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "R")
@@ -535,7 +534,7 @@ class PlayState extends MusicBeatState
 			}
 			checkFreestyleFiles = 1;
 			#else
-			while (OpenFlAssets.exists(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles))) {
+			while (OpenFlAssets.exists(Paths.sound("freestyle/") + SONG.song + "_" + i + checkFreestyleFiles)) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
 				else if (i == "R")
@@ -3792,7 +3791,7 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(coolSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = endSong();
+				FlxG.sound.music.onComplete = endSong;
 			}
 			changedSongGrade = true;
 		}
