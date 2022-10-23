@@ -5412,13 +5412,13 @@ class PlayState extends MusicBeatState
 
 	function freestyleHandler():Void
 	{
-		var upP = controls.UP_P;
-		var rightP = controls.RIGHT_P;
-		var downP = controls.DOWN_P;
-		var leftP = controls.LEFT_P;
+		var upP = controls.NOTE_UP_P;
+		var rightP = controls.NOTE_RIGHT_P;
+		var downP = controls.NOTE_DOWN_P;
+		var leftP = controls.NOTE_LEFT_P;
 
-		var holdIndex = FlxG.keys.pressed.J;
-		var restartIndex = FlxG.keys.pressed.K;
+		var holdIndex = controls.HOLD_NOTE_P;
+		var restartIndex = controls.RESET_COMBO_P;
 
 		var noteDiff:Float = Math.abs(curStepTime - Conductor.songPosition);
 		var noteDiff2:Float = Math.abs(curStepTime + Conductor.stepCrochet - Conductor.songPosition);
@@ -5430,7 +5430,6 @@ class PlayState extends MusicBeatState
 					songScore -= 10;
 				} else {
 					freestyleHealth += 1;
-					//gradeHealth += 0.01;
 					if (playerGrade == -1)
 						songScore += 200;
 				}

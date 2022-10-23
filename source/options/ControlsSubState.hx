@@ -35,6 +35,10 @@ class ControlsSubState extends MusicBeatSubstate {
 	private var bindLength:Int = 0;
 
 	var optionShit:Array<Dynamic> = [
+		['PARAPPA'],
+		['Hold Note', 'hold_note'],
+		['Reset Combo', 'reset_combo'],
+		[''],
 		['NOTES'],
 		['Left', 'note_left'],
 		['Down', 'note_down'],

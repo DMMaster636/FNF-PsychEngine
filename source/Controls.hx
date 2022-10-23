@@ -14,6 +14,12 @@ import flixel.input.keyboard.FlxKey;
 #if (haxe >= "4.0.0")
 enum abstract Action(String) to String from String
 {
+	var HOLD_NOTE = "hold_note";
+	var RESET_COMBO = "reset_combo";
+	var HOLD_NOTE_P = "hold_note-press";
+	var RESET_COMBO_P = "reset_combo-press";
+	var HOLD_NOTE_R = "hold_note-release";
+	var RESET_COMBO_R = "reset_combo-release";
 	var UI_UP = "ui_up";
 	var UI_LEFT = "ui_left";
 	var UI_RIGHT = "ui_right";
@@ -47,6 +53,12 @@ enum abstract Action(String) to String from String
 @:enum
 abstract Action(String) to String from String
 {
+	var HOLD_NOTE = "hold_note";
+	var RESET_COMBO = "reset_combo";
+	var HOLD_NOTE_P = "hold_note-press";
+	var RESET_COMBO_P = "reset_combo-press";
+	var HOLD_NOTE_R = "hold_note-release";
+	var RESET_COMBO_R = "reset_combo-release";
 	var UI_UP = "ui_up";
 	var UI_LEFT = "ui_left";
 	var UI_RIGHT = "ui_right";
@@ -91,6 +103,8 @@ enum Device
  */
 enum Control
 {
+	HOLD_NOTE
+	RESET_COMBO
 	UI_UP;
 	UI_LEFT;
 	UI_RIGHT;
@@ -119,6 +133,12 @@ enum KeyboardScheme
  */
 class Controls extends FlxActionSet
 {
+	var _hold_note = new FlxActionDigital(Action.HOLD_NOTE);
+	var _reset_combo = new FlxActionDigital(Action.RESET_COMBO);
+	var _hold_noteP = new FlxActionDigital(Action.HOLD_NOTE_P);
+	var _reset_comboP = new FlxActionDigital(Action.RESET_COMBO_P);
+	var _hold_noteR = new FlxActionDigital(Action.HOLD_NOTE_R);
+	var _reset_comboR = new FlxActionDigital(Action.RESET_COMBO_R);
 	var _ui_up = new FlxActionDigital(Action.UI_UP);
 	var _ui_left = new FlxActionDigital(Action.UI_LEFT);
 	var _ui_right = new FlxActionDigital(Action.UI_RIGHT);
@@ -156,6 +176,36 @@ class Controls extends FlxActionSet
 
 	public var gamepadsAdded:Array<Int> = [];
 	public var keyboardScheme = KeyboardScheme.None;
+
+	public var HOLD_NOTE(get, never):Bool;
+
+	inline function get_HOLD_NOTE()
+		return _hold_note.check();
+
+	public var RESET_COMBO(get, never):Bool;
+
+	inline function get_RESET_COMBO()
+		return _reset_combo.check();
+
+	public var HOLD_NOTE_P(get, never):Bool;
+
+	inline function get_HOLD_NOTE_P()
+		return _hold_noteP.check();
+
+	public var RESET_COMBO_P(get, never):Bool;
+
+	inline function get_RESET_COMBO_P()
+		return _reset_comboP.check();
+
+	public var HOLD_NOTE_R(get, never):Bool;
+
+	inline function get_HOLD_NOTE_R()
+		return _hold_noteR.check();
+
+	public var RESET_COMBO_R(get, never):Bool;
+
+	inline function get_RESET_COMBO_R()
+		return _reset_comboR.check();
 
 	public var UI_UP(get, never):Bool;
 
@@ -302,6 +352,12 @@ class Controls extends FlxActionSet
 	{
 		super(name);
 
+		add(_hold_note);
+		add(_reset_combo);
+		add(_hold_noteP);
+		add(_reset_comboP);
+		add(_hold_noteR);
+		add(_reset_comboR);
 		add(_ui_up);
 		add(_ui_left);
 		add(_ui_right);
@@ -341,6 +397,12 @@ class Controls extends FlxActionSet
 	{
 		super(name);
 
+		add(_hold_note);
+		add(_reset_combo);
+		add(_hold_noteP);
+		add(_reset_comboP);
+		add(_hold_noteR);
+		add(_reset_comboR);
 		add(_ui_up);
 		add(_ui_left);
 		add(_ui_right);
@@ -414,6 +476,8 @@ class Controls extends FlxActionSet
 	{
 		return switch (control)
 		{
+			case HOLD_NOTE: _hold_note;
+			case RESET_COMBO: _reset_combo;
 			case UI_UP: _ui_up;
 			case UI_DOWN: _ui_down;
 			case UI_LEFT: _ui_left;
@@ -445,6 +509,14 @@ class Controls extends FlxActionSet
 	{
 		switch (control)
 		{
+			case HOLD_NOTE:
+				func(_hold_note, PRESSED);
+				func(_hold_noteP, JUST_PRESSED);
+				func(_hold_noteR, JUST_RELEASED);
+			case RESET_COMBO:
+				func(_reset_combo, PRESSED);
+				func(_reset_comboP, JUST_PRESSED);
+				func(_reset_comboR, JUST_RELEASED);
 			case UI_UP:
 				func(_ui_up, PRESSED);
 				func(_ui_upP, JUST_PRESSED);
@@ -640,6 +712,8 @@ class Controls extends FlxActionSet
 		switch (scheme)
 		{
 			case Solo:
+				inline bindKeys(Control.HOLD_NOTE, keysMap.get('hold_note'));
+				inline bindKeys(Control.RESET_COMBO, keysMap.get('reset_combo'));
 				inline bindKeys(Control.UI_UP, keysMap.get('ui_up'));
 				inline bindKeys(Control.UI_DOWN, keysMap.get('ui_down'));
 				inline bindKeys(Control.UI_LEFT, keysMap.get('ui_left'));
@@ -654,6 +728,8 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.PAUSE, keysMap.get('pause'));
 				inline bindKeys(Control.RESET, keysMap.get('reset'));
 			case Duo(true):
+				inline bindKeys(Control.HOLD_NOTE, [Q]);
+				inline bindKeys(Control.RESET_COMBO, [E]);
 				inline bindKeys(Control.UI_UP, [W]);
 				inline bindKeys(Control.UI_DOWN, [S]);
 				inline bindKeys(Control.UI_LEFT, [A]);
@@ -667,6 +743,8 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.PAUSE, [ONE]);
 				inline bindKeys(Control.RESET, [R]);
 			case Duo(false):
+				inline bindKeys(Control.HOLD_NOTE, [Q]);
+				inline bindKeys(Control.RESET_COMBO, [E]);
 				inline bindKeys(Control.UI_UP, [FlxKey.UP]);
 				inline bindKeys(Control.UI_DOWN, [FlxKey.DOWN]);
 				inline bindKeys(Control.UI_LEFT, [FlxKey.LEFT]);
@@ -686,6 +764,8 @@ class Controls extends FlxActionSet
 		switch (scheme)
 		{
 			case Solo:
+				bindKeys(Control.HOLD_NOTE, [Q]);
+				bindKeys(Control.RESET_COMBO, [E]);
 				bindKeys(Control.UI_UP, [W, FlxKey.UP]);
 				bindKeys(Control.UI_DOWN, [S, FlxKey.DOWN]);
 				bindKeys(Control.UI_LEFT, [A, FlxKey.LEFT]);
@@ -699,6 +779,8 @@ class Controls extends FlxActionSet
 				bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
 				bindKeys(Control.RESET, [R]);
 			case Duo(true):
+				bindKeys(Control.HOLD_NOTE, [Q]);
+				bindKeys(Control.RESET_COMBO, [E]);
 				bindKeys(Control.UI_UP, [W]);
 				bindKeys(Control.UI_DOWN, [S]);
 				bindKeys(Control.UI_LEFT, [A]);
@@ -712,6 +794,8 @@ class Controls extends FlxActionSet
 				bindKeys(Control.PAUSE, [ONE]);
 				bindKeys(Control.RESET, [R]);
 			case Duo(false):
+				bindKeys(Control.HOLD_NOTE, [Q]);
+				bindKeys(Control.RESET_COMBO, [E]);
 				bindKeys(Control.UI_UP, [FlxKey.UP]);
 				bindKeys(Control.UI_DOWN, [FlxKey.DOWN]);
 				bindKeys(Control.UI_LEFT, [FlxKey.LEFT]);
@@ -790,6 +874,8 @@ class Controls extends FlxActionSet
 	{
 		#if !switch
 		addGamepadLiteral(id, [
+			Control.HOLD_NOTE => [LEFT_TRIGGER],
+			Control.RESET_COMBO => [RIGHT_TRIGGER],
 			Control.ACCEPT => [A, START],
 			Control.BACK => [B],
 			Control.UI_UP => [DPAD_UP, LEFT_STICK_DIGITAL_UP],
@@ -805,6 +891,8 @@ class Controls extends FlxActionSet
 		]);
 		#else
 		addGamepadLiteral(id, [
+			Control.HOLD_NOTE => [LEFT_TRIGGER],
+			Control.RESET_COMBO => [RIGHT_TRIGGER],
 			//Swap A and B for switch
 			Control.ACCEPT => [B, START],
 			Control.BACK => [A],
