@@ -1332,7 +1332,7 @@ class PlayState extends MusicBeatState
 		gradeTxtBad.visible = !ClientPrefs.hideHud;
 		add(gradeTxtBad);
 
-		gradeTxtAwful = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 16, FlxG.width, "            Awful", 20);
+		gradeTxtAwful = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y + 16, FlxG.width, "            Awful", 20);
 		gradeTxtAwful.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		gradeTxtAwful.scrollFactor.set();
 		gradeTxtAwful.borderSize = 4;
@@ -1359,7 +1359,8 @@ class PlayState extends MusicBeatState
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
-		gradeTxtCool.cameras = [camHUD];
+		if(ClientPrefs.freestyling)
+			gradeTxtCool.cameras = [camHUD];
 		gradeTxtGood.cameras = [camHUD];
 		gradeTxtBad.cameras = [camHUD];
 		gradeTxtAwful.cameras = [camHUD];
@@ -3674,7 +3675,7 @@ class PlayState extends MusicBeatState
 
 	function isGoodFreestyle():Bool
 	{
-		var freestyleSwag:Float = freestyleHealth/daphraseFrames * 1000;
+		var freestyleSwag:Float = freestyleHealth / daphraseFrames * 1000;
 		var freestyleMin:Int = 16;
 		if (playerGrade == -1)
 			freestyleMin = 22;
@@ -4905,8 +4906,6 @@ class PlayState extends MusicBeatState
 						{
 							sortedNotesList.push(daNote);
 							//notesDatas.push(daNote.noteData);
-							// idfk where this has to go -DM
-							freestyleHandler();
 						}
 						canMiss = true;
 					}
@@ -4937,6 +4936,8 @@ class PlayState extends MusicBeatState
 					if (canMiss) {
 						noteMissPress(key);
 					}
+					// idfk where this has to go -DM
+					freestyleHandler();
 				}
 
 				// I dunno what you need this for but here you go
@@ -5081,6 +5082,7 @@ class PlayState extends MusicBeatState
 
 	function noteMiss(daNote:Note):Void //You didn't hit the key and let it go offscreen, also used by Hurt Notes
 	{
+		if(ClientPrefs.freestyling && playerGrade == -1) return;
 		//Dupe note remove
 		notes.forEachAlive(function(note:Note) {
 			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1) {
