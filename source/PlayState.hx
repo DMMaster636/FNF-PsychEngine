@@ -522,13 +522,13 @@ class PlayState extends MusicBeatState
 			#if desktop
 			while (FileSystem.exists(Paths.sound("freestyle/") + SONG.song + "_" + i + checkFreestyleFiles)) {
 				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 
 				checkFreestyleFiles++;
 			}
@@ -536,13 +536,13 @@ class PlayState extends MusicBeatState
 			#else
 			while (OpenFlAssets.exists(Paths.sound("freestyle/") + SONG.song + "_" + i + checkFreestyleFiles)) {
 				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "_" + i + checkFreestyleFiles)));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles));
 
 				checkFreestyleFiles++;
 			}
@@ -1310,39 +1310,39 @@ class PlayState extends MusicBeatState
 		}
 
 		if(ClientPrefs.freestyling) {
-			gradeTxtCool = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 64, FlxG.width, "            Cool", 20);
-			gradeTxtCool.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			gradeTxtCool = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 128, FlxG.width, "            Cool", 20);
+			gradeTxtCool.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			gradeTxtCool.scrollFactor.set();
-			gradeTxtCool.borderSize = 3;
+			gradeTxtCool.borderSize = 4;
 			gradeTxtCool.visible = !ClientPrefs.hideHud;
 			add(gradeTxtCool);
 		}
 
-		gradeTxtGood = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 48, FlxG.width, "            Good", 20);
-		gradeTxtGood.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtGood = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 80, FlxG.width, "            Good", 20);
+		gradeTxtGood.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		gradeTxtGood.scrollFactor.set();
-		gradeTxtGood.borderSize = 3;
+		gradeTxtGood.borderSize = 4;
 		gradeTxtGood.visible = !ClientPrefs.hideHud;
 		add(gradeTxtGood);
 
 		gradeTxtBad = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 32, FlxG.width, "            Bad", 20);
-		gradeTxtBad.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtBad.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		gradeTxtBad.scrollFactor.set();
-		gradeTxtBad.borderSize = 3;
+		gradeTxtBad.borderSize = 4;
 		gradeTxtBad.visible = !ClientPrefs.hideHud;
 		add(gradeTxtBad);
 
 		gradeTxtAwful = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 16, FlxG.width, "            Awful", 20);
-		gradeTxtAwful.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtAwful.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		gradeTxtAwful.scrollFactor.set();
-		gradeTxtAwful.borderSize = 3;
+		gradeTxtAwful.borderSize = 4;
 		gradeTxtAwful.visible = !ClientPrefs.hideHud;
 		add(gradeTxtAwful);
 
-		gradeTxtMarker = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 32, FlxG.width, "U Rappin': >", 20);
-		gradeTxtMarker.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtMarker = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 80, FlxG.width, "U Rappin': >", 20);
+		gradeTxtMarker.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		gradeTxtMarker.scrollFactor.set();
-		gradeTxtMarker.borderSize = 3;
+		gradeTxtMarker.borderSize = 4;
 		gradeTxtMarker.visible = !ClientPrefs.hideHud;
 		add(gradeTxtMarker);
 
@@ -3294,9 +3294,6 @@ class PlayState extends MusicBeatState
 			curStepTime = Conductor.songPosition;
 		}
 
-		if (!startingSong)
-			daphraseFrames++;
-
 		// FlxG.watch.addQuick('VOL', vocals.amplitudeLeft);
 		// FlxG.watch.addQuick('VOLRight', vocals.amplitudeRight);
 
@@ -3376,6 +3373,7 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
+			daphraseFrames++;
 			if (!paused)
 			{
 				songTime += FlxG.game.ticks - previousFrameTime;
@@ -3935,6 +3933,8 @@ class PlayState extends MusicBeatState
 				boyfriend.stunned = true;
 				deathCounter++;
 
+				filters.resize(0);
+
 				paused = true;
 
 				vocals.stop();
@@ -4463,7 +4463,7 @@ class PlayState extends MusicBeatState
 		if (ClientPrefs.gradingStyle)
 			doParappaGrading();
 		if (playerGrade > 0 && ClientPrefs.requireGood) {
-			health = 0;
+			doDeathCheck(true);
 			return;
 		}
 
@@ -4905,6 +4905,8 @@ class PlayState extends MusicBeatState
 						{
 							sortedNotesList.push(daNote);
 							//notesDatas.push(daNote.noteData);
+							// idfk where this has to go -DM
+							freestyleHandler();
 						}
 						canMiss = true;
 					}
@@ -5020,8 +5022,6 @@ class PlayState extends MusicBeatState
 				{
 					if(parsedArray[i] && strumsBlocked[i] != true)
 						onKeyPress(new KeyboardEvent(KeyboardEvent.KEY_DOWN, true, true, -1, keysArray[i][0]));
-						// idfk where this has to go -DM
-						freestyleHandler();
 				}
 			}
 		}
