@@ -4461,7 +4461,8 @@ class PlayState extends MusicBeatState
 	public function endSong():Void
 	{
 		if (playerGrade > 0 && ClientPrefs.requireGood) {
-			doDeathCheck(true);
+			health = 0;
+			doDeathCheck(false);
 			return;
 		}
 
@@ -4887,7 +4888,7 @@ class PlayState extends MusicBeatState
 				var lastTime:Float = Conductor.songPosition;
 				Conductor.songPosition = FlxG.sound.music.time;
 
-				var canMiss:Bool = !ClientPrefs.ghostTapping;
+				var canMiss:Bool = (!ClientPrefs.ghostTapping || !ClientPrefs.freestyling);
 
 				// heavily based on my own code LOL if it aint broke dont fix it
 				var pressNotes:Array<Note> = [];
@@ -4933,8 +4934,6 @@ class PlayState extends MusicBeatState
 					if (canMiss) {
 						noteMissPress(key);
 					}
-					// idfk where this has to go -DM
-					freestyleHandler();
 				}
 
 				// I dunno what you need this for but here you go
@@ -4955,6 +4954,9 @@ class PlayState extends MusicBeatState
 				spr.resetAnim = 0;
 			}
 			callOnLuas('onKeyPress', [key]);
+
+			// idfk where this has to go -DM
+			freestyleHandler();
 		}
 		//trace('pressed: ' + controlArray);
 	}
