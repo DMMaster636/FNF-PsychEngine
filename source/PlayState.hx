@@ -472,6 +472,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		CustomFadeTransition.nextCamera = camOther;
 
+		// I don't think flashing is needed, but still, safety first -DM
 		if(ClientPrefs.flashing && ClientPrefs.shaders)
 		{
 			camGame.setFilters(filters);
@@ -1265,7 +1266,7 @@ class PlayState extends MusicBeatState
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		healthBarBG.visible = !ClientPrefs.hideHud;
-		healthBarBG.xAdd = -4;
+		healthBarBG.xAdd = -100;
 		healthBarBG.yAdd = -4;
 		add(healthBarBG);
 		if(ClientPrefs.downScroll) healthBarBG.y = 0.11 * FlxG.height;
@@ -1309,14 +1310,13 @@ class PlayState extends MusicBeatState
 			botplayTxt.y = timeBarBG.y - 78;
 		}
 
-		if(ClientPrefs.freestyling) {
-			gradeTxtCool = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 128, FlxG.width, "            Cool", 20);
-			gradeTxtCool.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-			gradeTxtCool.scrollFactor.set();
-			gradeTxtCool.borderSize = 4;
-			gradeTxtCool.visible = !ClientPrefs.hideHud;
+		gradeTxtCool = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 128, FlxG.width, "            Cool", 20);
+		gradeTxtCool.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.GRAY, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		gradeTxtCool.scrollFactor.set();
+		gradeTxtCool.borderSize = 4;
+		gradeTxtCool.visible = !ClientPrefs.hideHud;
+		if(ClientPrefs.freestyling)
 			add(gradeTxtCool);
-		}
 
 		gradeTxtGood = new FlxText(healthBarBG.x + healthBarBG.width - 200, healthBarBG.y - 80, FlxG.width, "            Good", 20);
 		gradeTxtGood.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -1359,8 +1359,7 @@ class PlayState extends MusicBeatState
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
-		if(ClientPrefs.freestyling)
-			gradeTxtCool.cameras = [camHUD];
+		gradeTxtCool.cameras = [camHUD];
 		gradeTxtGood.cameras = [camHUD];
 		gradeTxtBad.cameras = [camHUD];
 		gradeTxtAwful.cameras = [camHUD];
@@ -4461,8 +4460,6 @@ class PlayState extends MusicBeatState
 	public var transitioning = false;
 	public function endSong():Void
 	{
-		if (ClientPrefs.gradingStyle)
-			doParappaGrading();
 		if (playerGrade > 0 && ClientPrefs.requireGood) {
 			doDeathCheck(true);
 			return;
