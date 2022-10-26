@@ -4882,7 +4882,7 @@ class PlayState extends MusicBeatState
 
 		if (!cpuControlled && startedCountdown && !paused && key > -1 && (FlxG.keys.checkStatus(eventKey, JUST_PRESSED) || ClientPrefs.controllerMode))
 		{
-			if(!boyfriend.stunned && generatedMusic && !endingSong && playerGrade != -1)
+			if(!boyfriend.stunned && generatedMusic && !endingSong)
 			{
 				//more accurate hit time for the ratings?
 				var lastTime:Float = Conductor.songPosition;
@@ -4934,6 +4934,9 @@ class PlayState extends MusicBeatState
 					if (canMiss) {
 						noteMissPress(key);
 					}
+
+					// idfk where this has to go -DM
+					freestyleHandler();
 				}
 
 				// I dunno what you need this for but here you go
@@ -4954,9 +4957,6 @@ class PlayState extends MusicBeatState
 				spr.resetAnim = 0;
 			}
 			callOnLuas('onKeyPress', [key]);
-
-			// idfk where this has to go -DM
-			freestyleHandler();
 		}
 		//trace('pressed: ' + controlArray);
 	}
