@@ -490,7 +490,10 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
+		if(!isPixelStage)
+			freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
+		else
+			freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree-pixel'));
 
 		precacheList.set('gradeup', 'sound');
 		precacheList.set('gradedown', 'sound');
@@ -2552,17 +2555,6 @@ class PlayState extends MusicBeatState
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
-		FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-		FlxG.sound.music.pitch = playbackRate;
-		FlxG.sound.music.onComplete = finishSong.bind();
-		vocals.play();
-
-		if(startOnTime > 0)
-		{
-			setSongTime(startOnTime - 500);
-		}
-		startOnTime = 0;
-
 		if(paused) {
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
@@ -2610,6 +2602,15 @@ class PlayState extends MusicBeatState
 			}
 			#end
 		}
+		FlxG.sound.music.pitch = playbackRate;
+		vocals.play();
+		FlxG.sound.music.onComplete = finishSong.bind();
+
+		if(startOnTime > 0)
+		{
+			setSongTime(startOnTime - 500);
+		}
+		startOnTime = 0;
 
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
@@ -3787,7 +3788,8 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(coolSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = endSong();
+				FlxG.sound.music.pitch = playbackRate;
+				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;
 		}
@@ -3814,7 +3816,8 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = endSong();
+				FlxG.sound.music.pitch = playbackRate;
+				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 		}
 		gradeTxtCool.color = FlxColor.GRAY;
@@ -3846,7 +3849,8 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = endSong();
+				FlxG.sound.music.pitch = playbackRate;
+				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;	
 		}
@@ -3876,7 +3880,8 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Awful", 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = endSong();
+				FlxG.sound.music.pitch = playbackRate;
+				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;
 		}
