@@ -3787,7 +3787,7 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(coolSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = finishSong.bind();
+				FlxG.sound.music.onComplete = endSong();
 			}
 			changedSongGrade = true;
 		}
@@ -3798,6 +3798,7 @@ class PlayState extends MusicBeatState
 		gradeTxtMarker.y = gradeTxtCool.y;
 		strumLineNotes.visible = false;
 		notes.visible = false;
+		moveCamera(false);
 		vocals.volume = 0;
 		playerGrade = -1;
 	}
@@ -3813,7 +3814,7 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = finishSong.bind();
+				FlxG.sound.music.onComplete = endSong();
 			}
 		}
 		gradeTxtCool.color = FlxColor.GRAY;
@@ -3845,7 +3846,7 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = finishSong.bind();
+				FlxG.sound.music.onComplete = endSong();
 			}
 			changedSongGrade = true;	
 		}
@@ -3875,7 +3876,7 @@ class PlayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Awful", 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.onComplete = finishSong.bind();
+				FlxG.sound.music.onComplete = endSong();
 			}
 			changedSongGrade = true;
 		}
@@ -4372,16 +4373,15 @@ class PlayState extends MusicBeatState
 			case 'Change Player Grade':
 				switch(value1.toLowerCase().trim()) {
 					case 'cool':
-						playerGrade = -1;
+						goCool();
 					case 'good':
-						playerGrade = 0;
+						goGood();
 					case 'bad':
-						playerGrade = 1;
+						goBad();
 					case 'awful':
-						playerGrade = 2;
+						goAwful();
 					default:
-						playerGrade = Std.parseInt(value1);
-						if(Math.isNaN(playerGrade)) playerGrade = 0;
+						goGood();
 				}
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
@@ -4476,12 +4476,6 @@ class PlayState extends MusicBeatState
 	public var transitioning = false;
 	public function endSong():Void
 	{
-		if (playerGrade > 0 && ClientPrefs.requireGood) {
-			health = 0;
-			doDeathCheck();
-			return;
-		}
-
 		//Should kill you if you tried to cheat
 		if(!startingSong) {
 			notes.forEach(function(daNote:Note) {
@@ -4495,6 +4489,13 @@ class PlayState extends MusicBeatState
 				}
 			}
 
+			if(doDeathCheck()) {
+				return;
+			}
+		}
+
+		if (playerGrade > 0 && ClientPrefs.requireGood) {
+			health = 0;
 			if(doDeathCheck()) {
 				return;
 			}
