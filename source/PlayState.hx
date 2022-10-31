@@ -523,7 +523,7 @@ class PlayState extends MusicBeatState
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows) {
 			#if desktop
-			while (FileSystem.exists(Paths.fileExists("sounds/freestyle/" + SONG.song + "/" + i + checkFreestyleFiles))) {
+			while (FileSystem.exists(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles)) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
 				else if (i == "R")
@@ -537,7 +537,7 @@ class PlayState extends MusicBeatState
 			}
 			checkFreestyleFiles = 1;
 			#else
-			while (OpenFlAssets.exists(Paths.fileExists("sounds/freestyle/" + SONG.song + "/" + i + checkFreestyleFiles))) {
+			while (OpenFlAssets.exists(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles)) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
 				else if (i == "R")
