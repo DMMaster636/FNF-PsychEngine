@@ -490,10 +490,7 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		if(!isPixelStage)
-			freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
-		else
-			freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree-pixel'));
+		freestyleSound = new FlxSound().loadEmbedded(Paths.sound('freestyle/defaultfree'));
 
 		precacheList.set('gradeup', 'sound');
 		precacheList.set('gradedown', 'sound');
@@ -501,24 +498,24 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		#if desktop
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Awful")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
+		if (FileSystem.exists(Paths.instAwful(SONG.song))) {
+			FlxG.sound.cache(Paths.instAwful(SONG.song));
 		}
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Bad")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
+		if (FileSystem.exists(Paths.instBad(SONG.song))) {
+			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Cool")) {
-			coolSong = Paths.inst(SONG.song) + "_Cool";
+		if (FileSystem.exists(Paths.instCool(SONG.song))) {
+			coolSong = Paths.instCool(SONG.song);
 		}
 		#else
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
+		if (OpenFlAssets.exists(Paths.instAwful(SONG.song))) {
+			FlxG.sound.cache(Paths.instAwful(SONG.song));
 		}
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
+		if (OpenFlAssets.exists(Paths.instBad(SONG.song))) {
+			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool")) {
-			coolSong = Paths.inst(SONG.song) + "_Cool";
+		if (OpenFlAssets.exists(Paths.instCool(SONG.song))) {
+			coolSong = Paths.instCool(SONG.song);
 		}
 		#end
 
@@ -1276,7 +1273,8 @@ class PlayState extends MusicBeatState
 		add(healthBarBG);
 		if(ClientPrefs.downScroll) healthBarBG.y = 0.11 * FlxG.height;
 
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this, 'health', 0, 2);
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
+			'health', 0, 2);
 		healthBar.scrollFactor.set();
 		// healthBar
 		healthBar.visible = !ClientPrefs.hideHud;
@@ -2555,52 +2553,52 @@ class PlayState extends MusicBeatState
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
-		if(paused) {
-			//trace('Oopsie doopsie! Paused sound');
-			FlxG.sound.music.pause();
-			vocals.pause();
-		} else {
+		if(!paused) {
 			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
+					if (FileSystem.exists(Paths.instCool(PlayState.SONG.song)))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
+					if (FileSystem.exists(Paths.instBad(PlayState.SONG.song)))
+						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
+					if (FileSystem.exists(Paths.instAwful(PlayState.SONG.song)))
+						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
 			#else
 			switch (playerGrade) {
 				case -1:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
+					if (OpenFlAssets.exists(Paths.instCool(PlayState.SONG.song)))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
+					if (OpenFlAssets.exists(Paths.instBad(PlayState.SONG.song)))
+						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
+					if (OpenFlAssets.exists(Paths.instAwful(PlayState.SONG.song)))
+						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
 			#end
+		} else {
+			//trace('Oopsie doopsie! Paused sound');
+			FlxG.sound.music.pause();
+			vocals.pause();
 		}
 		FlxG.sound.music.pitch = playbackRate;
 		vocals.play();
@@ -3777,9 +3775,9 @@ class PlayState extends MusicBeatState
 		filters.resize(0);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Cool");
+		checkFileExists = FileSystem.exists(Paths.instCool(SONG.song));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool");
+		checkFileExists = OpenFlAssets.exists(Paths.instCool(SONG.song));
 		#end
 		if (checkFileExists) 
 		{
@@ -3838,15 +3836,15 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Bad").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Bad");
+		checkFileExists = FileSystem.exists(Paths.instBad(SONG.song));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad");
+		checkFileExists = OpenFlAssets.exists(Paths.instBad(SONG.song));
 		#end
 		if (checkFileExists)
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
+				FlxG.sound.playMusic(Paths.instBad(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -3869,15 +3867,15 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Awful").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Awful");
+		checkFileExists = FileSystem.exists(Paths.instAwful(SONG.song));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful");
+		checkFileExists = OpenFlAssets.exists(Paths.instAwful(SONG.song));
 		#end
 		if (checkFileExists)
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Awful", 1, false);
+				FlxG.sound.playMusic(Paths.instAwful(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -4524,7 +4522,8 @@ class PlayState extends MusicBeatState
 		} else {
 			var achieve:String = checkForAchievement(['week1_nomiss', 'week2_nomiss', 'week3_nomiss', 'week4_nomiss',
 				'week5_nomiss', 'week6_nomiss', 'week7_nomiss', 'ur_bad',
-				'ur_good', 'hype', 'two_keys', 'toastie', 'debugger']);
+				'ur_good', 'hype', 'two_keys', 'toastie', 'debugger',
+				'ur_cool']);
 
 			if(achieve != null) {
 				startAchievement(achieve);
@@ -6017,6 +6016,10 @@ class PlayState extends MusicBeatState
 						}
 					case 'debugger':
 						if(Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice) {
+							unlock = true;
+						}
+					case 'ur_cool':
+						if(playerGrade == -1 && !usedPractice) {
 							unlock = true;
 						}
 				}

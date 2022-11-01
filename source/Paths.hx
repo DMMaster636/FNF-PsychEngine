@@ -225,11 +225,32 @@ class Paths
 		return voices;
 	}
 
+	inline static public function instCool(song:String):Any
+	{
+		var songKey:String = '${formatToSongPath(song)}/Inst_Cool';
+		var instCool = returnSound('songs', songKey);
+		return instCool;
+	}
+
 	inline static public function inst(song:String):Any
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
+	}
+
+	inline static public function instBad(song:String):Any
+	{
+		var songKey:String = '${formatToSongPath(song)}/Inst_Bad';
+		var instBad = returnSound('songs', songKey);
+		return instBad;
+	}
+
+	inline static public function instAwful(song:String):Any
+	{
+		var songKey:String = '${formatToSongPath(song)}/Inst_Awful';
+		var instAwful = returnSound('songs', songKey);
+		return instAwful;
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
