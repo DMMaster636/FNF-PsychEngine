@@ -504,7 +504,7 @@ class PlayState extends MusicBeatState
 		if (FileSystem.exists(Paths.song(SONG.song, '_Bad'))) {
 			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
-		if (FileSystem.exists(Paths.song(SONG.song, _'Cool'))) {
+		if (FileSystem.exists(Paths.song(SONG.song, 'Cool'))) {
 			coolSong = Paths.instCool(SONG.song);
 		}
 		#else
