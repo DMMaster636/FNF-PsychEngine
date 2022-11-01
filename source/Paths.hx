@@ -253,6 +253,12 @@ class Paths
 		return instAwful;
 	}
 
+	inline static public function song(song:String, ext:String)
+	{
+		var songFile:String = 'songs/${formatToSongPath(song)}/Inst' + ext;
+		return songFile;
+	}
+
 	inline static public function image(key:String, ?library:String):FlxGraphic
 	{
 		// streamlined the assets process more

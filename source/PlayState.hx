@@ -498,23 +498,23 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		#if desktop
-		if (FileSystem.exists(Paths.instAwful(SONG.song))) {
+		if (FileSystem.exists(Paths.song(SONG.song, '_Awful'))) {
 			FlxG.sound.cache(Paths.instAwful(SONG.song));
 		}
-		if (FileSystem.exists(Paths.instBad(SONG.song))) {
+		if (FileSystem.exists(Paths.song(SONG.song, '_Bad'))) {
 			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
-		if (FileSystem.exists(Paths.instCool(SONG.song))) {
+		if (FileSystem.exists(Paths.song(SONG.song, _'Cool'))) {
 			coolSong = Paths.instCool(SONG.song);
 		}
 		#else
-		if (OpenFlAssets.exists(Paths.instAwful(SONG.song))) {
+		if (OpenFlAssets.exists(Paths.song(SONG.song, '_Awful'))) {
 			FlxG.sound.cache(Paths.instAwful(SONG.song));
 		}
-		if (OpenFlAssets.exists(Paths.instBad(SONG.song))) {
+		if (OpenFlAssets.exists(Paths.song(SONG.song, '_Bad'))) {
 			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
-		if (OpenFlAssets.exists(Paths.instCool(SONG.song))) {
+		if (OpenFlAssets.exists(Paths.song(SONG.song, '_Cool'))) {
 			coolSong = Paths.instCool(SONG.song);
 		}
 		#end
@@ -2557,19 +2557,19 @@ class PlayState extends MusicBeatState
 			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists(Paths.instCool(PlayState.SONG.song)))
+					if (FileSystem.exists(Paths.song(PlayState.SONG.song, '_Cool')))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (FileSystem.exists(Paths.instBad(PlayState.SONG.song)))
+					if (FileSystem.exists(Paths.song(PlayState.SONG.song, '_Bad')))
 						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (FileSystem.exists(Paths.instAwful(PlayState.SONG.song)))
+					if (FileSystem.exists(Paths.song(PlayState.SONG.song, '_Awful')))
 						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
@@ -2577,19 +2577,19 @@ class PlayState extends MusicBeatState
 			#else
 			switch (playerGrade) {
 				case -1:
-					if (OpenFlAssets.exists(Paths.instCool(PlayState.SONG.song)))
+					if (OpenFlAssets.exists(Paths.song(PlayState.SONG.song, '_Cool')))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (OpenFlAssets.exists(Paths.instBad(PlayState.SONG.song)))
+					if (OpenFlAssets.exists(Paths.song(PlayState.SONG.song, '_Bad')))
 						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (OpenFlAssets.exists(Paths.instAwful(PlayState.SONG.song)))
+					if (OpenFlAssets.exists(Paths.song(PlayState.SONG.song, '_Awful')))
 						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
@@ -3775,9 +3775,9 @@ class PlayState extends MusicBeatState
 		filters.resize(0);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.instCool(SONG.song));
+		checkFileExists = FileSystem.exists(Paths.song(SONG.song, '_Cool'));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.instCool(SONG.song));
+		checkFileExists = OpenFlAssets.exists(Paths.song(SONG.song, '_Cool'));
 		#end
 		if (checkFileExists) 
 		{
@@ -3836,9 +3836,9 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Bad").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.instBad(SONG.song));
+		checkFileExists = FileSystem.exists(Paths.song(SONG.song, '_Bad'));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.instBad(SONG.song));
+		checkFileExists = OpenFlAssets.exists(Paths.song(SONG.song, '_Bad'));
 		#end
 		if (checkFileExists)
 		{
@@ -3867,9 +3867,9 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Awful").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.instAwful(SONG.song));
+		checkFileExists = FileSystem.exists(Paths.song(SONG.song, '_Awful'));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.instAwful(SONG.song));
+		checkFileExists = OpenFlAssets.exists(Paths.song(SONG.song, '_Awful'));
 		#end
 		if (checkFileExists)
 		{
