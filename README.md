@@ -1,3 +1,14 @@
+# Parappa Rating System in Psych Engine
+
+![](https://user-images.githubusercontent.com/86197998/199311108-fdc52570-ccd3-444a-8e62-c38470fc4b9a.png)
+
+Port of the original [Parappa Rating System in FNF' Mod](https://gamebanana.com/mods/44323)
+
+## Credits:
+* DoggyDentures - Made the Original Mod
+* DMMaster636 - Ported it to Psych Engine
+_____________________________________
+
 # Friday Night Funkin' - Psych Engine
 Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
