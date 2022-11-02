@@ -190,6 +190,14 @@ class Paths
 		return getPath('$key.lua', TEXT, library);
 	}
 
+	inline static public function songFile(song:String, ext:String, ?library:String)
+	{
+		if(ext != null)
+			return getPath('songs/${formatToSongPath(song)}/Inst' + ext + '.$SOUND_EXT', MUSIC, library);
+		else
+			return getPath('songs/${formatToSongPath(song)}/Inst.$SOUND_EXT', MUSIC, library);
+	}
+
 	static public function video(key:String)
 	{
 		#if MODS_ALLOWED
@@ -230,6 +238,13 @@ class Paths
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
+	}
+
+	inline static public function instExt(song:String, ext:String):Any
+	{
+		var songKey:String = '${formatToSongPath(song)}/Inst' + ext;
+		var instExt = returnSound('songs', songKey);
+		return instExt;
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic

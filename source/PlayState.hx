@@ -498,24 +498,24 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		#if desktop
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Awful")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
+		if (FileSystem.exists(Paths.songFile(SONG.song, "_Awful"))) {
+			FlxG.sound.cache(Paths.instExt(SONG.song, "_Awful"));
 		}
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Bad")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
+		if (FileSystem.exists(Paths.songFile(SONG.song, "_Bad"))) {
+			FlxG.sound.cache(Paths.instExt(SONG.song, "_Bad"));
 		}
-		if (FileSystem.exists(Paths.inst(SONG.song) + "_Cool")) {
-			coolSong = Paths.inst(SONG.song) + "_Cool";
+		if (FileSystem.exists(Paths.songFile(SONG.song, "_Cool"))) {
+			coolSong = Paths.instExt(SONG.song, "_Cool");
 		}
 		#else
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Awful");
+		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Awful"))) {
+			FlxG.sound.cache(Paths.instExt(SONG.song, "_Awful"));
 		}
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad")) {
-			FlxG.sound.cache(Paths.inst(SONG.song) + "_Bad");
+		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Bad"))) {
+			FlxG.sound.cache(Paths.instExt(SONG.song, "_Bad"));
 		}
-		if (OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool")) {
-			coolSong = Paths.inst(SONG.song) + "_Cool";
+		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Cool"))) {
+			coolSong = Paths.instExt(SONG.song, "_Cool");
 		}
 		#end
 
@@ -2557,40 +2557,40 @@ class PlayState extends MusicBeatState
 			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
+					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Cool")))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
+					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
+						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Bad"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (FileSystem.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
+					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
+						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Awful"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
 			#else
 			switch (playerGrade) {
 				case -1:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Cool"))
+					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Cool")))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Bad"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Bad", 1, false);
+					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
+						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Bad"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (OpenFlAssets.exists(Paths.inst(PlayState.SONG.song) + "_Awful"))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song) + "_Awful", 1, false);
+					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
+						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Awful"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -3775,9 +3775,9 @@ class PlayState extends MusicBeatState
 		filters.resize(0);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Cool");
+		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Cool"));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Cool");
+		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Cool"));
 		#end
 		if (checkFileExists) 
 		{
@@ -3836,15 +3836,15 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Bad").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Bad");
+		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Bad"));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Bad");
+		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Bad"));
 		#end
 		if (checkFileExists)
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Bad", 1, false);
+				FlxG.sound.playMusic(Paths.instExt(SONG.song, "_Bad"), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -3867,15 +3867,15 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("Awful").filter);
 		var checkFileExists:Bool = false;
 		#if desktop
-		checkFileExists = FileSystem.exists(Paths.inst(SONG.song) + "_Awful");
+		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Awful"));
 		#else
-		checkFileExists = OpenFlAssets.exists(Paths.inst(SONG.song) + "_Awful");
+		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Awful"));
 		#end
 		if (checkFileExists)
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song) + "_Awful", 1, false);
+				FlxG.sound.playMusic(Paths.instExt(SONG.song, "_Awful"), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
