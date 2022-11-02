@@ -225,12 +225,11 @@ class Paths
 		return voices;
 	}
 
-	inline static public function inst(song:String, ext:String):Any
+	inline static public function inst(song:String, key:String):Any
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		if(ext != null)
-			songKey:String = '${formatToSongPath(song)}/Inst$ext';
-
+			songKey:String = '${formatToSongPath(song)}/Inst' + key;
 		var inst = returnSound('songs', songKey);
 		return inst;
 	}
