@@ -229,7 +229,7 @@ class Paths
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		if(ext != null)
-			songKey:String = '${formatToSongPath(song)}/Inst' + '$ext';
+			songKey:String = '${formatToSongPath(song)}/Inst$ext';
 
 		var inst = returnSound('songs', songKey);
 		return inst;
