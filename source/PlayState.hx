@@ -499,23 +499,23 @@ class PlayState extends MusicBeatState
 
 		#if desktop
 		if (FileSystem.exists(Paths.songFile(SONG.song, "_Awful"))) {
-			FlxG.sound.cache(Paths.instExt(SONG.song, "_Awful"));
+			FlxG.sound.cache(Paths.inst(SONG.song, "_Awful"));
 		}
 		if (FileSystem.exists(Paths.songFile(SONG.song, "_Bad"))) {
-			FlxG.sound.cache(Paths.instExt(SONG.song, "_Bad"));
+			FlxG.sound.cache(Paths.inst(SONG.song, "_Bad"));
 		}
 		if (FileSystem.exists(Paths.songFile(SONG.song, "_Cool"))) {
-			coolSong = Paths.instExt(SONG.song, "_Cool");
+			coolSong = Paths.inst(SONG.song, "_Cool");
 		}
 		#else
 		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Awful"))) {
-			FlxG.sound.cache(Paths.instExt(SONG.song, "_Awful"));
+			FlxG.sound.cache(Paths.inst(SONG.song, "_Awful"));
 		}
 		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Bad"))) {
-			FlxG.sound.cache(Paths.instExt(SONG.song, "_Bad"));
+			FlxG.sound.cache(Paths.inst(SONG.song, "_Bad"));
 		}
 		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Cool"))) {
-			coolSong = Paths.instExt(SONG.song, "_Cool");
+			coolSong = Paths.inst(SONG.song, "_Cool");
 		}
 		#end
 
@@ -2565,12 +2565,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
-						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Bad"), 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Bad"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
-						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Awful"), 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Awful"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -2585,12 +2585,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
-						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Bad"), 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Bad"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
-						FlxG.sound.playMusic(Paths.instExt(PlayState.SONG.song, "_Awful"), 1, false);
+						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Awful"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -3844,7 +3844,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.instExt(SONG.song, "_Bad"), 1, false);
+				FlxG.sound.playMusic(Paths.inst(SONG.song, "_Bad"), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -3875,7 +3875,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.instExt(SONG.song, "_Awful"), 1, false);
+				FlxG.sound.playMusic(Paths.inst(SONG.song, "_Awful"), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;

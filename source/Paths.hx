@@ -233,18 +233,13 @@ class Paths
 		return voices;
 	}
 
-	inline static public function inst(song:String):Any
+	inline static public function inst(song:String, ext:String):Any
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
+		if(ext != null)
+			songKey:String = '${formatToSongPath(song)}/Inst' + ext;
 		var inst = returnSound('songs', songKey);
 		return inst;
-	}
-
-	inline static public function instExt(song:String, ext:String):Any
-	{
-		var songKey:String = '${formatToSongPath(song)}/Inst' + ext;
-		var instExt = returnSound('songs', songKey);
-		return instExt;
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
