@@ -229,7 +229,8 @@ class Paths
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		if(ext != null)
-			songKey:String = '${formatToSongPath(song)}/Inst' + ext;
+			songKey:String = '${formatToSongPath(song)}/Inst' + '$ext';
+
 		var inst = returnSound('songs', songKey);
 		return inst;
 	}
@@ -237,10 +238,9 @@ class Paths
 	inline static public function songFile(song:String, ext:String, ?library:String)
 	{
 		var fileToCheck:String = getPath('songs/${formatToSongPath(song)}/Inst.$SOUND_EXT', MUSIC, library);
-
 		if(ext != null)
 			fileToCheck:String = getPath('songs/${formatToSongPath(song)}/Inst' + ext + '.$SOUND_EXT', MUSIC, library);
-		
+
 		return fileToCheck;
 	}
 
