@@ -3724,7 +3724,7 @@ class PlayState extends MusicBeatState
 		changedSongGrade = false;
 		filters.resize(0);
 		var checkFileExists:Bool = false;
-		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Cool");
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC);
 		if (checkFileExists) 
 		{
 			if (!startingSong)
@@ -3781,7 +3781,7 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("BlurBad").filter);
 		filters.push(filterMap.get("Bad").filter);
 		var checkFileExists:Bool = false;
-		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Bad");
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC);
 		if (checkFileExists)
 		{
 			if (!startingSong)
@@ -3808,7 +3808,7 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("BlurAwful").filter);
 		filters.push(filterMap.get("Awful").filter);
 		var checkFileExists:Bool = false;
-		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Awful");
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC);
 		if (checkFileExists)
 		{
 			if (!startingSong)
