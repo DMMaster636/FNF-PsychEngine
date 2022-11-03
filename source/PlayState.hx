@@ -498,13 +498,13 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC)) {
-			FlxG.sound.cache(Paths.inst(SONG.song, "_Awful"));
+			FlxG.sound.cache(Paths.instAwful(SONG.song));
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC)) {
-			FlxG.sound.cache(Paths.inst(SONG.song, "_Bad"));
+			FlxG.sound.cache(Paths.instBad(SONG.song));
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC)) {
-			coolSong = Paths.inst(SONG.song, "_Cool");
+			coolSong = Paths.instCool(SONG.song);
 		}
 
 		var checkFreestyleFiles:Int = 1;
@@ -2536,12 +2536,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Bad", MUSIC))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Bad"), 1, false);
+						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Awful", MUSIC))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Awful"), 1, false);
+						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -3786,7 +3786,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song, "_Bad"), 1, false);
+				FlxG.sound.playMusic(Paths.instBad(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -3813,7 +3813,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song, "_Awful"), 1, false);
+				FlxG.sound.playMusic(Paths.instAwful(SONG.song), 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
