@@ -497,33 +497,20 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasegood', 'sound');
 		precacheList.set('phrasebad', 'sound');
 
-		#if desktop
-		if (FileSystem.exists(Paths.songFile(SONG.song, "_Awful"))) {
+		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC)) {
 			FlxG.sound.cache(Paths.inst(SONG.song, "_Awful"));
 		}
-		if (FileSystem.exists(Paths.songFile(SONG.song, "_Bad"))) {
+		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC)) {
 			FlxG.sound.cache(Paths.inst(SONG.song, "_Bad"));
 		}
-		if (FileSystem.exists(Paths.songFile(SONG.song, "_Cool"))) {
+		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC)) {
 			coolSong = Paths.inst(SONG.song, "_Cool");
 		}
-		#else
-		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Awful"))) {
-			FlxG.sound.cache(Paths.inst(SONG.song, "_Awful"));
-		}
-		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Bad"))) {
-			FlxG.sound.cache(Paths.inst(SONG.song, "_Bad"));
-		}
-		if (OpenFlAssets.exists(Paths.songFile(SONG.song, "_Cool"))) {
-			coolSong = Paths.inst(SONG.song, "_Cool");
-		}
-		#end
 
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows) {
-			#if desktop
-			while (FileSystem.exists(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles)) {
+			while (Paths.fileExists("sounds/freestyle/" + SONG.song + "/" + i + checkFreestyleFiles, SOUND)) {
 				if (i == "L")
 					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
 				else if (i == "R")
@@ -536,21 +523,6 @@ class PlayState extends MusicBeatState
 				checkFreestyleFiles++;
 			}
 			checkFreestyleFiles = 1;
-			#else
-			while (OpenFlAssets.exists(Paths.sound("freestyle/") + SONG.song + "/" + i + checkFreestyleFiles)) {
-				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
-				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
-				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
-				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
-
-				checkFreestyleFiles++;
-			}
-			checkFreestyleFiles = 1;
-			#end
 		}
 
 		if (freestyleSoundsL.length == 0)
@@ -2554,47 +2526,25 @@ class PlayState extends MusicBeatState
 		lastReportedPlayheadPosition = 0;
 
 		if(!paused) {
-			#if desktop
 			switch (playerGrade) {
 				case -1:
-					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Cool")))
+					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Cool", MUSIC))
 						FlxG.sound.playMusic(coolSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 0:
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
-					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
+					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Bad", MUSIC))
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Bad"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
-					if (FileSystem.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
+					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Awful", MUSIC))
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Awful"), 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
-			#else
-			switch (playerGrade) {
-				case -1:
-					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Cool")))
-						FlxG.sound.playMusic(coolSong, 1, false);
-					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-				case 0:
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-				case 1:
-					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Bad")))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Bad"), 1, false);
-					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-				case 2:
-					if (OpenFlAssets.exists(Paths.songFile(PlayState.SONG.song, "_Awful")))
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, "_Awful"), 1, false);
-					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-			}
-			#end
 		} else {
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
@@ -3774,11 +3724,7 @@ class PlayState extends MusicBeatState
 		changedSongGrade = false;
 		filters.resize(0);
 		var checkFileExists:Bool = false;
-		#if desktop
-		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Cool"));
-		#else
-		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Cool"));
-		#end
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Cool");
 		if (checkFileExists) 
 		{
 			if (!startingSong)
@@ -3835,11 +3781,7 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("BlurBad").filter);
 		filters.push(filterMap.get("Bad").filter);
 		var checkFileExists:Bool = false;
-		#if desktop
-		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Bad"));
-		#else
-		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Bad"));
-		#end
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Bad");
 		if (checkFileExists)
 		{
 			if (!startingSong)
@@ -3866,11 +3808,7 @@ class PlayState extends MusicBeatState
 		filters.push(filterMap.get("BlurAwful").filter);
 		filters.push(filterMap.get("Awful").filter);
 		var checkFileExists:Bool = false;
-		#if desktop
-		checkFileExists = FileSystem.exists(Paths.songFile(SONG.song, "_Awful"));
-		#else
-		checkFileExists = OpenFlAssets.exists(Paths.songFile(SONG.song, "_Awful"));
-		#end
+		checkFileExists = Paths.fileExists("songs/" + SONG.song + "/Inst_Awful");
 		if (checkFileExists)
 		{
 			if (!startingSong)

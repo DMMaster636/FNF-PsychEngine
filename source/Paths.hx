@@ -234,14 +234,6 @@ class Paths
 		return inst;
 	}
 
-	inline static public function songFile(song:String, key:String, ?library:String)
-	{
-		var fileToCheck:String = getPath('songs/${formatToSongPath(song)}/Inst.$SOUND_EXT', MUSIC, library);
-		if(key != null)
-			fileToCheck = getPath('songs/${formatToSongPath(song)}/Inst' + key + '.$SOUND_EXT', MUSIC, library);
-		return fileToCheck;
-	}
-
 	inline static public function image(key:String, ?library:String):FlxGraphic
 	{
 		// streamlined the assets process more
