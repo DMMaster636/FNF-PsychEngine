@@ -498,10 +498,10 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC)) {
-			FlxG.sound.cache(Paths.instAwful(SONG.song));
+			FlxG.sound.cache(Paths.file("songs/" + SONG.song + "/Inst_Awful", MUSIC));
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC)) {
-			FlxG.sound.cache(Paths.instBad(SONG.song));
+			FlxG.sound.cache(Paths.file("songs/" + SONG.song + "/Inst_Bad", MUSIC));
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC)) {
 			coolSong = Paths.instCool(SONG.song);
