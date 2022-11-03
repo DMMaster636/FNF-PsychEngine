@@ -225,20 +225,20 @@ class Paths
 		return voices;
 	}
 
-	inline static public function inst(song:String, key:String):Any
+	inline static public function inst(song:String, ?key:String):Any
 	{
 		var songKey:String = '${formatToSongPath(song)}/Inst';
-		if(ext != null)
+		if(key != null)
 			songKey = '${formatToSongPath(song)}/Inst' + key;
 		var inst = returnSound('songs', songKey);
 		return inst;
 	}
 
-	inline static public function songFile(song:String, ext:String, ?library:String)
+	inline static public function songFile(song:String, key:String, ?library:String)
 	{
 		var fileToCheck:String = getPath('songs/${formatToSongPath(song)}/Inst.$SOUND_EXT', MUSIC, library);
-		if(ext != null)
-			fileToCheck = getPath('songs/${formatToSongPath(song)}/Inst' + ext + '.$SOUND_EXT', MUSIC, library);
+		if(key != null)
+			fileToCheck = getPath('songs/${formatToSongPath(song)}/Inst' + key + '.$SOUND_EXT', MUSIC, library);
 		return fileToCheck;
 	}
 
