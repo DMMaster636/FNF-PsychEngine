@@ -363,7 +363,10 @@ class PlayState extends MusicBeatState
 	public var freestyleSoundsR:Array<FlxSound> = [];
 	public var freestyleSoundsU:Array<FlxSound> = [];
 	public var freestyleSoundsD:Array<FlxSound> = [];
+
 	public var coolSong:FlxSoundAsset;
+	public var badSong:FlxSoundAsset;
+	public var awfulSong:FlxSoundAsset;
 
 	override public function create()
 	{
@@ -498,10 +501,10 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC)) {
-			FlxG.sound.cache(Paths.file("songs/" + SONG.song + "/Inst_Awful", MUSIC));
+			awfulSong = Paths.instAwful(SONG.song);
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC)) {
-			FlxG.sound.cache(Paths.file("songs/" + SONG.song + "/Inst_Bad", MUSIC));
+			badSong = Paths.instBad(SONG.song);
 		}
 		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC)) {
 			coolSong = Paths.instCool(SONG.song);
@@ -2536,12 +2539,12 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 1:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Bad", MUSIC))
-						FlxG.sound.playMusic(Paths.instBad(PlayState.SONG.song), 1, false);
+						FlxG.sound.playMusic(badSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 				case 2:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Awful", MUSIC))
-						FlxG.sound.playMusic(Paths.instAwful(PlayState.SONG.song), 1, false);
+						FlxG.sound.playMusic(awfulSong, 1, false);
 					else
 						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 			}
@@ -3786,7 +3789,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.instBad(SONG.song), 1, false);
+				FlxG.sound.playMusic(badSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
@@ -3813,7 +3816,7 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.instAwful(SONG.song), 1, false);
+				FlxG.sound.playMusic(awfulSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.pitch = playbackRate;
