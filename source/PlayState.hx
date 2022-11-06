@@ -513,15 +513,15 @@ class PlayState extends MusicBeatState
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows) {
-			while (Paths.fileExists("sounds/freestyle/" + SONG.song + "/" + i + checkFreestyleFiles, SOUND)) {
+			while (Paths.fileExists("sounds/freestyle/" + Paths.formatToSongPath(SONG.song) + "/" + i + checkFreestyleFiles, SOUND)) {
 				if (i == "L")
-					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(Paths.freestyleSound(SONG.song, i + checkFreestyleFiles)));
 				else if (i == "R")
-					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(Paths.freestyleSound(SONG.song, i + checkFreestyleFiles)));
 				else if (i == "U")
-					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(Paths.freestyleSound(SONG.song, i + checkFreestyleFiles)));
 				else if (i == "D")
-					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.sound("freestyle/" + SONG.song + "/" + i + checkFreestyleFiles)));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(Paths.freestyleSound(SONG.song, i + checkFreestyleFiles)));
 
 				checkFreestyleFiles++;
 			}

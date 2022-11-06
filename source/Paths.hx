@@ -212,6 +212,12 @@ class Paths
 		return sound(key + FlxG.random.int(min, max), library);
 	}
 
+	static public function freestyleSound(song:String, key:String, ?library:String):Sound
+	{
+		var freestyleSound:Sound = returnSound('sounds/freestyle/${formatToSongPath(song)}', key, library);
+		return freestyleSound;
+	}
+
 	inline static public function music(key:String, ?library:String):Sound
 	{
 		var file:Sound = returnSound('music', key, library);
