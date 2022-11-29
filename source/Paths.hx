@@ -214,8 +214,7 @@ class Paths
 
 	static public function freestyleSound(song:String, key:String, ?library:String):Sound
 	{
-		var freestyleSound:Sound = returnSound('sounds/freestyle/${formatToSongPath(song)}', key, library);
-		return freestyleSound;
+		return sound('freestyle/${formatToSongPath(song)}/' + key, library);
 	}
 
 	inline static public function music(key:String, ?library:String):Sound

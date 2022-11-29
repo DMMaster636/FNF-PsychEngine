@@ -500,13 +500,13 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasegood', 'sound');
 		precacheList.set('phrasebad', 'sound');
 
-		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Awful", MUSIC)) {
+		if (Paths.fileExists("songs/" + Paths.formatToSongPath(SONG.song) + "/Inst_Awful", MUSIC)) {
 			awfulSong = Paths.instAwful(SONG.song);
 		}
-		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Bad", MUSIC)) {
+		if (Paths.fileExists("songs/" + Paths.formatToSongPath(SONG.song) + "/Inst_Bad", MUSIC)) {
 			badSong = Paths.instBad(SONG.song);
 		}
-		if (Paths.fileExists("songs/" + SONG.song + "/Inst_Cool", MUSIC)) {
+		if (Paths.fileExists("songs/" + Paths.formatToSongPath(SONG.song) + "/Inst_Cool", MUSIC)) {
 			coolSong = Paths.instCool(SONG.song);
 		}
 
@@ -2814,7 +2814,6 @@ class PlayState extends MusicBeatState
 				smoke.active = true;
 				smoke.flipX = true;
 				dadbattleSmokes.add(smoke);
-
 
 			case 'Philly Glow':
 				blammedLightsBlack = new FlxSprite(FlxG.width * -0.5, FlxG.height * -0.5).makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
