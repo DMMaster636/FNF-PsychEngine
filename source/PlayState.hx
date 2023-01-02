@@ -1649,6 +1649,7 @@ class PlayState extends MusicBeatState
 		if(generatedMusic)
 		{
 			if(vocals != null) vocals.pitch = value;
+			inst.pitch = value;
 			FlxG.sound.music.pitch = value;
 		}
 		playbackRate = value;
@@ -2626,6 +2627,9 @@ class PlayState extends MusicBeatState
 		inst = new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song));
 		inst.pitch = playbackRate;
 		FlxG.sound.list.add(inst);
+
+		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song)));
+		FlxG.sound.music.volume = 0;
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -3890,6 +3894,7 @@ class PlayState extends MusicBeatState
 
 				paused = true;
 
+				inst.stop();
 				vocals.stop();
 				FlxG.sound.music.stop();
 
@@ -4412,6 +4417,7 @@ class PlayState extends MusicBeatState
 
 		updateTime = false;
 		FlxG.sound.music.volume = 0;
+		inst.volume = 0;
 		vocals.volume = 0;
 		vocals.pause();
 		if(ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
