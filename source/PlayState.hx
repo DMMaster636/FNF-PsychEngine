@@ -153,6 +153,7 @@ class PlayState extends MusicBeatState
 
 	public var spawnTime:Float = 2000;
 
+	public var inst:FlxSound;
 	public var vocals:FlxSound;
 	public var freestyleSound:FlxSound;
 
@@ -2492,11 +2493,16 @@ class PlayState extends MusicBeatState
 		if(time < 0) time = 0;
 
 		FlxG.sound.music.pause();
+		inst.pause();
 		vocals.pause();
 
 		FlxG.sound.music.time = time;
 		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.play();
+
+		inst.time = time;
+		inst.pitch = playbackRate;
+		inst.play();
 
 		if (Conductor.songPosition <= vocals.length)
 		{
@@ -2532,28 +2538,30 @@ class PlayState extends MusicBeatState
 			switch (playerGrade) {
 				case -1:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Cool", MUSIC))
-						FlxG.sound.playMusic(coolSong, 1, false);
+						inst.loadEmbedded(coolSong);
 					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+						inst.loadEmbedded(Paths.inst(PlayState.SONG.song));
 				case 0:
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+					inst.loadEmbedded(Paths.inst(PlayState.SONG.song));
 				case 1:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Bad", MUSIC))
-						FlxG.sound.playMusic(badSong, 1, false);
+						inst.loadEmbedded(badSong);
 					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+						inst.loadEmbedded(Paths.inst(PlayState.SONG.song));
 				case 2:
 					if (Paths.fileExists("songs/" + PlayState.SONG.song + "/Inst_Awful", MUSIC))
-						FlxG.sound.playMusic(awfulSong, 1, false);
+						inst.loadEmbedded(awfulSong);
 					else
-						FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+						inst.loadEmbedded(Paths.inst(PlayState.SONG.song));
 			}
 		} else {
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
+			inst.pause();
 			vocals.pause();
 		}
 		FlxG.sound.music.pitch = playbackRate;
+		inst.play();
 		vocals.play();
 		FlxG.sound.music.onComplete = finishSong.bind();
 
@@ -2614,7 +2622,10 @@ class PlayState extends MusicBeatState
 
 		vocals.pitch = playbackRate;
 		FlxG.sound.list.add(vocals);
-		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song)));
+
+		inst = new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song));
+		inst.pitch = playbackRate;
+		FlxG.sound.list.add(inst);
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -3039,6 +3050,11 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.play();
 		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time;
+
+		inst.play();
+		inst.time = Conductor.songPosition;
+		inst.pitch = playbackRate;
+
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = Conductor.songPosition;
@@ -3731,11 +3747,9 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(coolSong, 1, false);
-				FlxG.sound.music.time = Conductor.songPosition;
+				inst.loadEmbedded(coolSong);
+				inst.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.pitch = playbackRate;
-				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;
 		}
@@ -3759,11 +3773,9 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(Paths.inst(SONG.song), 1, false);
-				FlxG.sound.music.time = Conductor.songPosition;
+				inst.loadEmbedded(Paths.inst(SONG.song));
+				inst.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.pitch = playbackRate;
-				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 		}
 		gradeTxtCool.color = FlxColor.GRAY;
@@ -3788,11 +3800,9 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(badSong, 1, false);
-				FlxG.sound.music.time = Conductor.songPosition;
+				inst.loadEmbedded(badSong);
+				inst.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.pitch = playbackRate;
-				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;	
 		}
@@ -3815,11 +3825,9 @@ class PlayState extends MusicBeatState
 		{
 			if (!startingSong)
 			{
-				FlxG.sound.playMusic(awfulSong, 1, false);
-				FlxG.sound.music.time = Conductor.songPosition;
+				inst.loadEmbedded(awfulSong);
+				inst.time = Conductor.songPosition;
 				resyncVocals();
-				FlxG.sound.music.pitch = playbackRate;
-				FlxG.sound.music.onComplete = finishSong.bind();
 			}
 			changedSongGrade = true;
 		}
