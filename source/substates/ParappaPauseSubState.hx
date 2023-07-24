@@ -65,7 +65,7 @@ class ParappaPauseSubState extends MusicBeatState
 				PlayState.changedDifficulty = false;
 				PlayState.seenCutscene = false;
 				PlayState.deathCounter = 0;
-				MusicBeatState.switchState(new MainMenuState());
+				MusicBeatState.switchState(new states.MainMenuState());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 		}

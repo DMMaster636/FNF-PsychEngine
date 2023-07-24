@@ -382,7 +382,7 @@ class Paths
 		return false;
 	}
 
-	inline static public function soundExists(song:String, key:String)
+	public static function soundExists(song:String, key:String)
 	{
 		#if MODS_ALLOWED
 		for(mod in Mods.getGlobalMods())
@@ -400,7 +400,7 @@ class Paths
 		return false;
 	}
 
-	inline static public function songExists(song:String, key:String)
+	public static function songExists(song:String, key:String)
 	{
 		#if MODS_ALLOWED
 		for(mod in Mods.getGlobalMods())
