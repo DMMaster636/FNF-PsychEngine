@@ -203,6 +203,12 @@ class Paths
 		return sound(key + FlxG.random.int(min, max), library);
 	}
 
+	static public function freestyleSound(song:String, key:String, ?library:String):Sound
+	{
+		var file:Sound = returnSound('sounds', 'freestyle/${formatToSongPath(song)}/' + key, library);
+		return file;
+	}
+
 	inline static public function music(key:String, ?library:String):Sound
 	{
 		var file:Sound = returnSound('music', key, library);
@@ -220,6 +226,17 @@ class Paths
 		#end
 	}
 
+	inline static public function instCool(song:String):Any
+	{
+		#if html5
+		return 'songs:assets/songs/${formatToSongPath(song)}/Inst_Cool.$SOUND_EXT';
+		#else
+		var songKey:String = '${formatToSongPath(song)}/Inst_Cool';
+		var instCool = returnSound('songs', songKey);
+		return instCool;
+		#end
+	}
+
 	inline static public function inst(song:String):Any
 	{
 		#if html5
@@ -228,6 +245,28 @@ class Paths
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
+		#end
+	}
+
+	inline static public function instBad(song:String):Any
+	{
+		#if html5
+		return 'songs:assets/songs/${formatToSongPath(song)}/Inst_Bad.$SOUND_EXT';
+		#else
+		var songKey:String = '${formatToSongPath(song)}/Inst_Bad';
+		var instBad = returnSound('songs', songKey);
+		return instBad;
+		#end
+	}
+
+	inline static public function instAwful(song:String):Any
+	{
+		#if html5
+		return 'songs:assets/songs/${formatToSongPath(song)}/Inst_Awful.$SOUND_EXT';
+		#else
+		var songKey:String = '${formatToSongPath(song)}/Inst_Awful';
+		var instAwful = returnSound('songs', songKey);
+		return instAwful;
 		#end
 	}
 
@@ -338,6 +377,42 @@ class Paths
 		#end
 
 		if(OpenFlAssets.exists(getPath(key, type, library, false))) {
+			return true;
+		}
+		return false;
+	}
+
+	inline static public function soundExists(song:String, key:String)
+	{
+		#if MODS_ALLOWED
+		for(mod in Mods.getGlobalMods())
+			if (FileSystem.exists(mods('$mod/$key')))
+				return true;
+
+		if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + 'sounds/freestyle/${formatToSongPath(song)}' + key + '.$SOUND_EXT'))
+		|| FileSystem.exists(mods('sounds/freestyle/${formatToSongPath(song)}' + key + '.$SOUND_EXT')))
+			return true;
+		#end
+
+		if(OpenFlAssets.exists(getPath('sounds/freestyle/${formatToSongPath(song)}/' + key + '.$SOUND_EXT', SOUND, 'preload', false))) {
+			return true;
+		}
+		return false;
+	}
+
+	inline static public function songExists(song:String, key:String)
+	{
+		#if MODS_ALLOWED
+		for(mod in Mods.getGlobalMods())
+			if (FileSystem.exists(mods('$mod/songs/${formatToSongPath(song)}/$key.$SOUND_EXT')))
+				return true;
+
+		if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + 'songs/${formatToSongPath(song)}' + key + '.$SOUND_EXT'))
+		|| FileSystem.exists(mods('songs/${formatToSongPath(song)}' + key + '.$SOUND_EXT')))
+			return true;
+		#end
+
+		if(OpenFlAssets.exists(getPath('${formatToSongPath(song)}/' + key + '.$SOUND_EXT', MUSIC, 'songs', false))) {
 			return true;
 		}
 		return false;

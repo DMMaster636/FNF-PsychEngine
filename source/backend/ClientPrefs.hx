@@ -78,6 +78,13 @@ class SaveVariables {
 	public var safeFrames:Float = 10;
 	public var discordRPC:Bool = true;
 
+	public var requireGood:Bool = true;
+	public var freestyling:Bool = false;
+	public var gradingStyle:Bool = true;
+	public var parappaEffects:Bool = true;
+	public var health:Bool = false;
+	// public var coolEvents:Bool = false; // maybe some other time
+
 	public function new()
 	{
 		//Why does haxe needs this again?
@@ -91,6 +98,9 @@ class ClientPrefs {
 	//Every key has two binds, add your key bind down here and then add your control on options/ControlsSubState.hx and Controls.hx
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
 		//Key Bind, Name for ControlsSubState
+		'hold_note'		=> [Q],
+		'reset_combo'	=> [E],
+
 		'note_up'		=> [W, UP],
 		'note_left'		=> [A, LEFT],
 		'note_down'		=> [S, DOWN],
@@ -114,6 +124,9 @@ class ClientPrefs {
 		'debug_2'		=> [EIGHT]
 	];
 	public static var gamepadBinds:Map<String, Array<FlxGamepadInputID>> = [
+		'hold_note'		=> [LEFT_SHOULDER],
+		'reset_combo'	=> [RIGHT_SHOULDER],
+
 		'note_up'		=> [DPAD_UP, Y],
 		'note_left'		=> [DPAD_LEFT, X],
 		'note_down'		=> [DPAD_DOWN, A],
@@ -257,6 +270,7 @@ class ClientPrefs {
 		TitleState.volumeUpKeys = keyBinds.get('volume_up').copy();
 		toggleVolumeKeys(true);
 	}
+
 	public static function toggleVolumeKeys(turnOn:Bool) {
 		if(turnOn)
 		{

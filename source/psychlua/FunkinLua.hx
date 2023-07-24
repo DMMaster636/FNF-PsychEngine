@@ -206,6 +206,14 @@ class FunkinLua {
 		set('splashSkinPostfix', NoteSplash.getSplashSkinPostfix());
 		set('splashAlpha', ClientPrefs.data.splashAlpha);
 
+		// Parappa shit
+		set('requireGood', ClientPrefs.data.requireGood);
+		set('freestyling', ClientPrefs.data.freestyling);
+		set('gradingStyle', ClientPrefs.data.gradingStyle);
+		set('parappaEffects', ClientPrefs.data.parappaEffects);
+		set('health', ClientPrefs.data.health);
+		// set('coolEvents', ClientPrefs.data.coolEvents);
+
 		#if windows
 		set('buildTarget', 'windows');
 		#elseif linux
