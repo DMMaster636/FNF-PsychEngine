@@ -224,6 +224,8 @@ class FunkinLua {
 		set('buildTarget', 'browser');
 		#elseif android
 		set('buildTarget', 'android');
+		#elseif switch
+		set('buildTarget', 'switch');
 		#else
 		set('buildTarget', 'unknown');
 		#end
