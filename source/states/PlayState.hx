@@ -2234,6 +2234,8 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.onComplete = finishSong.bind();
 
 		playerGrade = grade;
+
+		callOnScripts('onGradeChange', [grade]);
 	}
 
 	function openPauseMenu()
@@ -3577,6 +3579,8 @@ class PlayState extends MusicBeatState
 		freestylePrevArrow = freestyleCurrentArrow;
 
 		freestyleSound.play(true);
+
+		callOnScripts('onFreestyle', [freestyleCurrentArrow, freestylePrevArrow, freestyleSoundIndex]);
 	}
 
 	override function destroy() {

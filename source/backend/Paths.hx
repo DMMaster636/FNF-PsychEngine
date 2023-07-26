@@ -386,7 +386,7 @@ class Paths
 	{
 		#if MODS_ALLOWED
 		for(mod in Mods.getGlobalMods())
-			if (FileSystem.exists(mods('$mod/$key')))
+			if (FileSystem.exists(mods('$mod/sounds/freestyle/${formatToSongPath(song)}/$key.$SOUND_EXT')))
 				return true;
 
 		if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + 'sounds/freestyle/${formatToSongPath(song)}' + key + '.$SOUND_EXT'))
