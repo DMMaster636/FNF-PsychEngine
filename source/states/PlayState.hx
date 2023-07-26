@@ -414,7 +414,7 @@ class PlayState extends MusicBeatState
 			badSong = Paths.instBad(SONG.song);
 			trace('bad real');
 		} else {
-			awfulSong = Paths.inst(SONG.song);
+			badSong = Paths.inst(SONG.song);
 			trace('no bad?');
 		}
 		// Cool
@@ -422,7 +422,7 @@ class PlayState extends MusicBeatState
 			coolSong = Paths.instCool(SONG.song);
 			trace('cool real');
 		} else {
-			awfulSong = Paths.inst(SONG.song);
+			coolSong = Paths.inst(SONG.song);
 			trace('no cool?');
 		}
 
