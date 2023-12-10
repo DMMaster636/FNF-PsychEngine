@@ -17,6 +17,10 @@ class ControlsSubState extends MusicBeatSubstate
 
 	//Show on gamepad - Display name - Save file key - Rebind display name
 	var options:Array<Dynamic> = [
+		[true, 'PARAPPA'],
+		[true, 'Hold Note', 'hold_note', 'Hold Note'],
+		[true, 'Reset Combo', 'reset_combo', 'Reset Combo'],
+		[true],
 		[true, 'NOTES'],
 		[true, 'Left', 'note_left', 'Note Left'],
 		[true, 'Down', 'note_down', 'Note Down'],

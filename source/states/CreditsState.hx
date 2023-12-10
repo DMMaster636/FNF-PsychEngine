@@ -39,6 +39,10 @@ class CreditsState extends MusicBeatState
 		#end
 
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+			['PaRappa Rating System Mod'],
+			['doggydentures',		'doggydentures',	'Created the Original Mod',										'https://gamebanana.com/members/1790484','FFFF00'],
+			['DMMaster',			'dmmaster',			'Ported it to Psych Engine',									'https://twitter.com/KunKunDM',			 '8E86FF'],
+			[''],
 			['Psych Engine Team'],
 			['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',								 'https://ko-fi.com/shadowmario',		 '444444'],
 			['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',							 'https://twitter.com/riverennn',		 '14967B'],
