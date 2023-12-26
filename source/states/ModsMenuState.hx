@@ -3,7 +3,6 @@ package states;
 import backend.WeekData;
 import backend.Mods;
 
-import flixel.math.FlxPoint;
 import flixel.ui.FlxButton;
 import flixel.FlxBasic;
 import flixel.graphics.FlxGraphic;
@@ -332,6 +331,7 @@ class ModsMenuState extends MusicBeatState
 			else MusicBeatState.switchState(new MainMenuState());
 
 			persistentUpdate = false;
+			FlxG.autoPause = ClientPrefs.data.autoPause;
 			FlxG.mouse.visible = false;
 			return;
 		}
@@ -392,8 +392,8 @@ class ModsMenuState extends MusicBeatState
 						changeSelectedMod(shiftMult);
 					else if(controls.UI_UP_P)
 						changeSelectedMod(-shiftMult);
-					else if(FlxG.mouse.wheel != 0 && curSelectedMod != 0 && curSelectedMod != modsList.all.length - 1)
-						changeSelectedMod(-FlxG.mouse.wheel * shiftMult);
+					else if(FlxG.mouse.wheel != 0)
+						changeSelectedMod(-FlxG.mouse.wheel * shiftMult, true);
 					else if(FlxG.keys.justPressed.HOME || FlxG.keys.justPressed.END ||
 						FlxG.gamepads.anyJustPressed(LEFT_TRIGGER) || FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER))
 					{
@@ -603,7 +603,7 @@ class ModsMenuState extends MusicBeatState
 		return buttons[Std.int(Math.max(0, Math.min(buttons.length-1, curSelectedButton)))];
 	}
 
-	function changeSelectedMod(add:Int = 0)
+	function changeSelectedMod(add:Int = 0, isMouseWheel:Bool = false)
 	{
 		var max = modsList.all.length - 1;
 		if(max < 0) return;
@@ -629,7 +629,7 @@ class ModsMenuState extends MusicBeatState
 			limited = true;
 		}
 		
-		if(limited && Math.abs(add) == 1)
+		if(!isMouseWheel && limited && Math.abs(add) == 1)
 		{
 			if(add < 0) // pressed up on first mod
 			{
