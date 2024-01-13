@@ -229,3 +229,21 @@ end
 function onSoundFinished(tag)
 	-- Only called if you use playSound() with a tag
 end
+
+-- Parappa Shit
+function onGradeChange(grade)
+	-- Function called when the Grade changes
+	-- grade: -1 = Cool, 0 = Good, 1 = Bad, 2 = Awful
+end
+
+function onFreestylePre(freestyleCurrentArrow, freestylePrevArrow, freestyleSoundIndex)
+	-- Function called when you freestyle (***before*** any updates to the direction)
+	-- freestyleCurrentArrow: The Current Direction used for the freestyle
+	-- freestylePrevArrow: The Previous Direction that was used
+	-- freestyleSoundIndex: The Current Index of the freestyle sound
+end
+
+function onFreestyle(freestyleCurrentArrow, freestylePrevArrow, freestyleSoundIndex)
+	-- Function called when you freestyle (***after*** an updates of the direction)
+	-- Values work the same as goodNoteHitPre
+end

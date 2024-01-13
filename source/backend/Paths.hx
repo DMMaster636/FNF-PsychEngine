@@ -216,9 +216,10 @@ class Paths
 		return voices;
 	}
 
-	inline static public function inst(song:String, ?grade:String = ''):Any
+	inline static public function inst(song:String, postfix:String = null):Any
 	{
-		var songKey:String = '${formatToSongPath(song)}/Inst' + grade;
+		var songKey:String = '${formatToSongPath(song)}/Inst';
+		if(postfix != null) songKey += '-' + postfix;
 		var inst = returnSound(null, songKey, 'songs');
 		return inst;
 	}

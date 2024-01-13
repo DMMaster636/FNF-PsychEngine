@@ -254,3 +254,24 @@ function onCustomSubstateDestroy(name:String)
 	// name is defined on "openCustomSubstate(name)"
 	// called when you use "closeCustomSubstate()"
 }
+
+// Parappa Shit
+function onGradeChange(grade:Int)
+{
+	// unction called when the Grade changes
+	// grade: -1 = Cool, 0 = Good, 1 = Bad, 2 = Awful
+}
+
+function onFreestylePre(freestyleCurrentArrow:Int, freestylePrevArrow:Int, freestyleSoundIndex:Int)
+{
+	// Function called when you freestyle (***before*** any updates to the direction)
+	// freestyleCurrentArrow: The Current Direction used for the freestyle
+	// freestylePrevArrow: The Previous Direction that was used
+	// freestyleSoundIndex: The Current Index of the freestyle sound
+}
+
+function onFreestyle(freestyleCurrentArrow:Int, freestylePrevArrow:Int, freestyleSoundIndex:Int)
+{
+	// Function called when you freestyle (***after*** an updates of the direction)
+	// Values work the same as goodNoteHitPre
+}

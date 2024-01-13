@@ -405,20 +405,20 @@ class PlayState extends MusicBeatState
 		precacheList.set('phrasebad', 'sound');
 
 		// Awful
-		if (Paths.songExists(SONG.song, 'Inst_Awful')) {
-			awfulSong = Paths.inst(SONG.song, '_Awful');
+		if (Paths.songExists(SONG.song, 'Inst-Awful')) {
+			awfulSong = Paths.inst(SONG.song, 'Awful');
 			trace('awful real');
 		} else awfulSong = Paths.inst(SONG.song);
 
 		// Bad
-		if (Paths.songExists(SONG.song, 'Inst_Bad')) {
-			badSong = Paths.inst(SONG.song, '_Bad');
+		if (Paths.songExists(SONG.song, 'Inst-Bad')) {
+			badSong = Paths.inst(SONG.song, 'Bad');
 			trace('bad real');
 		} else badSong = Paths.inst(SONG.song);
 
 		// Cool
-		if (Paths.songExists(SONG.song, 'Inst_Cool')) {
-			coolSong = Paths.inst(SONG.song, '_Cool');
+		if (Paths.songExists(SONG.song, 'Inst-Cool')) {
+			coolSong = Paths.inst(SONG.song, 'Cool');
 			trace('cool real');
 		} else coolSong = Paths.inst(SONG.song);
 
@@ -2316,6 +2316,7 @@ class PlayState extends MusicBeatState
 					notes.visible = false;
 					moveCamera(false);
 					vocals.volume = 0;
+					opponentVocals.volume = 0;
 				case 0:
 					FlxG.sound.playMusic(inst._sound, 1, false);
 					gradeTxtGood.color = FlxColor.WHITE;
@@ -3260,10 +3261,11 @@ class PlayState extends MusicBeatState
 	private function keyPressed(key:Int)
 	{
 		if(cpuControlled || paused || inCutscene || key < 0 || key >= playerStrums.length || !generatedMusic || endingSong || boyfriend.stunned) return;
-		if(ClientPrefs.data.freestyling && playerGrade == -1) return freestyleHandler();
 
 		var ret:Dynamic = callOnScripts('onKeyPressPre', [key]);
 		if(ret == LuaUtils.Function_Stop) return;
+
+		if(ClientPrefs.data.freestyling && playerGrade == -1) return freestyleHandler(key);
 
 		// more accurate hit time for the ratings?
 		var lastTime:Float = Conductor.songPosition;
@@ -3303,7 +3305,7 @@ class PlayState extends MusicBeatState
 			noteMissPress(key);
 		}
 		else if(!shouldMiss && ClientPrefs.data.freestyling)
-			freestyleHandler();
+			freestyleHandler(key);
 
 		// Needed for the  "Just the Two of Us" achievement.
 		//									- Shadow Mario
@@ -3442,7 +3444,7 @@ class PlayState extends MusicBeatState
 
 	function noteMissPress(direction:Int = 1):Void //You pressed a key when there was no notes to press for this key
 	{
-		if(ClientPrefs.data.freestyling) return freestyleHandler();
+		if(ClientPrefs.data.freestyling) return freestyleHandler(direction);
 		if(ClientPrefs.data.ghostTapping) return;
 
 		noteMissCommon(direction);
@@ -3718,9 +3720,14 @@ class PlayState extends MusicBeatState
 
 	var daFreestyleArray:Array<FlxSound> = [];
 	var freestyleCurrentArrow:Int = 0;
-	function freestyleHandler():Void
+	function freestyleHandler(freestyleArrow:Int = 0):Void
 	{
 		if(startingSong || endingSong) return;
+
+		var ret:Dynamic = callOnScripts('onFreestylePre', [freestyleCurrentArrow, freestylePrevArrow, freestyleSoundIndex]);
+		if(ret == LuaUtils.Function_Stop) return;
+
+		freestyleCurrentArrow = freestyleArrow;
 
 		if ((Math.abs(curStepTime - Conductor.songPosition)) <= Conductor.safeZoneOffset * 0.104 ||
 		(Math.abs(curStepTime + Conductor.stepCrochet - Conductor.songPosition)) <= Conductor.safeZoneOffset * 0.104)
@@ -3745,21 +3752,19 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		if (controls.NOTE_LEFT_P) {
-			daFreestyleArray = freestyleSoundsL;
-			freestyleCurrentArrow = 0;
-		} else if (controls.NOTE_DOWN_P) {
-			daFreestyleArray = freestyleSoundsD;
-			freestyleCurrentArrow = 1;
-		} else if (controls.NOTE_UP_P) {
-			daFreestyleArray = freestyleSoundsU;
-			freestyleCurrentArrow = 2;
-		} else if (controls.NOTE_RIGHT_P) {
-			daFreestyleArray = freestyleSoundsR;
-			freestyleCurrentArrow = 3;
+		switch (freestyleArrow)
+		{
+			case 0:
+				daFreestyleArray = freestyleSoundsL;
+			case 1:
+				daFreestyleArray = freestyleSoundsD;
+			case 2:
+				daFreestyleArray = freestyleSoundsU;
+			case 3:
+				daFreestyleArray = freestyleSoundsR;
 		}
 
-		var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, freestyleCurrentArrow)))];
+		var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, freestyleArrow)))];
 
 		var char:Character = boyfriend;
 		if(SONG.notes[curSection] != null && SONG.notes[curSection].gfSection) char = gf;
@@ -3772,21 +3777,25 @@ class PlayState extends MusicBeatState
 
 		freestyleSound.stop();
 
-		if (freestyleCurrentArrow != freestylePrevArrow || controls.RESET_COMBO_P)
+		if (freestyleArrow != freestylePrevArrow || controls.RESET_COMBO_P)
 			freestyleSoundIndex = 0;
-		if (playerGrade == -1 && controls.HOLD_NOTE && freestyleCurrentArrow == freestylePrevArrow)
+
+		if (playerGrade == -1 && controls.HOLD_NOTE && freestyleArrow == freestylePrevArrow)
 		{
 			if (freestyleSoundIndex == 0)
 				freestyleSoundIndex = daFreestyleArray.length-1;
 			else
 				freestyleSoundIndex--;
 		}
+
 		freestyleSound = daFreestyleArray[freestyleSoundIndex];
+
 		if (playerGrade == -1)
 			freestyleSoundIndex++;
 		if (freestyleSoundIndex > daFreestyleArray.length-1)
 			freestyleSoundIndex = 0;
-		freestylePrevArrow = freestyleCurrentArrow;
+
+		freestylePrevArrow = freestyleArrow;
 
 		freestyleSound.play(true);
 
