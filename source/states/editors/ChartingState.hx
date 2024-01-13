@@ -392,6 +392,7 @@ class ChartingState extends MusicBeatState
 	#if FLX_PITCH
 	var sliderRate:FlxUISlider;
 	#end
+	var strumTimeOffsetInput:FlxUIInputText;
 	function addSongUI():Void
 	{
 		UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
@@ -589,6 +590,34 @@ class ChartingState extends MusicBeatState
 		stageDropDown.selectedLabel = _song.stage;
 		blockPressWhileScrolling.push(stageDropDown);
 
+		strumTimeOffsetInput = new FlxUIInputText(10, player2DropDown.y + 120, 100, '0', 8);
+		blockPressWhileTypingOn.push(strumTimeOffsetInput);
+
+		var offsetNotesButton:FlxButton = new FlxButton(strumTimeOffsetInput.x + 105, strumTimeOffsetInput.y - 3, "Move Notes", function()
+		{
+			var value:Float = Std.parseFloat(strumTimeOffsetInput.text);
+			if(Math.isNaN(value)) value = 0;
+
+			for (daSection in 0..._song.notes.length)
+				for (note in _song.notes[daSection].sectionNotes)
+					note[0] += value;
+
+			strumTimeOffsetInput.text = '0';
+			updateGrid();
+		});
+
+		var offsetEventsButton:FlxButton = new FlxButton(offsetNotesButton.x + 85, offsetNotesButton.y, "Move Events", function()
+		{
+			var value:Float = Std.parseFloat(strumTimeOffsetInput.text);
+			if(Math.isNaN(value)) value = 0;
+
+			for (event in _song.events)
+				event[0] += value;
+
+			strumTimeOffsetInput.text = '0';
+			updateGrid();
+		});
+
 		var tab_group_song = new FlxUI(null, UI_box);
 		tab_group_song.name = "Song";
 		tab_group_song.add(UI_songTitle);
@@ -611,10 +640,14 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(new FlxText(gfVersionDropDown.x, gfVersionDropDown.y - 15, 0, 'Girlfriend:'));
 		tab_group_song.add(new FlxText(player1DropDown.x, player1DropDown.y - 15, 0, 'Boyfriend:'));
 		tab_group_song.add(new FlxText(stageDropDown.x, stageDropDown.y - 15, 0, 'Stage:'));
+		tab_group_song.add(new FlxText(strumTimeOffsetInput.x - 2, strumTimeOffsetInput.y - 15, 0, 'Strum Time Offset (ms):'));
 		tab_group_song.add(player2DropDown);
 		tab_group_song.add(gfVersionDropDown);
 		tab_group_song.add(player1DropDown);
 		tab_group_song.add(stageDropDown);
+		tab_group_song.add(strumTimeOffsetInput);
+		tab_group_song.add(offsetNotesButton);
+		tab_group_song.add(offsetEventsButton);
 
 		UI_box.addGroup(tab_group_song);
 
