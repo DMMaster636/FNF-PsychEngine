@@ -69,10 +69,15 @@ class EditorPlayState extends MusicBeatSubstate
 	var dataTxt:FlxText;
 	var guitarHeroSustains:Bool = false;
 
-	public function new(playbackRate:Float)
+	var lilPlayStage:FlxSprite;
+	var lilPlayGf:FlxSprite;
+	var lilPlayBf:FlxSprite;
+	var lilPlayOpp:FlxSprite;
+
+	public function new(playbackRate:Float, ?lilBuddies:Bool = false)
 	{
 		super();
-		
+
 		/* setting up some important data */
 		this.playbackRate = playbackRate;
 		this.startPos = Conductor.songPosition;
@@ -97,7 +102,74 @@ class EditorPlayState extends MusicBeatSubstate
 		bg.color = 0xFF101010;
 		bg.alpha = 0.9;
 		add(bg);
-		
+
+		/* lil buddies :) */
+		lilPlayStage = new FlxSprite().loadGraphic(Paths.image("editors/lilStage"));
+		lilPlayStage.antialiasing = false;
+		lilPlayStage.screenCenter();
+		lilPlayStage.scrollFactor.set();
+		add(lilPlayStage);
+
+		lilPlayGf = new FlxSprite().loadGraphic(Paths.image("editors/lilGf"), true, 300, 256);
+		lilPlayGf.animation.add("idle", [0, 1], 12, true);
+		lilPlayGf.animation.add("0", [3, 4, 5], 12, false);
+		lilPlayGf.animation.add("1", [6, 7, 8], 12, false);
+		lilPlayGf.animation.add("2", [9, 10, 11], 12, false);
+		lilPlayGf.animation.add("3", [12, 13, 14], 12, false);
+		lilPlayGf.animation.add("yeah", [15, 16, 17], 12, false);
+		lilPlayGf.animation.play("idle");
+		lilPlayGf.animation.finishCallback = function(name:String) {
+			lilPlayGf.animation.play(name, true, false, lilPlayGf.animation.getByName(name).numFrames - 2);
+		}
+		lilPlayGf.antialiasing = false;
+		lilPlayGf.screenCenter();
+		lilPlayGf.x += 22;
+		lilPlayGf.scrollFactor.set();
+		add(lilPlayGf);
+
+		lilPlayBf = new FlxSprite().loadGraphic(Paths.image("editors/lilBf"), true, 300, 256);
+		lilPlayBf.animation.add("idle", [0, 1], 12, true);
+		lilPlayBf.animation.add("0", [3, 4, 5], 12, false);
+		lilPlayBf.animation.add("1", [6, 7, 8], 12, false);
+		lilPlayBf.animation.add("2", [9, 10, 11], 12, false);
+		lilPlayBf.animation.add("3", [12, 13, 14], 12, false);
+		lilPlayBf.animation.add("miss0", [15, 16], 12, true);
+		lilPlayBf.animation.add("miss1", [18, 19], 12, true);
+		lilPlayBf.animation.add("miss2", [21, 22], 12, true);
+		lilPlayBf.animation.add("miss3", [24, 25], 12, true);
+		lilPlayBf.animation.add("yeah", [17, 20, 23], 12, false);
+		lilPlayBf.animation.play("idle");
+		lilPlayBf.animation.finishCallback = function(name:String) {
+			lilPlayBf.animation.play(name, true, false, lilPlayBf.animation.getByName(name).numFrames - 2);
+		}
+		lilPlayBf.antialiasing = false;
+		lilPlayBf.screenCenter();
+		lilPlayBf.x += 22;
+		lilPlayBf.scrollFactor.set();
+		add(lilPlayBf);
+
+		lilPlayOpp = new FlxSprite().loadGraphic(Paths.image("editors/lilOpp"), true, 300, 256);
+		lilPlayOpp.animation.add("idle", [0, 1], 12, true);
+		lilPlayOpp.animation.add("0", [3, 4, 5], 12, false);
+		lilPlayOpp.animation.add("1", [6, 7, 8], 12, false);
+		lilPlayOpp.animation.add("2", [9, 10, 11], 12, false);
+		lilPlayOpp.animation.add("3", [12, 13, 14], 12, false);
+		lilPlayOpp.animation.add("yeah", [15, 16, 17], 12, false);
+		lilPlayOpp.animation.play("idle");
+		lilPlayOpp.animation.finishCallback = function(name:String) {
+			lilPlayOpp.animation.play(name, true, false, lilPlayOpp.animation.getByName(name).numFrames - 2);
+		}
+		lilPlayOpp.antialiasing = false;
+		lilPlayOpp.screenCenter();
+		lilPlayOpp.x += 22;
+		lilPlayOpp.scrollFactor.set();
+		add(lilPlayOpp);
+
+		lilPlayGf.visible = lilBuddies;
+		lilPlayBf.visible = lilBuddies;
+		lilPlayOpp.visible = lilBuddies;
+		lilPlayStage.visible = lilBuddies;
+
 		/**** NOTES ****/
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		add(strumLineNotes);
@@ -246,13 +318,17 @@ class EditorPlayState extends MusicBeatSubstate
 		super.beatHit();
 		lastBeatHit = curBeat;
 	}
-	
+
 	override function sectionHit()
 	{
 		if (PlayState.SONG.notes[curSection] != null)
 		{
 			if (PlayState.SONG.notes[curSection].changeBPM)
 				Conductor.bpm = PlayState.SONG.notes[curSection].bpm;
+
+			lilPlayGf.animation.play("idle", true);
+			lilPlayBf.animation.play("idle", true);
+			lilPlayOpp.animation.play("idle", true);
 		}
 		super.sectionHit();
 	}
@@ -787,6 +863,21 @@ class EditorPlayState extends MusicBeatSubstate
 		}
 		note.hitByOpponent = true;
 
+		if (!note.noAnimation)
+		{
+			if(note.gfNote) {
+				lilPlayGf.animation.play("" + note.noteData, true);
+
+				if(note.noteType == 'Hey!')
+					lilPlayGf.animation.play("yeah", true);
+			} else {
+				lilPlayOpp.animation.play("" + note.noteData, true);
+
+				if(note.noteType == 'Hey!')
+					lilPlayOpp.animation.play("yeah", true);
+			}
+		}
+
 		if (!note.isSustainNote)
 			invalidateNote(note);
 	}
@@ -814,6 +905,21 @@ class EditorPlayState extends MusicBeatSubstate
 			combo++;
 			if(combo > 9999) combo = 9999;
 			popUpScore(note);
+		}
+
+		if (!note.noAnimation)
+		{
+			if(note.gfNote) {
+				lilPlayGf.animation.play("" + note.noteData, true);
+
+				if(note.noteType == 'Hey!')
+					lilPlayGf.animation.play("yeah", true);
+			} else {
+				lilPlayBf.animation.play("" + note.noteData, true);
+
+				if(note.noteType == 'Hey!')
+					lilPlayBf.animation.play("yeah", true);
+			}
 		}
 
 		var spr:StrumNote = playerStrums.members[note.noteData];
@@ -863,6 +969,9 @@ class EditorPlayState extends MusicBeatSubstate
 				}
 			}
 		}
+
+		if (!daNote.noMissAnimation)
+			lilPlayBf.animation.play("miss" + daNote.noteData, true);
 
 		// score and data
 		songMisses++;
