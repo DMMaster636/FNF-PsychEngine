@@ -397,10 +397,10 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.bpm = SONG.bpm;
 
-		precacheList.set('gradeup', 'sound');
-		precacheList.set('gradedown', 'sound');
-		precacheList.set('phrasegood', 'sound');
-		precacheList.set('phrasebad', 'sound');
+		Paths.sound('gradeup');
+		Paths.sound('gradedown');
+		Paths.sound('phrasegood');
+		Paths.sound('phrasebad');
 
 		// Awful
 		if (Paths.songExists(SONG.song, 'Inst-Awful')) {
