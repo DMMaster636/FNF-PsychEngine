@@ -79,6 +79,10 @@ class EditorPlayState extends MusicBeatSubstate
 	var lilPlayBf:FlxSprite;
 	var lilPlayOpp:FlxSprite;
 
+	var singTimerGF:FlxTimer = null;
+	var singTimerOpponent:FlxTimer = null;
+	var singTimerPlayer:FlxTimer = null;
+
 	public function new(playbackRate:Float, ?lilBuddies:Bool = false)
 	{
 		super();
@@ -336,10 +340,6 @@ class EditorPlayState extends MusicBeatSubstate
 		{
 			if (PlayState.SONG.notes[curSection].changeBPM)
 				Conductor.bpm = PlayState.SONG.notes[curSection].bpm;
-
-			lilPlayGf.animation.play("idle", true);
-			lilPlayBf.animation.play("idle", true);
-			lilPlayOpp.animation.play("idle", true);
 		}
 		super.sectionHit();
 	}
@@ -349,6 +349,9 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 		FlxG.mouse.visible = true;
+		if(singTimerGF != null) singTimerGF.cancel();
+		if(singTimerOpponent != null) singTimerOpponent.cancel();
+		if(singTimerPlayer != null) singTimerPlayer.cancel();
 		super.destroy();
 	}
 	
@@ -887,7 +890,6 @@ class EditorPlayState extends MusicBeatSubstate
 					keyReleased(i);
 	}
 
-	
 	function opponentNoteHit(note:Note):Void
 	{
 		if (PlayState.SONG.needsVoices && opponentVocals.length <= 0)
@@ -902,16 +904,24 @@ class EditorPlayState extends MusicBeatSubstate
 
 		if (!note.noAnimation)
 		{
-			if(note.gfNote) {
-				lilPlayGf.animation.play("" + note.noteData, true);
+			var char:FlxSprite = lilPlayOpp;
+			if(note.gfNote || PlayState.SONG.notes[curSection].gfSection) char = lilPlayGf;
 
-				if(note.noteType == 'Hey!')
-					lilPlayGf.animation.play("yeah", true);
+			char.animation.play("" + note.noteData, true);
+
+			if(note.noteType == 'Hey!')
+				char.animation.play("yeah", true);
+
+			if(note.gfNote || PlayState.SONG.notes[curSection].gfSection) {
+				if(singTimerGF != null) singTimerGF.cancel();
+				singTimerGF = new FlxTimer().start(0.6, function(tmr:FlxTimer) {
+					lilPlayGf.animation.play("idle", true);
+				});
 			} else {
-				lilPlayOpp.animation.play("" + note.noteData, true);
-
-				if(note.noteType == 'Hey!')
-					lilPlayOpp.animation.play("yeah", true);
+				if(singTimerOpponent != null) singTimerOpponent.cancel();
+				singTimerOpponent = new FlxTimer().start(0.6, function(tmr:FlxTimer) {
+					lilPlayOpp.animation.play("idle", true);
+				});
 			}
 		}
 
@@ -946,16 +956,24 @@ class EditorPlayState extends MusicBeatSubstate
 
 		if (!note.noAnimation)
 		{
-			if(note.gfNote) {
-				lilPlayGf.animation.play("" + note.noteData, true);
+			var char:FlxSprite = lilPlayBf;
+			if(note.gfNote || PlayState.SONG.notes[curSection].gfSection) char = lilPlayGf;
 
-				if(note.noteType == 'Hey!')
-					lilPlayGf.animation.play("yeah", true);
+			char.animation.play("" + note.noteData, true);
+
+			if(note.noteType == 'Hey!')
+				char.animation.play("yeah", true);
+
+			if(note.gfNote || PlayState.SONG.notes[curSection].gfSection) {
+				if(singTimerGF != null) singTimerGF.cancel();
+				singTimerGF = new FlxTimer().start(0.6, function(tmr:FlxTimer) {
+					lilPlayGf.animation.play("idle", true);
+				});
 			} else {
-				lilPlayBf.animation.play("" + note.noteData, true);
-
-				if(note.noteType == 'Hey!')
-					lilPlayBf.animation.play("yeah", true);
+				if(singTimerPlayer != null) singTimerPlayer.cancel();
+				singTimerPlayer = new FlxTimer().start(0.6, function(tmr:FlxTimer) {
+					lilPlayBf.animation.play("idle", true);
+				});
 			}
 		}
 
@@ -1007,8 +1025,13 @@ class EditorPlayState extends MusicBeatSubstate
 			}
 		}
 
-		if (!daNote.noMissAnimation)
+		if (!daNote.noMissAnimation) {
 			lilPlayBf.animation.play("miss" + daNote.noteData, true);
+			if(singTimerPlayer != null) singTimerPlayer.cancel();
+			singTimerPlayer = new FlxTimer().start(0.6, function(tmr:FlxTimer) {
+				lilPlayBf.animation.play("idle", true);
+			});
+		}
 
 		// score and data
 		songMisses++;
