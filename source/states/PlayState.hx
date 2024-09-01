@@ -237,8 +237,6 @@ class PlayState extends MusicBeatState
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	#end
-	public var introSoundsSuffix:String = '';
-	public var introSoundNames:Array<String> = [];
 
 	// Less laggy controls
 	private var keysArray:Array<String>;
@@ -347,16 +345,27 @@ class PlayState extends MusicBeatState
 		if(girlfriendCameraOffset == null)
 			girlfriendCameraOffset = [0, 0];
 
-		introSoundNames = stageData.introSounds;
-		if(introSoundNames == null || introSoundNames.length < 4)
-			introSoundNames = getCountdownSoundNames(stageUI); // safety measure
-		for(sndName in introSoundNames) {
-			if(sndName == null) continue;
-			// trim trailing spaces in the sound, just in case, JUST in case.
-			var sndi: Int = introSoundNames.indexOf(sndName);
-			introSoundNames[sndi] = sndName.trim();
+		introSprites = stageData.introSprites;
+		if(introSprites == null || introSprites.length < 4)
+			introSprites = getCountdownSpriteNames(); // safety measure
+
+		for(num => sprite in introSprites)
+		{
+			if(sprite == null) continue;
+			// trim trailing spaces in the sprite, just in case, JUST in case.
+			introSprites[num] = sprite.trim();
 		}
-		//trace(introSoundNames);
+
+		introSounds = stageData.introSounds;
+		if(introSounds == null || introSounds.length < 4)
+			introSounds = getCountdownSoundNames(); // safety measure
+
+		for(num => sound in introSounds)
+		{
+			if(sound == null) continue;
+			// trim trailing spaces in the sound, just in case, JUST in case.
+			introSounds[num] = sound.trim();
+		}
 
 		boyfriendGroup = new FlxSpriteGroup(BF_X, BF_Y);
 		dadGroup = new FlxSpriteGroup(DAD_X, DAD_Y);
@@ -909,7 +918,11 @@ class PlayState extends MusicBeatState
 	var startTimer:FlxTimer;
 	var finishTimer:FlxTimer = null;
 
-	// For being able to mess with the sprites on Lua
+	// For being able to mess with the countdown on Lua
+	public var introSprites:Array<String> = null;
+	public var introSounds:Array<String> = null;
+	public var introSoundsSuffix:String = '';
+
 	public var countdownPrepare:FlxSprite; // new additional sprite, for "three" sound during countdown
 	public var countdownReady:FlxSprite;
 	public var countdownSet:FlxSprite;
@@ -918,24 +931,36 @@ class PlayState extends MusicBeatState
 
 	function cacheCountdown()
 	{
-		var introSprites:Array<String> = getCountdownSpriteNames(stageUI);
-		for (asset in introSprites) Paths.image(asset);
-		for (sound in introSoundNames) Paths.sound(sound + introSoundsSuffix, true, false); // this should cover backwards compat
+		// extra checks to not try and cache sumn that doesn't exist    - DM
+		if (introSprites != null)
+			for (sprite in introSprites)
+			{
+				if (sprite != null && sprite.length > 0)
+					Paths.image(sprite);
+			}
+		if (introSounds != null)
+			for (sound in introSounds)
+			{
+				if (sound != null && sound.length > 0)
+					Paths.sound(sound + introSoundsSuffix, true, false); // this should cover backwards compat
+			}
 	}
 
-	function getCountdownSpriteNames(?givenUI: Null<String>):Array<String> {
-		if(givenUI == null) givenUI = stageUI;
-		return switch(givenUI) {
-			case "pixel": ['${givenUI}UI/ready-pixel', '${givenUI}UI/ready-pixel', '${givenUI}UI/set-pixel', '${givenUI}UI/date-pixel'];
+	function getCountdownSpriteNames():Array<String>
+	{
+		return switch(stageUI)
+		{
+			case "pixel": ['${stageUI}UI/ready-pixel', '${stageUI}UI/ready-pixel', '${stageUI}UI/set-pixel', '${stageUI}UI/date-pixel'];
 			case "normal": ["prepare", "ready", "set" ,"go"];
-			default: ['${givenUI}UI/prepare', '${givenUI}UI/ready', '${givenUI}UI/set', '${givenUI}UI/go'];
+			default: ['${stageUI}UI/prepare', '${stageUI}UI/ready', '${stageUI}UI/set', '${stageUI}UI/go'];
 		};
 	}
 
-	function getCountdownSoundNames(?givenUI: Null<String>):Array<String> {
-		if(givenUI == null) givenUI = stageUI;
-		var sounds: Array<String> = ["intro3", "intro2", "intro1", "introGo"];
-		return switch(givenUI) { // add custom ones here if you need to hardcode or something
+	function getCountdownSoundNames():Array<String>
+	{
+		var sounds:Array<String> = ["intro3", "intro2", "intro1", "introGo"];
+		return switch(stageUI) // add custom ones here if you need to hardcode or something
+		{
 			default: sounds;
 		}
 	}
@@ -971,8 +996,10 @@ class PlayState extends MusicBeatState
 			setOnScripts('startedCountdown', true);
 			callOnScripts('onCountdownStarted');
 
+			var tick:Countdown = THREE;
 			var swagCounter:Int = 0;
-			if (startOnTime > 0) {
+			if (startOnTime > 0)
+			{
 				clearNotesBefore(startOnTime);
 				setSongTime(startOnTime - 350);
 				return true;
@@ -988,27 +1015,23 @@ class PlayState extends MusicBeatState
 			{
 				characterBopper(tmr.loopsLeft);
 
-				var introSprites:Array<String> = getCountdownSpriteNames(stageUI);
-				var antialias:Bool = (ClientPrefs.data.antialiasing && !isPixelStage);
-				var tick:Countdown = THREE;
-
 				switch (swagCounter)
 				{
 					case 0:
-						countdownPrepare = createCountdownSprite(introSprites[0], antialias);
-						CoolUtil.playSoundSafe(Paths.sound(introSoundNames[0] + introSoundsSuffix, true, false), 0.6);
+						countdownPrepare = createCountdownSprite(introSprites[0]);
+						CoolUtil.playSoundSafe(Paths.sound(introSounds[0] + introSoundsSuffix, true, false), 0.6);
 						tick = THREE;
 					case 1:
-						countdownReady = createCountdownSprite(introSprites[1], antialias);
-						CoolUtil.playSoundSafe(Paths.sound(introSoundNames[1] + introSoundsSuffix, true, false), 0.6);
+						countdownReady = createCountdownSprite(introSprites[1]);
+						CoolUtil.playSoundSafe(Paths.sound(introSounds[1] + introSoundsSuffix, true, false), 0.6);
 						tick = TWO;
 					case 2:
-						countdownSet = createCountdownSprite(introSprites[2], antialias);
-						CoolUtil.playSoundSafe(Paths.sound(introSoundNames[2] + introSoundsSuffix, true, false), 0.6);
+						countdownSet = createCountdownSprite(introSprites[2]);
+						CoolUtil.playSoundSafe(Paths.sound(introSounds[2] + introSoundsSuffix, true, false), 0.6);
 						tick = ONE;
 					case 3:
-						countdownGo = createCountdownSprite(introSprites[3], antialias);
-						CoolUtil.playSoundSafe(Paths.sound(introSoundNames[3] + introSoundsSuffix, true, false), 0.6);
+						countdownGo = createCountdownSprite(introSprites[3]);
+						CoolUtil.playSoundSafe(Paths.sound(introSounds[3] + introSoundsSuffix, true, false), 0.6);
 						tick = GO;
 					case 4:
 						tick = START;
@@ -1037,12 +1060,13 @@ class PlayState extends MusicBeatState
 		return true;
 	}
 
-	inline private function createCountdownSprite(image:String, antialias:Bool):FlxSprite
+	inline private function createCountdownSprite(image:String):FlxSprite
 	{
+		var antialias:Bool = (ClientPrefs.data.antialiasing && !isPixelStage);
 		var countdownGraphic = Paths.image(image);
 		if (countdownGraphic == null) {
 			var dum:FlxSprite = new FlxSprite();
-			new FlxTimer().start(Conductor.crochet / 1000, function(_) dum.destroy());
+			new FlxTimer().start(Conductor.crochet / 1000 / playbackRate, function(_) dum.destroy());
 			return dum; // return an empty sprite if the image doesn't exist
 		}
 
@@ -1057,7 +1081,7 @@ class PlayState extends MusicBeatState
 		spr.screenCenter();
 		spr.antialiasing = antialias;
 		insert(members.indexOf(noteGroup), spr);
-		FlxTween.tween(spr, {/*y: spr.y + 100,*/ alpha: 0}, Conductor.crochet / 1000, {
+		FlxTween.tween(spr, {/*y: spr.y + 100,*/ alpha: 0}, Conductor.crochet / 1000 / playbackRate, {
 			ease: FlxEase.cubeInOut,
 			onComplete: function(twn:FlxTween)
 			{

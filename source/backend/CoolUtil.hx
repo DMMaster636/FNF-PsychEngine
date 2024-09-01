@@ -24,7 +24,7 @@ class CoolUtil
 	 * @param sound					The sound stream (i.e: String, openfl.media.Sound, etc)
 	 * @param volume				Sound's volume
 	**/
-	public static function playSoundSafe(sound:flixel.system.FlxAssets.FlxSoundAsset, ?beepOnError: Bool = true, volume: Float = 1.0)
+	public static function playSoundSafe(sound:flixel.system.FlxAssets.FlxSoundAsset, volume:Float = 1.0)
 	{
 		if(sound != null) FlxG.sound.play(sound, volume);
 	}
