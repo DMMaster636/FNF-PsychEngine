@@ -13,11 +13,10 @@ class MusicBeatState extends FlxState
 
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
+
 	public var controls(get, never):Controls;
 	private function get_controls()
-	{
 		return Controls.instance;
-	}
 
 	var _psychCameraInitialized:Bool = false;
 

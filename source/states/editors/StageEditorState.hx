@@ -28,6 +28,8 @@ import states.editors.content.PreloadListSubState;
 
 class StageEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
+	public static var instance:StageEditorState;
+
 	final minZoom = 0.1;
 	final maxZoom = 2;
 
@@ -36,8 +38,10 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var boyfriend:Character;
 	var stageJson:StageFile;
 
-	var camGame:FlxCamera;
+	public var camGame:FlxCamera;
 	public var camHUD:FlxCamera;
+	public var camOther:FlxCamera;
+	public var camEditor:FlxCamera;
 
 	var UI_stagebox:PsychUIBox;
 	var UI_box:PsychUIBox;
@@ -67,10 +71,18 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
+		instance = this;
+
 		camGame = initPsychCamera();
 		camHUD = new FlxCamera();
+		camOther = new FlxCamera();
+		camEditor = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
+		camOther.bgColor.alpha = 0;
+		camEditor.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
+		FlxG.cameras.add(camOther, false);
+		FlxG.cameras.add(camEditor, false);
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence('Stage Editor', 'Stage: ' + lastLoadedStage);
@@ -127,11 +139,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var showSelectionQuad:Bool = true;
 	function addHelpScreen()
 	{
-		#if FLX_DEBUG
-		var btn = 'F3';
-		#else
-		var btn = 'F2';
-		#end
+		final btn = #if FLX_DEBUG 'F3' #else 'F2' #end;
 
 		var str:Array<String> = ["E/Q - Camera Zoom In/Out",
 			"J/K/L/I - Move Camera",
@@ -148,12 +156,12 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		helpBg.scale.set(FlxG.width, FlxG.height);
 		helpBg.updateHitbox();
 		helpBg.alpha = 0.6;
-		helpBg.cameras = [camHUD];
+		helpBg.cameras = [camEditor];
 		helpBg.active = helpBg.visible = false;
 		add(helpBg);
 
 		helpTexts = new FlxSpriteGroup();
-		helpTexts.cameras = [camHUD];
+		helpTexts.cameras = [camEditor];
 		for (i => txt in str)
 		{
 			if(txt.length < 1) continue;
@@ -214,12 +222,12 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 		spriteList_box = new PsychUIBox(25, 40, 250, 200, ['Sprite List']);
 		spriteList_box.scrollFactor.set();
-		spriteList_box.cameras = [camHUD];
+		spriteList_box.cameras = [camEditor];
 		add(spriteList_box);
 		addSpriteListBox();
 
 		var bg:FlxSprite = new FlxSprite(0, FlxG.height - 60).makeGraphic(1, 1, FlxColor.BLACK);
-		bg.cameras = [camHUD];
+		bg.cameras = [camEditor];
 		bg.alpha = 0.4;
 		bg.scale.set(FlxG.width, FlxG.height - bg.y);
 		bg.updateHitbox();
@@ -227,7 +235,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		
 		var tipText:FlxText = new FlxText(0, FlxG.height - 44, 300, 'Press F1 for Help', 20);
 		tipText.alignment = CENTER;
-		tipText.cameras = [camHUD];
+		tipText.cameras = [camEditor];
 		tipText.scrollFactor.set();
 		tipText.screenCenter(X);
 		tipText.active = false;
@@ -235,7 +243,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 		var targetTxt:FlxText = new FlxText(30, FlxG.height - 52, 300, 'Camera Target', 16);
 		targetTxt.alignment = CENTER;
-		targetTxt.cameras = [camHUD];
+		targetTxt.cameras = [camEditor];
 		targetTxt.scrollFactor.set();
 		targetTxt.active = false;
 		add(targetTxt);
@@ -254,17 +262,17 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		for (radio in focusRadioGroup.radios)
 			radio.text.size = 11;
 		
-		focusRadioGroup.cameras = [camHUD];
+		focusRadioGroup.cameras = [camEditor];
 		add(focusRadioGroup);
 
 		lowQualityCheckbox = new PsychUICheckBox(FlxG.width - 240, FlxG.height - 36, 'Can see Low Quality Sprites?', 90);
-		lowQualityCheckbox.cameras = [camHUD];
+		lowQualityCheckbox.cameras = [camEditor];
 		lowQualityCheckbox.onClick = visibilityFilterUpdate;
 		lowQualityCheckbox.checked = false;
 		add(lowQualityCheckbox);
 
 		highQualityCheckbox = new PsychUICheckBox(FlxG.width - 120, FlxG.height - 36, 'Can see High Quality Sprites?', 90);
-		highQualityCheckbox.cameras = [camHUD];
+		highQualityCheckbox.cameras = [camEditor];
 		highQualityCheckbox.onClick = visibilityFilterUpdate;
 		highQualityCheckbox.checked = true;
 		add(highQualityCheckbox);
@@ -273,7 +281,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		posTxt = new FlxText(0, 50, 500, 'X: 0\nY: 0', 24);
 		posTxt.setFormat(Paths.font('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		posTxt.borderSize = 2;
-		posTxt.cameras = [camHUD];
+		posTxt.cameras = [camEditor];
 		posTxt.screenCenter(X);
 		posTxt.visible = false;
 		add(posTxt);
@@ -282,7 +290,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		outputTxt.alignment = CENTER;
 		outputTxt.borderStyle = OUTLINE_FAST;
 		outputTxt.borderSize = 1;
-		outputTxt.cameras = [camHUD];
+		outputTxt.cameras = [camEditor];
 		outputTxt.screenCenter();
 		outputTxt.alpha = 0;
 		add(outputTxt);
@@ -292,7 +300,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	{
 		var tab_group = spriteList_box.getTab('Sprite List').menu;
 		spriteListRadioGroup = new PsychUIRadioGroup(10, 10, [], 25, 18, false, 200);
-		spriteListRadioGroup.cameras = [camHUD];
+		spriteListRadioGroup.cameras = [camEditor];
 		spriteListRadioGroup.onClick = function() {
 			trace('Selected sprite: ${spriteListRadioGroup.checkedRadio.label}');
 			updateSelectedUI();
@@ -316,7 +324,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 			updateSpriteListRadio();
 		});
-		buttonMoveUp.cameras = [camHUD];
+		buttonMoveUp.cameras = [camEditor];
 		tab_group.add(buttonMoveUp);
 
 		var buttonMoveDown:PsychUIButton = new PsychUIButton(buttonX, buttonY + 30, 'Move Down', function()
@@ -334,11 +342,11 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 			updateSpriteListRadio();
 		});
-		buttonMoveDown.cameras = [camHUD];
+		buttonMoveDown.cameras = [camEditor];
 		tab_group.add(buttonMoveDown);
 		
 		var buttonCreate:PsychUIButton = new PsychUIButton(buttonX, buttonY + 60, 'New', function() createPopup.visible = createPopup.active = true);
-		buttonCreate.cameras = [camHUD];
+		buttonCreate.cameras = [camEditor];
 		buttonCreate.normalStyle.bgColor = FlxColor.GREEN;
 		buttonCreate.normalStyle.textColor = FlxColor.WHITE;
 		tab_group.add(buttonCreate);
@@ -420,7 +428,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			copiedMeta.name = findUnoccupiedName('${copiedMeta.name}_copy');
 			insertMeta(copiedMeta, 1);
 		});
-		buttonDuplicate.cameras = [camHUD];
+		buttonDuplicate.cameras = [camEditor];
 		buttonDuplicate.normalStyle.bgColor = FlxColor.BLUE;
 		buttonDuplicate.normalStyle.textColor = FlxColor.WHITE;
 		tab_group.add(buttonDuplicate);
@@ -439,7 +447,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 			updateSpriteListRadio();
 		});
-		buttonDelete.cameras = [camHUD];
+		buttonDelete.cameras = [camEditor];
 		buttonDelete.normalStyle.bgColor = FlxColor.RED;
 		buttonDelete.normalStyle.textColor = FlxColor.WHITE;
 		tab_group.add(buttonDelete);
@@ -498,7 +506,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	function spriteCreatePopup()
 	{
 		createPopup = new FlxSpriteGroup();
-		createPopup.cameras = [camHUD];
+		createPopup.cameras = [camEditor];
 		
 		var bg:FlxSprite = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
 		bg.alpha = 0.6;
@@ -576,13 +584,13 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	function editorUI()
 	{
 		UI_box = new PsychUIBox(FlxG.width - 225, 10, 200, 400, ['Meta', 'Data', 'Object']);
-		UI_box.cameras = [camHUD];
+		UI_box.cameras = [camEditor];
 		UI_box.scrollFactor.set();
 		add(UI_box);
 		UI_box.selectedName = 'Data';
 
 		UI_stagebox = new PsychUIBox(FlxG.width - 275, 25, 250, 100, ['Stage']);
-		UI_stagebox.cameras = [camHUD];
+		UI_stagebox.cameras = [camEditor];
 		UI_stagebox.scrollFactor.set();
 		add(UI_stagebox);
 		UI_box.y += UI_stagebox.y + UI_stagebox.height;
@@ -768,6 +776,9 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var lowQualityCheckbox:PsychUICheckBox;
 	var highQualityCheckbox:PsychUICheckBox;
 
+	var cameraInputText:PsychUIInputText;
+	var blendDropDown:PsychUIDropDownMenu;
+
 	function getSelected(blockReserved:Bool = true)
 	{
 		var selected:Int = spriteListRadioGroup.checked;
@@ -864,6 +875,19 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		};
 		tab_group.add(colorInputText);
 
+		final blendList:Array<String> = [
+			'normal', 'add', 'alpha', 'darken', 'difference', 'erase', 'hardlight', 'invert',
+			'layer', 'lighten', 'multiply', 'overlay', 'screen', 'shader', 'subtract'
+		];
+		tab_group.add(new FlxText(objX + 90, objY - 18, 80, 'Blend Mode:'));
+		blendDropDown = new PsychUIDropDownMenu(objX + 90, objY, blendList, function(sel:Int, value:String) {
+			// blend mode
+			var selected = getSelected();
+			if(selected != null)
+				selected.blend = value;
+		});
+		blendDropDown.selectedLabel = blendList[0];
+
 		function updateScale()
 		{
 			// scale
@@ -936,9 +960,19 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		};
 		tab_group.add(angleStepper);
 
+		tab_group.add(new FlxText(objX + 90, objY - 18, 80, 'Camera:'));
+		cameraInputText = new PsychUIInputText(objX + 90, objY, 80, 'camGame', 8);
+		cameraInputText.onChange = function(old:String, cur:String) {
+			// change color
+			var selected = getSelected();
+			if(selected != null)
+				selected.camera = cameraInputText.text;
+		};
+		tab_group.add(cameraInputText);
+
 		function updateFlip()
 		{
-			//flip X and flip Y
+			// flip X and flip Y
 			var selected = getSelected();
 			if(selected != null)
 			{
@@ -983,6 +1017,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		highQualityCheckbox.onClick = recalcFilter;
 		tab_group.add(lowQualityCheckbox);
 		tab_group.add(highQualityCheckbox);
+
+		tab_group.add(blendDropDown);
 	}
 
 	var oppDropdown:PsychUIDropDownMenu;
@@ -1105,8 +1141,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			#end
 
 			stageJson = StageData.getStageFile(lastLoadedStage);
-			updateSpriteList();
 			updateStageDataUI();
+			updateSpriteList();
 			reloadCharacters();
 			reloadStageDropDown();
 		});
@@ -1118,8 +1154,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			#end
 
 			stageJson = StageData.dummy();
-			updateSpriteList();
 			updateStageDataUI();
+			updateSpriteList();
 			reloadCharacters();
 		});
 		dummyStage.normalStyle.bgColor = FlxColor.RED;
@@ -1140,8 +1176,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 				#if DISCORD_ALLOWED
 				DiscordClient.changePresence('Stage Editor', 'Stage: ' + lastLoadedStage);
 				#end
-				updateSpriteList();
 				updateStageDataUI();
+				updateSpriteList();
 				reloadCharacters();
 				reloadStageDropDown();
 			}
@@ -1225,6 +1261,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		if(selected == null) return;
 
 		// Texts/Input Texts
+		cameraInputText.text = selected.camera;
 		colorInputText.text = selected.color;
 		nameInputText.text = selected.name;
 		imgTxt.text = 'Image: ' + selected.image;
@@ -1250,6 +1287,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		scrollStepperY.value = selected.scroll[1];
 		angleStepper.value = selected.angle;
 		alphaStepper.value = selected.alpha;
+		blendDropDown.selectedLabel = selected.blend;
 
 		// Checkboxes
 		antialiasingCheckbox.checked = selected.antialiasing;
@@ -1334,7 +1372,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var outputTime:Float = 0;
 	override function update(elapsed:Float)
 	{
-		if(createPopup.visible && (FlxG.mouse.justPressedRight || (FlxG.mouse.justPressed && !FlxG.mouse.overlaps(createPopup, camHUD))))
+		if(createPopup.visible && (FlxG.mouse.justPressedRight || (FlxG.mouse.justPressed && !FlxG.mouse.overlaps(createPopup, camEditor))))
 			createPopup.visible = createPopup.active = false;
 
 		for (basic in stageSprites)
@@ -1865,6 +1903,27 @@ class StageEditorMetaSprite
 		sprite.color = CoolUtil.colorFromString(v);
 		return (color = v);
 	}
+
+	public var camera(default, set):String = 'camGame';
+	function set_camera(v:String)
+	{
+		var cam:FlxCamera = null;
+		switch(v.toLowerCase()) {
+			case 'camhud' | 'hud': cam = StageEditorState.instance.camHUD;
+			case 'camother' | 'other': cam = StageEditorState.instance.camOther;
+			default: cam = StageEditorState.instance.camGame;
+		}
+		sprite.cameras = [cam];
+		return (camera = v);
+	}
+
+	public var blend(default, set):String = 'normal';
+	function set_blend(v:String)
+	{
+		sprite.blend = LuaUtils.blendModeFromString(v);
+		return (blend = v);
+	}
+
 	public var image(default, set):String = 'unknown';
 	function set_image(v:String)
 	{
@@ -1927,7 +1986,7 @@ class StageEditorMetaSprite
 		switch(this.type)
 		{
 			case 'sprite', 'square', 'animatedSprite':
-				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'filters', 'antialiasing'])
+				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'camera', 'blend', 'filters', 'antialiasing'])
 				{
 					var dat:Dynamic = Reflect.field(data, v);
 					if(dat != null) Reflect.setField(this, v, dat);
@@ -1955,6 +2014,8 @@ class StageEditorMetaSprite
 				obj.alpha = alpha;
 				obj.angle = angle;
 				obj.color = color;
+				obj.camera = camera;
+				obj.blend = blend;
 				obj.filters = filters;
 
 				if(type != 'square')
@@ -1999,7 +2060,7 @@ class StageEditorAnimationSubstate extends MusicBeatSubstate {
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
 
 	var UI_animationbox:PsychUIBox;
-	var camHUD:FlxCamera = cast(FlxG.state, StageEditorState).camHUD;
+	var camEditor:FlxCamera = cast(FlxG.state, StageEditorState).camEditor;
 	public function new()
 	{
 		super();
@@ -2008,11 +2069,11 @@ class StageEditorAnimationSubstate extends MusicBeatSubstate {
 		add(grid);
 		
 		animsTxtGroup = new FlxTypedGroup<FlxText>();
-		animsTxtGroup.cameras = [camHUD];
+		animsTxtGroup.cameras = [camEditor];
 		add(animsTxtGroup);
 		
 		UI_animationbox = new PsychUIBox(FlxG.width - 320, 20, 300, 250, ['Animations']);
-		UI_animationbox.cameras = [camHUD];
+		UI_animationbox.cameras = [camEditor];
 		UI_animationbox.scrollFactor.set();
 		add(UI_animationbox);
 		addAnimationsUI();

@@ -4,6 +4,7 @@ import openfl.utils.Assets;
 import haxe.Json;
 import backend.Song;
 import psychlua.ModchartSprite;
+import psychlua.LuaUtils;
 
 typedef StageFile = {
 	var directory:String;
@@ -195,14 +196,24 @@ class StageData {
 					}
 					spr.scrollFactor.set(data.scroll[0], data.scroll[1]);
 					spr.color = CoolUtil.colorFromString(data.color);
-					
+					spr.blend = LuaUtils.blendModeFromString(data.blend);
+
 					for (varName in ['alpha', 'angle'])
 					{
 						var dat:Dynamic = Reflect.getProperty(data, varName);
 						if(dat != null) Reflect.setProperty(spr, varName, dat);
 					}
 
-					if (group != null) group.add(spr);
+					if (group == PlayState.instance && PlayState.instance != null)
+						spr.cameras = [LuaUtils.cameraFromString(data.camera)];
+
+					if (group != null)
+					{
+						if (group == PlayState.instance)
+							spr.cameras = [LuaUtils.cameraFromString(data.camera)];
+
+						group.add(spr);
+					}
 					addedObjects.set(data.name, spr);
 
 				default:
