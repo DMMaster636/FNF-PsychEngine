@@ -84,6 +84,10 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.add(camEditor, false);
 
+		MusicBeatState.getVariables().set('camGame', camGame);
+		MusicBeatState.getVariables().set('camHUD', camHUD);
+		MusicBeatState.getVariables().set('camOther', camOther);
+
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence('Stage Editor', 'Stage: ' + lastLoadedStage);
 		#end
@@ -963,7 +967,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		tab_group.add(new FlxText(objX + 90, objY - 18, 80, 'Camera:'));
 		cameraInputText = new PsychUIInputText(objX + 90, objY, 80, 'camGame', 8);
 		cameraInputText.onChange = function(old:String, cur:String) {
-			// change color
+			// change camera
 			var selected = getSelected();
 			if(selected != null)
 				selected.camera = cameraInputText.text;
@@ -1867,6 +1871,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	{
 		destroySubStates = true;
 		animationEditor.destroy();
+		instance = null;
 		super.destroy();
 	}
 }
@@ -1907,13 +1912,7 @@ class StageEditorMetaSprite
 	public var camera(default, set):String = 'camGame';
 	function set_camera(v:String)
 	{
-		var cam:FlxCamera = null;
-		switch(v.toLowerCase()) {
-			case 'camhud' | 'hud': cam = StageEditorState.instance.camHUD;
-			case 'camother' | 'other': cam = StageEditorState.instance.camOther;
-			default: cam = StageEditorState.instance.camGame;
-		}
-		sprite.cameras = [cam];
+		sprite.cameras = [LuaUtils.cameraFromString(v)];
 		return (camera = v);
 	}
 

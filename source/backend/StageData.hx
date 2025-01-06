@@ -204,13 +204,9 @@ class StageData {
 						if(dat != null) Reflect.setProperty(spr, varName, dat);
 					}
 
-					if (group != null)
-					{
-						if (group == PlayState.instance)
-							spr.cameras = [LuaUtils.cameraFromString(data.camera)];
+					spr.cameras = [LuaUtils.cameraFromString(data.camera)];
 
-						group.add(spr);
-					}
+					if (group != null) group.add(spr);
 					addedObjects.set(data.name, spr);
 
 				default:
