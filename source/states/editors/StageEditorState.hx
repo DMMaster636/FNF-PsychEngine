@@ -28,8 +28,6 @@ import states.editors.content.PreloadListSubState;
 
 class StageEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
-	public static var instance:StageEditorState;
-
 	final minZoom = 0.1;
 	final maxZoom = 2;
 
@@ -71,8 +69,6 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
-		instance = this;
-
 		camGame = initPsychCamera();
 		camHUD = new FlxCamera();
 		camOther = new FlxCamera();
@@ -83,7 +79,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		FlxG.cameras.add(camHUD, false);
 		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.add(camEditor, false);
-
+		// Doing this let's us use the cams using LuaUtils
 		MusicBeatState.getVariables().set('camGame', camGame);
 		MusicBeatState.getVariables().set('camHUD', camHUD);
 		MusicBeatState.getVariables().set('camOther', camOther);
@@ -763,6 +759,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		}
 	}
 
+	var cameraInputText:PsychUIInputText;
 	var colorInputText:PsychUIInputText;
 	var nameInputText:PsychUIInputText;
 	var imgTxt:FlxText;
@@ -780,7 +777,6 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var lowQualityCheckbox:PsychUICheckBox;
 	var highQualityCheckbox:PsychUICheckBox;
 
-	var cameraInputText:PsychUIInputText;
 	var blendDropDown:PsychUIDropDownMenu;
 
 	function getSelected(blockReserved:Bool = true)
@@ -1871,7 +1867,6 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	{
 		destroySubStates = true;
 		animationEditor.destroy();
-		instance = null;
 		super.destroy();
 	}
 }
@@ -1909,18 +1904,18 @@ class StageEditorMetaSprite
 		return (color = v);
 	}
 
-	public var camera(default, set):String = 'camGame';
-	function set_camera(v:String)
-	{
-		sprite.cameras = [LuaUtils.cameraFromString(v)];
-		return (camera = v);
-	}
-
 	public var blend(default, set):String = 'normal';
 	function set_blend(v:String)
 	{
 		sprite.blend = LuaUtils.blendModeFromString(v);
 		return (blend = v);
+	}
+
+	public var camera(default, set):String = 'camGame';
+	function set_camera(v:String)
+	{
+		sprite.cameras = [LuaUtils.cameraFromString(v)];
+		return (camera = v);
 	}
 
 	public var image(default, set):String = 'unknown';
@@ -1985,7 +1980,7 @@ class StageEditorMetaSprite
 		switch(this.type)
 		{
 			case 'sprite', 'square', 'animatedSprite':
-				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'camera', 'blend', 'filters', 'antialiasing'])
+				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'blend', 'camera', 'filters', 'antialiasing'])
 				{
 					var dat:Dynamic = Reflect.field(data, v);
 					if(dat != null) Reflect.setField(this, v, dat);
@@ -2013,8 +2008,8 @@ class StageEditorMetaSprite
 				obj.alpha = alpha;
 				obj.angle = angle;
 				obj.color = color;
-				obj.camera = camera;
 				obj.blend = blend;
+				obj.camera = camera;
 				obj.filters = filters;
 
 				if(type != 'square')
