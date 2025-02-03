@@ -236,6 +236,10 @@ class LoadingState extends MusicBeatState
 	var finishedLoading:Bool = false;
 	function onLoad()
 	{
+		loaded = 0;
+		loadMax = 0;
+		initialThreadCompleted = true;
+
 		if (stopMusic && FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -251,12 +255,12 @@ class LoadingState extends MusicBeatState
 	{
 		for (key => bitmap in requestedBitmaps)
 		{
-			if (bitmap != null && Paths.cacheBitmap(originalBitmapKeys.get(key), bitmap) != null) trace('finished preloading image $key');
+			if (bitmap != null && Paths.cacheBitmap(originalBitmapKeys.get(key), bitmap) != null) {} //trace('finished preloading image $key');
 			else trace('failed to cache image $key');
 		}
 		requestedBitmaps.clear();
 		originalBitmapKeys.clear();
-		return (loaded == loadMax && initialThreadCompleted);
+		return (loaded >= loadMax && initialThreadCompleted);
 	}
 
 	public static function loadNextDirectory()
@@ -525,7 +529,17 @@ class LoadingState extends MusicBeatState
 		loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
 		loaded = 0;
 
+		#if MULTITHREADED_LOADING
 		//then start threads
+		_threadFunc();
+		#else
+		//or a single thread if you have multithreading turned off
+		Thread.create(() -> _threadFunc());
+		#end
+	}
+
+	static function _threadFunc()
+	{
 		for (sound in soundsToPrepare) initThread(() -> preloadSound('sounds/$sound'), 'sound $sound');
 		for (music in musicToPrepare) initThread(() -> preloadSound('music/$music'), 'music $music');
 		for (song in songsToPrepare) initThread(() -> preloadSound(song, 'songs', true, false), 'song $song');
@@ -536,7 +550,9 @@ class LoadingState extends MusicBeatState
 
 	static function initThread(func:Void->Dynamic, traceData:String)
 	{
+		#if MULTITHREADED_LOADING
 		Thread.create(() -> {
+		#end
 			try {
 				if (func() != null) trace('finished preloading $traceData');
 				else trace('ERROR! fail on preloading $traceData');
@@ -547,7 +563,9 @@ class LoadingState extends MusicBeatState
 			mutex.acquire();
 			loaded++;
 			mutex.release();
+		#if MULTITHREADED_LOADING
 		});
+		#end
 	}
 
 	inline private static function preloadCharacter(char:String, ?prefixVocals:String)
@@ -655,6 +673,7 @@ class LoadingState extends MusicBeatState
 					#else
 					var bitmap:BitmapData = OpenFlAssets.getBitmapData(file, false);
 					#end
+
 					mutex.acquire();
 					requestedBitmaps.set(file, bitmap);
 					originalBitmapKeys.set(file, requestKey);
