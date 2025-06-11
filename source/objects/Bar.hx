@@ -7,6 +7,7 @@ class Bar extends FlxSpriteGroup
 	public var leftBar:FlxSprite;
 	public var rightBar:FlxSprite;
 	public var bg:FlxSprite;
+
 	public var valueFunction:Void->Float = null;
 	public var percent(default, set):Float = 0;
 	public var bounds:Dynamic = {min: 0, max: 1};
@@ -16,36 +17,46 @@ class Bar extends FlxSpriteGroup
 	// you might need to change this if you want to use a custom bar
 	public var barWidth(default, set):Int = 1;
 	public var barHeight(default, set):Int = 1;
-	public var barOffset:FlxPoint = new FlxPoint(3, 3);
+	public var barOffset:FlxPoint = FlxPoint.get(3, 3);
 
-	public function new(x:Float, y:Float, image:String = 'healthBar', valueFunction:Void->Float = null, boundX:Float = 0, boundY:Float = 1)
+	public function new(x:Float, y:Float, bgImage:String = 'healthBar', barImage:String = null, valueFunction:Void->Float = null, boundX:Float = 0, boundY:Float = 1)
 	{
 		super(x, y);
-		
+
 		this.valueFunction = valueFunction;
 		setBounds(boundX, boundY);
-		
-		bg = new FlxSprite().loadGraphic(Paths.image(image));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
-		barWidth = Std.int(bg.width - 6);
-		barHeight = Std.int(bg.height - 6);
+
+		bg = new FlxSprite().loadGraphic(Paths.image(bgImage));
+		bg.updateHitbox();
+
+		barWidth = Std.int(bg.width - barOffset.x * 2);
+		barHeight = Std.int(bg.height - barOffset.y * 2);
 
 		leftBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
-		//leftBar.color = FlxColor.WHITE;
-		leftBar.antialiasing = antialiasing = ClientPrefs.data.antialiasing;
-
 		rightBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
+
+		if(barImage != null && barImage.length > 0)
+		{
+			leftBar.loadGraphic(Paths.image(barImage));
+			leftBar.updateHitbox();
+
+			rightBar.loadGraphic(Paths.image(barImage));
+			rightBar.updateHitbox();
+		}
+
+		//leftBar.color = FlxColor.WHITE;
 		rightBar.color = FlxColor.BLACK;
-		rightBar.antialiasing = ClientPrefs.data.antialiasing;
 
 		add(leftBar);
 		add(rightBar);
 		add(bg);
+
 		regenerateClips();
 	}
 
 	public var enabled:Bool = true;
-	override function update(elapsed:Float) {
+	override function update(elapsed:Float)
+	{
 		if(!enabled)
 		{
 			super.update(elapsed);
@@ -58,6 +69,7 @@ class Bar extends FlxSpriteGroup
 			percent = (value != null ? value : 0);
 		}
 		else percent = 0;
+
 		super.update(elapsed);
 	}
 	
@@ -69,10 +81,8 @@ class Bar extends FlxSpriteGroup
 
 	public function setColors(left:FlxColor = null, right:FlxColor = null)
 	{
-		if (left != null)
-			leftBar.color = left;
-		if (right != null)
-			rightBar.color = right;
+		if (left != null) leftBar.color = left;
+		if (right != null) rightBar.color = right;
 	}
 
 	public function updateBar()
@@ -111,12 +121,14 @@ class Bar extends FlxSpriteGroup
 			leftBar.updateHitbox();
 			leftBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
 		}
+
 		if(rightBar != null)
 		{
 			rightBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
 			rightBar.updateHitbox();
 			rightBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
 		}
+
 		updateBar();
 	}
 

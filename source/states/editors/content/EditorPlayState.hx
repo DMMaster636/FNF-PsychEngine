@@ -95,7 +95,6 @@ class EditorPlayState extends MusicBeatSubstate
 
 		/* setting up Editor PlayState stuff */
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.scrollFactor.set();
 		bg.color = 0xFF101010;
 		bg.alpha = 0.9;
@@ -205,14 +204,17 @@ class EditorPlayState extends MusicBeatSubstate
 		keysCheck();
 		if(notes.length > 0)
 		{
-			var fakeCrochet:Float = (60 / PlayState.SONG.bpm) * 1000;
-			notes.forEachAlive(function(daNote:Note)
+			var i:Int = 0;
+			while(i < notes.length)
 			{
+				var daNote:Note = notes.members[i];
+				if(daNote == null) continue;
+
 				var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
 				if(!daNote.mustPress) strumGroup = opponentStrums;
 
 				var strum:StrumNote = strumGroup.members[daNote.noteData];
-				daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
+				daNote.followStrumNote(strum, songSpeed / playbackRate);
 
 				if(!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
 					opponentNoteHit(daNote);
@@ -220,7 +222,7 @@ class EditorPlayState extends MusicBeatSubstate
 				if(daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
 
 				// Kill extremely late notes and cause misses
-				if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
+				if(Conductor.songPosition - daNote.strumTime > noteKillOffset)
 				{
 					if (daNote.mustPress && !daNote.ignoreNote && (daNote.tooLate || !daNote.wasGoodHit))
 						noteMiss(daNote);
@@ -228,7 +230,9 @@ class EditorPlayState extends MusicBeatSubstate
 					daNote.active = daNote.visible = false;
 					invalidateNote(daNote);
 				}
-			});
+
+				if(daNote.exists) i++;
+			}
 		}
 		
 		var time:Float = CoolUtil.floorDecimal((Conductor.songPosition - ClientPrefs.data.noteOffset) / 1000, 1);
@@ -243,10 +247,8 @@ class EditorPlayState extends MusicBeatSubstate
 	var lastBeatHit:Int = -1;
 	override function beatHit()
 	{
-		if(lastBeatHit >= curBeat) {
-			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
-			return;
-		}
+		if(lastBeatHit >= curBeat) return;
+
 		notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
 		super.beatHit();
@@ -273,7 +275,7 @@ class EditorPlayState extends MusicBeatSubstate
 		flixel.util.FlxDestroyUtil.destroy(inst);
 		super.destroy();
 	}
-	
+
 	function startSong():Void
 	{
 		startingSong = false;
@@ -349,12 +351,12 @@ class EditorPlayState extends MusicBeatSubstate
 					daBpm = PlayState.SONG.notes[noteSec].bpm;
 			}
 
-			var idx: Int = _noteList.indexOf(note);
+			var idx:Int = _noteList.indexOf(note);
 			if (idx != 0) {
 				// CLEAR ANY POSSIBLE GHOST NOTES
 				for (evilNote in unspawnNotes) {
 					var matches: Bool = note.noteData == evilNote.noteData && note.mustPress == evilNote.mustPress && note.noteType == evilNote.noteType;
-					if (matches && Math.abs(note.strumTime - evilNote.strumTime) < flixel.math.FlxMath.EPSILON) {
+					if (matches && Math.abs(note.strumTime - evilNote.strumTime) < FlxMath.EPSILON) {
 						if (evilNote.tail.length > 0)
 							for (tail in evilNote.tail)
 							{
@@ -394,7 +396,6 @@ class EditorPlayState extends MusicBeatSubstate
 					unspawnNotes.push(sustainNote);
 					swagNote.tail.push(sustainNote);
 
-					sustainNote.correctionOffset = swagNote.height / 2;
 					if(!PlayState.isPixelStage)
 					{
 						if(oldNote.isSustainNote)
@@ -403,9 +404,6 @@ class EditorPlayState extends MusicBeatSubstate
 							oldNote.scale.y /= playbackRate;
 							oldNote.resizeByRatio(curStepCrochet / Conductor.stepCrochet);
 						}
-
-						if(ClientPrefs.data.downScroll)
-							sustainNote.correctionOffset = 0;
 					}
 					else if(oldNote.isSustainNote)
 					{
@@ -423,17 +421,12 @@ class EditorPlayState extends MusicBeatSubstate
 				}
 			}
 
-			if (swagNote.mustPress)
-			{
-				swagNote.x += FlxG.width / 2; // general offset
-			}
+			if (swagNote.mustPress) swagNote.x += FlxG.width / 2; // general offset
 			else if(ClientPrefs.data.middleScroll)
 			{
 				swagNote.x += 310;
 				if(swagNote.noteData > 1) //Up and Right
-				{
 					swagNote.x += FlxG.width / 2 + 25;
-				}
 			}
 			oldNote = swagNote;
 		}
@@ -552,12 +545,8 @@ class EditorPlayState extends MusicBeatSubstate
 			songHits++;
 
 		var uiFolder:String = "";
-		var antialias:Bool = ClientPrefs.data.antialiasing;
-		if (PlayState.stageUI != "normal")
-		{
-			uiFolder = PlayState.uiPrefix + "UI/";
-			antialias = !PlayState.isPixelStage;
-		}
+		var antialias:Bool = (!PlayState.isPixelStage && ClientPrefs.data.antialiasing);
+		if (PlayState.stageUI != "normal") uiFolder = PlayState.uiPrefix + "UI/";
 
 		rating.loadGraphic(Paths.image(uiFolder + daRating.image + PlayState.uiPostfix));
 		rating.screenCenter();

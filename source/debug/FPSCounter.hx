@@ -50,7 +50,8 @@ class FPSCounter extends TextField
 		times.push(now);
 		while (times[0] < now - 1000) times.shift();
 		// prevents the overlay from updating every frame, why would you need to anyways @crowplexus
-		if (deltaTimeout < 50) {
+		if (deltaTimeout < 50)
+		{
 			deltaTimeout += deltaTime;
 			return;
 		}
@@ -60,9 +61,9 @@ class FPSCounter extends TextField
 		deltaTimeout = 0.0;
 	}
 
-	public dynamic function updateText():Void { // so people can override it in hscript
-		text = 'FPS: ${currentFPS}'
-		+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
+	public dynamic function updateText():Void // so people can override it in hscript
+	{
+		text = 'FPS: ${currentFPS} - Memory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.drawFramerate * 0.5)

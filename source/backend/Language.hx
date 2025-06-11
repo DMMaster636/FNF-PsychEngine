@@ -43,7 +43,7 @@ class Language
 		}
 
 		if(!hasPhrases) ClientPrefs.data.language = ClientPrefs.defaultData.language;
-		
+
 		var alphaPath:String = getFileTranslation('images/alphabet');
 		if(alphaPath.startsWith('images/')) alphaPath = alphaPath.substr('images/'.length);
 		var pngPos:Int = alphaPath.indexOf('.png');
@@ -56,17 +56,15 @@ class Language
 
 	inline public static function getPhrase(key:String, ?defaultPhrase:String, values:Array<Dynamic> = null):String
 	{
+		var str:String = defaultPhrase;
 		#if TRANSLATIONS_ALLOWED
 		//trace(formatKey(key));
-		var str:String = phrases.get(formatKey(key));
+		str = phrases.get(formatKey(key));
 		if(str == null) str = defaultPhrase;
-		#else
-		var str:String = defaultPhrase;
 		#end
 
-		if(str == null)
-			str = key;
-		
+		if(str == null) str = key;
+
 		if(values != null)
 			for (num => value in values)
 				str = str.replace('{${num+1}}', value);

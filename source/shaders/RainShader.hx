@@ -1,13 +1,11 @@
 package shaders;
 
-import flixel.system.FlxAssets.FlxShader;
 import openfl.display.BitmapData;
 import openfl.display.ShaderParameter;
 import openfl.display.ShaderParameterType;
 import openfl.utils.Assets;
 
-typedef Light =
-{
+typedef Light = {
 	var position:Array<Float>;
 	var color:Array<Float>;
 	var radius:Float;

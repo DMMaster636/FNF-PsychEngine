@@ -5,8 +5,7 @@ import lime.utils.Assets;
 
 import objects.Note;
 
-typedef SwagSong =
-{
+typedef SwagSong = {
 	var song:String;
 	var notes:Array<SwagSection>;
 	var events:Array<Dynamic>;
@@ -14,26 +13,27 @@ typedef SwagSong =
 	var needsVoices:Bool;
 	var speed:Float;
 	var offset:Float;
+	var stage:String;
 
 	var player1:String;
 	var player2:String;
 	var gfVersion:String;
-	var stage:String;
-	var format:String;
 
 	@:optional var gameOverChar:String;
 	@:optional var gameOverSound:String;
 	@:optional var gameOverLoop:String;
 	@:optional var gameOverEnd:String;
-	
+	@:optional var gameOverBPM:Float;
+
 	@:optional var disableNoteRGB:Bool;
 
 	@:optional var arrowSkin:String;
 	@:optional var splashSkin:String;
+
+	@:optional var format:String;
 }
 
-typedef SwagSection =
-{
+typedef SwagSection = {
 	var sectionNotes:Array<Dynamic>;
 	var sectionBeats:Float;
 	var mustHitSection:Bool;
@@ -56,6 +56,7 @@ class Song
 	public var gameOverSound:String;
 	public var gameOverLoop:String;
 	public var gameOverEnd:String;
+	public var gameOverBPM:Float;
 	public var disableNoteRGB:Bool = false;
 	public var speed:Float = 1;
 	public var stage:String;
@@ -72,7 +73,7 @@ class Song
 			if(Reflect.hasField(songJson, 'player3')) Reflect.deleteField(songJson, 'player3');
 		}
 
-		if(songJson.events == null)
+		if(songJson.events == null || songJson.events.length < 1)
 		{
 			songJson.events = [];
 			for (secNum in 0...songJson.notes.length)
@@ -110,6 +111,8 @@ class Song
 
 			for (note in section.sectionNotes)
 			{
+				if(note[1] < 0) continue;
+
 				var gottaHitNote:Bool = (note[1] < 4) ? section.mustHitSection : !section.mustHitSection;
 				note[1] = (note[1] % 4) + (gottaHitNote ? 0 : 4);
 

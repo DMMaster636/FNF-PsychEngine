@@ -2,8 +2,6 @@ package backend;
 
 import openfl.utils.Assets;
 
-import haxe.Json;
-
 typedef ModsList = {
 	enabled:Array<String>,
 	disabled:Array<String>,
@@ -94,7 +92,7 @@ class Mods
 	inline public static function directoriesWithFile(path:String, fileToFind:String, mods:Bool = true)
 	{
 		var foldersToCheck:Array<String> = [];
-		//Main folder
+		// Main folder
 		if(FileSystem.exists(path + fileToFind))
 			foldersToCheck.push(path + fileToFind);
 
@@ -139,22 +137,18 @@ class Mods
 		var path = Paths.mods(folder + '/pack.json');
 		if(FileSystem.exists(path)) {
 			try {
-				#if sys
-				var rawJson:String = File.getContent(path);
-				#else
-				var rawJson:String = Assets.getText(path);
-				#end
+				var rawJson:String = #if sys File.getContent(path) #else Assets.getText(path) #end;
 				if(rawJson != null && rawJson.length > 0) return tjson.TJSON.parse(rawJson);
-			} catch(e:Dynamic) {
-				trace(e);
 			}
+			catch(e:Dynamic) trace(e);
 		}
 		#end
 		return null;
 	}
 
 	public static var updatedOnState:Bool = false;
-	inline public static function parseList():ModsList {
+	inline public static function parseList():ModsList
+	{
 		if(!updatedOnState) updateModList();
 		var list:ModsList = {enabled: [], disabled: [], all: []};
 
@@ -167,18 +161,14 @@ class Mods
 
 				var dat = mod.split("|");
 				list.all.push(dat[0]);
-				if (dat[1] == "1")
-					list.enabled.push(dat[0]);
-				else
-					list.disabled.push(dat[0]);
+				if (dat[1] == "1") list.enabled.push(dat[0]);
+				else list.disabled.push(dat[0]);
 			}
-		} catch(e) {
-			trace(e);
-		}
+		} catch(e) trace(e);
 		#end
 		return list;
 	}
-	
+
 	private static function updateModList()
 	{
 		#if MODS_ALLOWED
@@ -196,10 +186,8 @@ class Mods
 					list.push([folder, (dat[1] == "1")]);
 				}
 			}
-		} catch(e) {
-			trace(e);
-		}
-		
+		} catch(e) trace(e);
+
 		// Scan for folders that aren't on modsList.txt yet
 		for (folder in getModDirectories())
 		{
@@ -229,7 +217,7 @@ class Mods
 	public static function loadTopMod()
 	{
 		Mods.currentModDirectory = '';
-		
+
 		#if MODS_ALLOWED
 		var list:Array<String> = Mods.parseList().enabled;
 		if(list != null && list[0] != null)

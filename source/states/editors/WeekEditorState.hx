@@ -6,7 +6,7 @@ import openfl.utils.Assets;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import flash.net.FileFilter;
+import openfl.net.FileFilter;
 import lime.system.Clipboard;
 import haxe.Json;
 
@@ -46,11 +46,9 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 		var ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
 		var bgYellow:FlxSprite = new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		bgSprite = new FlxSprite(0, 56);
-		bgSprite.antialiasing = ClientPrefs.data.antialiasing;
 
 		weekThing = new MenuItem(0, bgSprite.y + 396, weekFileName);
 		weekThing.y += weekThing.height + 20;
-		weekThing.antialiasing = ClientPrefs.data.antialiasing;
 		add(weekThing);
 
 		var blackBarThingie:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, 56, FlxColor.BLACK);
@@ -62,7 +60,6 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 		lock.frames = ui_tex;
 		lock.animation.addByPrefix('lock', 'lock');
 		lock.animation.play('lock');
-		lock.antialiasing = ClientPrefs.data.antialiasing;
 		add(lock);
 		
 		missingFileText = new FlxText(0, 0, FlxG.width, "");
@@ -84,7 +81,6 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 		add(grpWeekCharacters);
 
 		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgSprite.y + 435).loadGraphic(Paths.image('Menu_Tracks'));
-		tracksSprite.antialiasing = ClientPrefs.data.antialiasing;
 		add(tracksSprite);
 
 		txtTracklist = new FlxText(FlxG.width * 0.05, tracksSprite.y + 60, 0, "", 32);
@@ -120,7 +116,7 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
 		
-		var freeplayButton:PsychUIButton = new PsychUIButton(0, 650, "Freeplay", function() MusicBeatState.switchState(new WeekEditorFreeplayState(weekFile)));
+		var freeplayButton:PsychUIButton = new PsychUIButton(0, 650, "Freeplay", function() FlxG.switchState(() -> new WeekEditorFreeplayState(weekFile)));
 		freeplayButton.screenCenter(X);
 		add(freeplayButton);
 	
@@ -402,7 +398,7 @@ class WeekEditorState extends MusicBeatState implements PsychUIEventHandler.Psyc
 			{
 				if(!unsavedProgress)
 				{
-					MusicBeatState.switchState(new MasterEditorMenu());
+					FlxG.switchState(() -> new MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				}
 				else openSubState(new ExitConfirmationPrompt(function() unsavedProgress = false));
@@ -558,7 +554,6 @@ class WeekEditorFreeplayState extends MusicBeatState implements PsychUIEventHand
 
 	override function create() {
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = FlxColor.WHITE;
 		add(bg);
 
@@ -615,7 +610,7 @@ class WeekEditorFreeplayState extends MusicBeatState implements PsychUIEventHand
 		add(loadWeekButton);
 		
 		var storyModeButton:PsychUIButton = new PsychUIButton(0, 685, "Story Mode", function() {
-			MusicBeatState.switchState(new WeekEditorState(weekFile));
+			FlxG.switchState(() -> new WeekEditorState(weekFile));
 			
 		});
 		storyModeButton.screenCenter(X);
@@ -745,7 +740,7 @@ class WeekEditorFreeplayState extends MusicBeatState implements PsychUIEventHand
 			super.update(elapsed);
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
-			MusicBeatState.switchState(new WeekEditorFreeplayState(WeekEditorState.loadedWeek));
+			FlxG.switchState(() -> new WeekEditorFreeplayState(WeekEditorState.loadedWeek));
 			WeekEditorState.loadedWeek = null;
 			return;
 		}
@@ -758,7 +753,7 @@ class WeekEditorFreeplayState extends MusicBeatState implements PsychUIEventHand
 			if(FlxG.keys.justPressed.ESCAPE) {
 				if(!WeekEditorState.unsavedProgress)
 				{
-					MusicBeatState.switchState(new MasterEditorMenu());
+					FlxG.switchState(() -> new MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				}
 				else openSubState(new ExitConfirmationPrompt());

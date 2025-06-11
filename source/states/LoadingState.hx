@@ -1,22 +1,22 @@
 package states;
 
-import lime.app.Future;
-import sys.thread.FixedThreadPool;
 import haxe.Json;
+import lime.app.Future;
 import lime.utils.Assets;
 import openfl.display.BitmapData;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.FlxGraphic;
 import flixel.system.FlxAssets;
-import flixel.FlxState;
+import flixel.util.typeLimit.NextState;
 
-import flash.media.Sound;
+import openfl.media.Sound;
 
 import backend.Song;
 import backend.StageData;
 import objects.Character;
 
+import sys.thread.FixedThreadPool;
 import sys.thread.Thread;
 import sys.thread.Mutex;
 
@@ -24,7 +24,7 @@ import objects.Note;
 import objects.NoteSplash;
 
 #if HSCRIPT_ALLOWED
-import psychlua.HScript;
+import scripting.HScript;
 import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
@@ -36,6 +36,7 @@ import crowplexus.hscript.Printer;
 #include <thread>
 ')
 #end
+
 class LoadingState extends MusicBeatState
 {
 	public static var loaded:Int = 0;
@@ -46,7 +47,7 @@ class LoadingState extends MusicBeatState
 	static var mutex:Mutex;
 	static var threadPool:FixedThreadPool = null;
 
-	function new(target:FlxState, stopMusic:Bool)
+	function new(target:NextState, stopMusic:Bool)
 	{
 		this.target = target;
 		this.stopMusic = stopMusic;
@@ -54,10 +55,10 @@ class LoadingState extends MusicBeatState
 		super();
 	}
 
-	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, intrusive:Bool = true)
-		MusicBeatState.switchState(getNextState(target, stopMusic, intrusive));
+	inline static public function loadAndSwitchState(target:NextState, stopMusic = false, intrusive:Bool = true)
+		FlxG.switchState(getNextState(target, stopMusic, intrusive));
 	
-	var target:FlxState = null;
+	var target:NextState = null;
 	var stopMusic:Bool = false;
 	var dontUpdate:Bool = false;
 
@@ -87,6 +88,7 @@ class LoadingState extends MusicBeatState
 	#if HSCRIPT_ALLOWED
 	var hscript:HScript;
 	#end
+
 	override function create()
 	{
 		persistentUpdate = true;
@@ -109,6 +111,7 @@ class LoadingState extends MusicBeatState
 		if(Mods.currentModDirectory != null && Mods.currentModDirectory.trim().length > 0)
 		{
 			var scriptPath:String = 'mods/${Mods.currentModDirectory}/data/LoadingScreen.hx'; //mods/My-Mod/data/LoadingScreen.hx
+			if(!FileSystem.exists(scriptPath)) scriptPath = 'mods/data/LoadingScreen.hx';
 			if(FileSystem.exists(scriptPath))
 			{
 				try
@@ -144,7 +147,6 @@ class LoadingState extends MusicBeatState
 
 		#if PSYCH_WATERMARKS // PSYCH LOADING SCREEN
 		var bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.setGraphicSize(Std.int(FlxG.width));
 		bg.color = 0xFFD16FFF;
 		bg.updateHitbox();
@@ -156,7 +158,6 @@ class LoadingState extends MusicBeatState
 		addBehindBar(loadingText);
 	
 		logo = new FlxSprite(0, 0).loadGraphic(Paths.image('loading_screen/icon'));
-		logo.antialiasing = ClientPrefs.data.antialiasing;
 		logo.scale.set(0.75, 0.75);
 		logo.updateHitbox();
 		logo.screenCenter();
@@ -172,11 +173,11 @@ class LoadingState extends MusicBeatState
 		addBehindBar(bg);
 
 		funkay = new FlxSprite(0, 0).loadGraphic(Paths.image('funkay'));
-		funkay.antialiasing = ClientPrefs.data.antialiasing;
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
 		addBehindBar(funkay);
 		#end
+
 		super.create();
 
 		if (stateChangeDelay <= 0 && checkLoaded())
@@ -220,7 +221,7 @@ class LoadingState extends MusicBeatState
 			bar.scale.x = barWidth * curPercent;
 			bar.updateHitbox();
 		}
-		
+
 		#if HSCRIPT_ALLOWED
 		if(hscript != null)
 		{
@@ -235,12 +236,9 @@ class LoadingState extends MusicBeatState
 		var dots:String = '';
 		switch(Math.floor(timePassed % 1 * 3))
 		{
-			case 0:
-				dots = '.';
-			case 1:
-				dots = '..';
-			case 2:
-				dots = '...';
+			case 0: dots = '.';
+			case 1: dots = '..';
+			case 2: dots = '...';
 		}
 		loadingText.text = Language.getPhrase('now_loading', 'Now Loading{1}', [dots]);
 
@@ -267,7 +265,6 @@ class LoadingState extends MusicBeatState
 				pessy.frames = Paths.getSparrowAtlas('loading_screen/pessy');
 				pessy.animation.addByPrefix('run', 'run', 24, true);
 				pessy.animation.addByPrefix('spin', 'spin', 24, true);
-				pessy.antialiasing = ClientPrefs.data.antialiasing;
 				pessy.flipX = (logo.offset.x > 0);
 				pessy.visible = false;
 
@@ -323,15 +320,14 @@ class LoadingState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		FlxG.camera.visible = false;
-		MusicBeatState.switchState(target);
+		FlxG.switchState(target);
 		transitioning = true;
 		finishedLoading = true;
 	}
 
 	static function _loaded()
 	{
-		loaded = 0;
-		loadMax = 0;
+		loaded = loadMax = 0;
 		initialThreadCompleted = true;
 		isIntrusive = false;
 
@@ -367,7 +363,7 @@ class LoadingState extends MusicBeatState
 	}
 
 	static var isIntrusive:Bool = false;
-	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
+	static function getNextState(target:NextState, stopMusic = false, intrusive:Bool = true):NextState
 	{
 		#if !SHOW_LOADING_SCREEN
 		intrusive = false;
@@ -377,9 +373,8 @@ class LoadingState extends MusicBeatState
 		_startPool();
 		loadNextDirectory();
 
-		if(intrusive)
-			return new LoadingState(target, stopMusic);
-		
+		if(intrusive) return new LoadingState(target, stopMusic);
+
 		if (stopMusic && FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -410,11 +405,9 @@ class LoadingState extends MusicBeatState
 	static var dontPreloadDefaultVoices:Bool = false;
 	static function _startPool()
 	{
-		#if MULTITHREADED_LOADING
-		// Due to the Main thread and Discord thread, we decrease it by 2.
-		var threadCount:Int = Std.int(Math.max(1, getCPUThreadsCount() - #if DISCORD_ALLOWED 2 #else 1 #end));
-		#else
 		var threadCount:Int = 1;
+		#if MULTITHREADED_LOADING // Due to the Main thread and Discord thread, we decrease it by 2.
+		threadCount = Std.int(Math.max(1, getCPUThreadsCount() - #if DISCORD_ALLOWED 2 #else 1 #end));
 		#end
 		threadPool = new FixedThreadPool(threadCount);
 	}
@@ -435,6 +428,7 @@ class LoadingState extends MusicBeatState
 		}
 
 		_startPool();
+
 		imagesToPrepare = [];
 		soundsToPrepare = [];
 		musicToPrepare = [];
@@ -510,8 +504,7 @@ class LoadingState extends MusicBeatState
 			}
 			catch(e:Dynamic) {}
 			return true;
-		}, isIntrusive)
-		.then((_) -> new Future<Bool>(() -> {
+		}, isIntrusive).then((_) -> new Future<Bool>(() -> {
 			if (song.stage == null || song.stage.length < 1)
 				song.stage = StageData.vanillaSongStage(folder);
 
@@ -597,8 +590,7 @@ class LoadingState extends MusicBeatState
 				initialThreadCompleted = true;
 			}
 			return true;
-		}, isIntrusive))
-		.onError((err:Dynamic) -> {
+		}, isIntrusive)).onError((err:Dynamic) -> {
 			trace('ERROR! while preparing song: $err');
 		});
 	}
@@ -641,7 +633,6 @@ class LoadingState extends MusicBeatState
 		var i:Int = 0;
 		while(i < arr.length)
 		{
-
 			var member:String = arr[i];
 			var myKey = '$prefix/$member$ext';
 			if(parentFolder == 'songs') myKey = '$member$ext';
@@ -701,6 +692,7 @@ class LoadingState extends MusicBeatState
 			catch(e:Dynamic) {
 				trace('ERROR! fail on preloading $traceData: $e');
 			}
+
 			// mutex.acquire();
 			loaded++;
 			// mutex.release();
@@ -787,6 +779,7 @@ class LoadingState extends MusicBeatState
 				return FlxAssets.getSound('flixel/sounds/beep');
 			}
 		}
+
 		mutex.acquire();
 		Paths.localTrackedAssets.push(file);
 		mutex.release();
@@ -831,15 +824,12 @@ class LoadingState extends MusicBeatState
 
 		return null;
 	}
-	
+
 	#if cpp
-	@:functionCode('
-		return std::thread::hardware_concurrency();
-    	')
-	@:noCompletion
-    	public static function getCPUThreadsCount():Int
-    	{
-        	return -1;
-    	}
-    	#end
+	@:functionCode('return std::thread::hardware_concurrency();')
+	@:noCompletion public static function getCPUThreadsCount():Int
+	{
+    	return -1;
+    }
+    #end
 }

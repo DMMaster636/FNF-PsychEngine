@@ -2,7 +2,7 @@ package states.stages;
 
 import states.stages.objects.*;
 import substates.GameOverSubstate;
-import cutscenes.DialogueBox;
+import cutscenes.DialogueBoxOld;
 
 import openfl.utils.Assets as OpenFlAssets;
 
@@ -104,7 +104,7 @@ class School extends BaseStage
 		}
 	}
 
-	var doof:DialogueBox = null;
+	var doof:DialogueBoxOld = null;
 	function initDoof()
 	{
 		var file:String = Paths.txt('$songName/${songName}Dialogue_${ClientPrefs.data.language}'); //Checks for vanilla/Senpai dialogue
@@ -127,7 +127,7 @@ class School extends BaseStage
 			return;
 		}
 
-		doof = new DialogueBox(false, CoolUtil.coolTextFile(file));
+		doof = new DialogueBoxOld(false, CoolUtil.coolTextFile(file));
 		doof.cameras = [camHUD];
 		doof.scrollFactor.set();
 		doof.finishThing = startCountdown;

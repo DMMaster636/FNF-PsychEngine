@@ -37,6 +37,8 @@ class ChartingGridSprite extends FlxSprite
 		stripe.scrollFactor.x = 0;
 		stripe.color = FlxColor.BLACK;
 		updateStripes();
+
+		vortexLine.antialiasing = stripe.antialiasing = antialiasing = false;
 	}
 
 	public function loadGrid(color1:FlxColor, color2:FlxColor)
@@ -66,8 +68,7 @@ class ChartingGridSprite extends FlxSprite
 		for (i in 1...Math.ceil(rows))
 		{
 			y += ChartingState.GRID_SIZE + spacing;
-			if(y - camera.scroll.y >= FlxG.height)
-				break;
+			if(y - camera.scroll.y >= FlxG.height) break;
 
 			animation.play((i % 2 == 1) ? 'odd' : 'even', true);
 			scale.y = ChartingState.GRID_SIZE * Math.min(1, rows - i);
@@ -97,10 +98,9 @@ class ChartingGridSprite extends FlxSprite
 	{
 		for (i => column in stripes)
 		{
-			if(column == 0)
-				stripe.x = this.x;
-			else 
-				stripe.x = this.x + ChartingState.GRID_SIZE * column - stripe.width/2;
+			if(column == 0) stripe.x = this.x;
+			else  stripe.x = this.x + ChartingState.GRID_SIZE * column - stripe.width/2;
+
 			stripe.draw();
 		}
 	}
@@ -108,6 +108,7 @@ class ChartingGridSprite extends FlxSprite
 	public function updateStripes()
 	{
 		if(stripe == null || !stripe.exists) return;
+
 		stripe.y = this.y;
 		stripe.setGraphicSize(2, this.height);
 		stripe.updateHitbox();

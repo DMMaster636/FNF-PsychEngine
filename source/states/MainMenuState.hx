@@ -37,7 +37,6 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
-	static var showOutdatedWarning:Bool = true;
 	override function create()
 	{
 		super.create();
@@ -56,7 +55,6 @@ class MainMenuState extends MusicBeatState
 
 		var yScroll:Float = 0.25;
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
@@ -67,7 +65,6 @@ class MainMenuState extends MusicBeatState
 		add(camFollow);
 
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
-		magenta.antialiasing = ClientPrefs.data.antialiasing;
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
 		magenta.updateHitbox();
@@ -86,8 +83,7 @@ class MainMenuState extends MusicBeatState
 			item.screenCenter(X);
 		}
 
-		if (leftOption != null)
-			leftItem = createMenuItem(leftOption, 60, 490);
+		if (leftOption != null) leftItem = createMenuItem(leftOption, 60, 490);
 		if (rightOption != null)
 		{
 			rightItem = createMenuItem(rightOption, FlxG.width - 60, 490);
@@ -115,14 +111,6 @@ class MainMenuState extends MusicBeatState
 		#end
 		#end
 
-		#if CHECK_FOR_UPDATES
-		if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
-			persistentUpdate = false;
-			showOutdatedWarning = false;
-			openSubState(new substates.OutdatedSubState());
-		}
-		#end
-
 		FlxG.camera.follow(camFollow, null, 0.15);
 	}
 
@@ -134,15 +122,12 @@ class MainMenuState extends MusicBeatState
 		menuItem.animation.addByPrefix('selected', '$name selected', 24, true);
 		menuItem.animation.play('idle');
 		menuItem.updateHitbox();
-		
-		menuItem.antialiasing = ClientPrefs.data.antialiasing;
 		menuItem.scrollFactor.set();
 		menuItems.add(menuItem);
 		return menuItem;
 	}
 
 	var selectedSomethin:Bool = false;
-
 	var timeNotMoving:Float = 0;
 	override function update(elapsed:Float)
 	{
@@ -151,11 +136,8 @@ class MainMenuState extends MusicBeatState
 
 		if (!selectedSomethin)
 		{
-			if (controls.UI_UP_P)
-				changeItem(-1);
-
-			if (controls.UI_DOWN_P)
-				changeItem(1);
+			if (controls.UI_UP_P) changeItem(-1);
+			if (controls.UI_DOWN_P) changeItem(1);
 
 			var allowMouse:Bool = allowMouse;
 			if (allowMouse && ((FlxG.mouse.deltaScreenX != 0 && FlxG.mouse.deltaScreenY != 0) || FlxG.mouse.justPressed)) //FlxG.mouse.deltaScreenX/Y checks is more accurate than FlxG.mouse.justMoved
@@ -164,16 +146,12 @@ class MainMenuState extends MusicBeatState
 				FlxG.mouse.visible = true;
 				timeNotMoving = 0;
 
-				var selectedItem:FlxSprite;
-				switch(curColumn)
+				var selectedItem:FlxSprite = switch(curColumn)
 				{
-					case CENTER:
-						selectedItem = menuItems.members[curSelected];
-					case LEFT:
-						selectedItem = leftItem;
-					case RIGHT:
-						selectedItem = rightItem;
-				}
+					case CENTER: menuItems.members[curSelected];
+					case LEFT: leftItem;
+					case RIGHT: rightItem;
+				};
 
 				if(leftItem != null && FlxG.mouse.overlaps(leftItem))
 				{
@@ -260,7 +238,7 @@ class MainMenuState extends MusicBeatState
 				selectedSomethin = true;
 				FlxG.mouse.visible = false;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				MusicBeatState.switchState(new TitleState());
+				FlxG.switchState(() -> new TitleState());
 			}
 
 			if (controls.ACCEPT || (FlxG.mouse.justPressed && allowMouse))
@@ -294,24 +272,24 @@ class MainMenuState extends MusicBeatState
 					switch (option)
 					{
 						case 'story_mode':
-							MusicBeatState.switchState(new StoryMenuState());
+							FlxG.switchState(() -> new StoryMenuState());
 						case 'freeplay':
-							MusicBeatState.switchState(new FreeplayState());
+							FlxG.switchState(() -> new FreeplayState());
 
 						#if MODS_ALLOWED
 						case 'mods':
-							MusicBeatState.switchState(new ModsMenuState());
+							FlxG.switchState(() -> new ModsMenuState());
 						#end
 
 						#if ACHIEVEMENTS_ALLOWED
 						case 'achievements':
-							MusicBeatState.switchState(new AchievementsMenuState());
+							FlxG.switchState(() -> new AchievementsMenuState());
 						#end
 
 						case 'credits':
-							MusicBeatState.switchState(new CreditsState());
+							FlxG.switchState(() -> new CreditsState());
 						case 'options':
-							MusicBeatState.switchState(new OptionsState());
+							FlxG.switchState(() -> new OptionsState());
 							OptionsState.onPlayState = false;
 							if (PlayState.SONG != null)
 							{
@@ -332,18 +310,18 @@ class MainMenuState extends MusicBeatState
 				
 				for (memb in menuItems)
 				{
-					if(memb == item)
-						continue;
+					if(memb == item) continue;
 
 					FlxTween.tween(memb, {alpha: 0}, 0.4, {ease: FlxEase.quadOut});
 				}
 			}
+
 			#if desktop
 			if (controls.justPressed('debug_1'))
 			{
 				selectedSomethin = true;
 				FlxG.mouse.visible = false;
-				MusicBeatState.switchState(new MasterEditorMenu());
+				FlxG.switchState(() -> new MasterEditorMenu());
 			}
 			#end
 		}

@@ -7,7 +7,6 @@ class PhillyTrain extends BGSprite
 	{
 		super(image, x, y);
 		active = true; //Allow update
-		antialiasing = ClientPrefs.data.antialiasing;
 
 		this.sound = new FlxSound().loadEmbedded(Paths.sound(sound));
 		FlxG.sound.list.add(this.sound);
@@ -46,12 +45,10 @@ class PhillyTrain extends BGSprite
 						x = -1150;
 						cars -= 1;
 
-						if (cars <= 0)
-							finishing = true;
+						if (cars <= 0) finishing = true;
 					}
 
-					if (x < -4000 && finishing)
-						restart();
+					if (x < -4000 && finishing) restart();
 				}
 				frameTiming = 0;
 			}
@@ -61,8 +58,7 @@ class PhillyTrain extends BGSprite
 
 	public function beatHit(curBeat:Int):Void
 	{
-		if (!moving)
-			cooldown += 1;
+		if (!moving) cooldown += 1;
 
 		if (curBeat % 8 == 4 && FlxG.random.bool(30) && !moving && cooldown > 8)
 		{
@@ -74,8 +70,7 @@ class PhillyTrain extends BGSprite
 	public function start():Void
 	{
 		moving = true;
-		if (!sound.playing)
-			sound.play(true);
+		if (!sound.playing) sound.play(true);
 	}
 
 	public function restart():Void

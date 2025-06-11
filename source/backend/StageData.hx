@@ -1,15 +1,17 @@
 package backend;
 
 import openfl.utils.Assets;
-import haxe.Json;
 import backend.Song;
-import psychlua.ModchartSprite;
+import scripting.ModchartSprite;
+import scripting.LuaUtils;
 
 typedef StageFile = {
 	var directory:String;
 	var defaultZoom:Float;
-	@:optional var isPixelStage:Null<Bool>;
 	var stageUI:String;
+	@:optional var isPixelStage:Null<Bool>;
+	@:optional var introSprites:Array<String>;
+	@:optional var introSounds:Array<String>;
 
 	var boyfriend:Array<Dynamic>;
 	var girlfriend:Array<Dynamic>;
@@ -19,6 +21,14 @@ typedef StageFile = {
 	var camera_boyfriend:Array<Float>;
 	var camera_opponent:Array<Float>;
 	var camera_girlfriend:Array<Float>;
+
+	// forces cam positions to a specific spot
+	// if these are null, the character cam positions get used
+	@:optional var useStageCamPosition:Bool;
+	@:optional var stage_cam_opponent:Array<Float>;
+	@:optional var stage_cam_player:Array<Float>;
+	@:optional var stage_cam_gf:Array<Float>;
+
 	var camera_speed:Null<Float>;
 
 	@:optional var preload:Dynamic;
@@ -35,13 +45,16 @@ enum abstract LoadFilters(Int) from Int from UInt to Int to UInt
 	var FREEPLAY:Int = (1 << 3);
 }
 
-class StageData {
+class StageData
+{
 	public static function dummy():StageFile
 	{
 		return {
 			directory: "",
 			defaultZoom: 0.9,
 			stageUI: "normal",
+			introSprites: [null, "ready", "set", "go"],
+			introSounds: ["intro3", "intro2", "intro1", "introGo"],
 
 			boyfriend: [770, 100],
 			girlfriend: [400, 130],
@@ -51,6 +64,12 @@ class StageData {
 			camera_boyfriend: [0, 0],
 			camera_opponent: [0, 0],
 			camera_girlfriend: [0, 0],
+
+			useStageCamPosition: false,
+			stage_cam_opponent: null,
+			stage_cam_player: null,
+			stage_cam_gf: null,
+
 			camera_speed: 1,
 
 			_editorMeta: {
@@ -62,30 +81,24 @@ class StageData {
 	}
 
 	public static var forceNextDirectory:String = null;
-	public static function loadDirectory(SONG:SwagSong) {
+	public static function loadDirectory(SONG:SwagSong)
+	{
 		var stage:String = '';
-		if(SONG.stage != null)
-			stage = SONG.stage;
-		else if(Song.loadedSongName != null)
-			stage = vanillaSongStage(Paths.formatToSongPath(Song.loadedSongName));
-		else
-			stage = 'stage';
+		if(SONG.stage != null) stage = SONG.stage;
+		else if(Song.loadedSongName != null) stage = vanillaSongStage(Paths.formatToSongPath(Song.loadedSongName));
+		else stage = 'stage';
 
 		var stageFile:StageFile = getStageFile(stage);
 		forceNextDirectory = (stageFile != null) ? stageFile.directory : ''; //preventing crashes
 	}
 
-	public static function getStageFile(stage:String):StageFile {
+	public static function getStageFile(stage:String):StageFile
+	{
 		try
 		{
-			var path:String = Paths.getPath('stages/' + stage + '.json', TEXT, null, true);
-			#if MODS_ALLOWED
-			if(FileSystem.exists(path))
-				return cast tjson.TJSON.parse(File.getContent(path));
-			#else
-			if(Assets.exists(path))
-				return cast tjson.TJSON.parse(Assets.getText(path));
-			#end
+			final path:String = Paths.getPath('stages/$stage.json', TEXT, null, true);
+			if(Paths.fileExistsAbsolute(path))
+				return cast tjson.TJSON.parse(#if MODS_ALLOWED File.getContent(path) #else Assets.getText(path) #end);
 		}
 		return dummy();
 	}
@@ -110,6 +123,10 @@ class StageData {
 				return 'schoolEvil';
 			case 'ugh' | 'guns' | 'stress':
 				return 'tank';
+			case 'darnell' | 'lit-up' | '2hot':
+				return 'phillyStreets';
+			case 'blazin':
+				return 'phillyBlazin';
 		}
 		return 'stage';
 	}
@@ -118,9 +135,9 @@ class StageData {
 	public static function addObjectsToState(objectList:Array<Dynamic>, gf:FlxSprite, dad:FlxSprite, boyfriend:FlxSprite, ?group:Dynamic = null, ?ignoreFilters:Bool = false)
 	{
 		var addedObjects:Map<String, FlxSprite> = [];
-		for (num => data in objectList)
+		for(num => data in objectList)
 		{
-			if (addedObjects.exists(data)) continue;
+			if(addedObjects.exists(data)) continue;
 
 			switch(data.type)
 			{
@@ -157,25 +174,25 @@ class StageData {
 							spr.loadGraphic(Paths.image(data.image));
 						else
 							spr.frames = Paths.getAtlas(data.image);
-						
+
 						if(data.type == 'animatedSprite' && data.animations != null)
 						{
 							var anims:Array<objects.Character.AnimArray> = cast data.animations;
-							for (key => anim in anims)
+							for(key => anim in anims)
 							{
 								if(anim.indices == null || anim.indices.length < 1)
 									spr.animation.addByPrefix(anim.anim, anim.name, anim.fps, anim.loop);
 								else
 									spr.animation.addByIndices(anim.anim, anim.name, anim.indices, '', anim.fps, anim.loop);
-	
+
 								if(anim.offsets != null)
 									spr.addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
-	
+
 								if(spr.animation.curAnim == null || data.firstAnimation == anim.anim)
 									spr.playAnim(anim.anim, true);
 							}
 						}
-						for (varName in ['antialiasing', 'flipX', 'flipY'])
+						for(varName in ['antialiasing', 'flipX', 'flipY'])
 						{
 							var dat:Dynamic = Reflect.getProperty(data, varName);
 							if(dat != null) Reflect.setProperty(spr, varName, dat);
@@ -195,14 +212,39 @@ class StageData {
 					}
 					spr.scrollFactor.set(data.scroll[0], data.scroll[1]);
 					spr.color = CoolUtil.colorFromString(data.color);
-					
-					for (varName in ['alpha', 'angle'])
+					spr.blend = LuaUtils.blendModeFromString(data.blend);
+
+					for(varName in ['alpha', 'angle'])
 					{
 						var dat:Dynamic = Reflect.getProperty(data, varName);
 						if(dat != null) Reflect.setProperty(spr, varName, dat);
 					}
 
-					if (group != null) group.add(spr);
+					/*if(data.shader != null && data.shader.length > 0) // wip
+					{
+						if(data.shader.name != null)
+						{
+							final shadName:String = data.shader.name;
+							final shadForce:Bool = (data.shader.force == true);
+							spr.shader = ShaderHelper.createRuntimeShader(shadName, shadForce);
+
+							for(key => anim in anims)
+							{
+								if(anim.indices == null || anim.indices.length < 1)
+									spr.animation.addByPrefix(anim.anim, anim.name, anim.fps, anim.loop);
+								else
+									spr.animation.addByIndices(anim.anim, anim.name, anim.indices, '', anim.fps, anim.loop);
+
+								if(anim.offsets != null)
+									spr.addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
+
+								if(spr.animation.curAnim == null || data.firstAnimation == anim.anim)
+									spr.playAnim(anim.anim, true);
+							}
+						}
+					}*/
+
+					if(group != null) group.add(spr);
 					addedObjects.set(data.name, spr);
 
 				default:

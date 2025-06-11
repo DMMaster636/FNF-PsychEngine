@@ -7,16 +7,17 @@ class MallCrowd extends BGSprite
 	{
 		super(sprite, x, y, 0.9, 0.9, [idle]);
 		animation.addByPrefix('hey', hey, 24, false);
-		antialiasing = ClientPrefs.data.antialiasing;
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
-		if(heyTimer > 0) {
+		if(heyTimer > 0)
+		{
 			heyTimer -= elapsed;
-			if(heyTimer <= 0) {
+			if(heyTimer <= 0)
+			{
 				dance(true);
 				heyTimer = 0;
 			}

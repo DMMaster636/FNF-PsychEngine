@@ -44,7 +44,7 @@ class PhillyStreets extends BaseStage
 	var spraycanPile:BGSprite;
 
 	var darkenable:Array<FlxSprite> = [];
-	var abot:ABotSpeaker;
+
 	override function create()
 	{
 		if(!ClientPrefs.data.lowQuality)
@@ -125,18 +125,12 @@ class PhillyStreets extends BaseStage
 		if(!ClientPrefs.data.lowQuality)
 		{
 			picoFade = new FlxSprite();
-			picoFade.antialiasing = ClientPrefs.data.antialiasing;
 			picoFade.alpha = 0;
 			add(picoFade);
 			darkenable.push(picoFade);
 		}
 
-		abot = new ABotSpeaker(gfGroup.x, gfGroup.y + 550);
-		updateABotEye(true);
-		add(abot);
-		
-		if(ClientPrefs.data.shaders)
-			setupRainShader();
+		if(ClientPrefs.data.shaders) setupRainShader();
 
 		var _song = PlayState.SONG;
 		if(_song.gameOverSound == null || _song.gameOverSound.trim().length < 1) GameOverSubstate.deathSoundName = 'fnf_loss_sfx-pico';
@@ -215,13 +209,12 @@ class PhillyStreets extends BaseStage
 		{
 			#if VIDEOS_ALLOWED
 			game.startVideo(videoName);
-			game.videoCutscene.finishCallback = game.videoCutscene.onSkip = function()
+			game.videoCutscene.overallFinish = function()
 			{
 				videoEnded = true;
 				game.videoCutscene = null;
 				videoCutscene();
 			};
-
 			#else //Make a timer to prevent it from crashing due to sprites not being ready yet.
 			new FlxTimer().start(0.0, function(tmr:FlxTimer)
 			{
@@ -231,14 +224,11 @@ class PhillyStreets extends BaseStage
 			#end
 			return;
 		}
-		
-		if (isStoryMode)
+
+		switch (songName)
 		{
-			switch (songName)
-			{
-				case 'darnell':
-					darnellCutscene();
-			}
+			case 'darnell':
+				darnellCutscene();
 		}
 	}
 
@@ -388,19 +378,8 @@ class PhillyStreets extends BaseStage
 		FlxG.camera.fade(FlxColor.BLACK, 2, true, null, true);
 	}
 
-	function updateABotEye(finishInstantly:Bool = false)
-	{
-		if(PlayState.SONG.notes[Std.int(FlxMath.bound(curSection, 0, PlayState.SONG.notes.length - 1))].mustHitSection == true)
-			abot.lookRight();
-		else
-			abot.lookLeft();
-
-		if(finishInstantly) abot.eyes.anim.curFrame = abot.eyes.anim.length - 1;
-	}
-
 	override function startSong()
 	{
-		abot.snd = FlxG.sound.music;
 		gf.animation.finishCallback = onNeneAnimationFinished;
 	}
 	
@@ -515,7 +494,7 @@ class PhillyStreets extends BaseStage
 				rainShaderEndIntensity = 0.4;
 		}
 		rainShader.intensity = rainShaderStartIntensity;
-		FlxG.camera.setFilters([new ShaderFilter(rainShader)]);
+		FlxG.camera.filters = [new ShaderFilter(rainShader)];
 	}
 	
 	var currentNeneState:NeneState = STATE_DEFAULT;
@@ -588,11 +567,6 @@ class PhillyStreets extends BaseStage
 		}
 	}
 
-	override function sectionHit()
-	{
-		updateABotEye();
-	}
-
 	var lightsStop:Bool = false;
 	var lastChange:Int = 0;
 	var changeInterval:Int = 8;
@@ -603,7 +577,6 @@ class PhillyStreets extends BaseStage
 
 	override function beatHit()
 	{
-		//if(curBeat % 2 == 0) abot.beatHit();
 		switch(currentNeneState) {
 			case STATE_READY:
 				if (blinkCountdown == 0)
@@ -789,21 +762,6 @@ class PhillyStreets extends BaseStage
 
 	override function goodNoteHit(note:Note)
 	{
-		// 10% chance of playing combo50/combo100 animations for Nene
-		if(FlxG.random.bool(10))
-		{
-			switch(game.combo)
-			{
-				case 50, 100:
-					var animToPlay:String = 'combo${game.combo}';
-					if(gf.animation.exists(animToPlay))
-					{
-						gf.playAnim(animToPlay);
-						gf.specialAnim = true;
-					}
-			}
-		}
-
 		switch(note.noteType)
 		{
 			case 'weekend-1-cockgun': // HE'S PULLING HIS COCK OUT

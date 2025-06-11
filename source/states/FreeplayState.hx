@@ -1,7 +1,6 @@
 package states;
 
 import backend.WeekData;
-import backend.Highscore;
 import backend.Song;
 
 import objects.HealthIcon;
@@ -70,9 +69,9 @@ class FreeplayState extends MusicBeatState
 		{
 			FlxTransitionableState.skipNextTransIn = true;
 			persistentUpdate = false;
-			MusicBeatState.switchState(new states.ErrorState("NO WEEKS ADDED FOR FREEPLAY\n\nPress ACCEPT to go to the Week Editor Menu.\nPress BACK to return to Main Menu.",
-				function() MusicBeatState.switchState(new states.editors.WeekEditorState()),
-				function() MusicBeatState.switchState(new states.MainMenuState())));
+			FlxG.switchState(() -> new states.ErrorState("NO WEEKS ADDED FOR FREEPLAY\n\nPress ACCEPT to go to the Week Editor Menu.\nPress BACK to return to Main Menu.",
+				function() FlxG.switchState(() -> new states.editors.WeekEditorState()),
+				function() FlxG.switchState(() -> new states.MainMenuState())));
 			return;
 		}
 
@@ -104,7 +103,6 @@ class FreeplayState extends MusicBeatState
 		Mods.loadTopMod();
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 		bg.screenCenter();
 
@@ -238,8 +236,7 @@ class FreeplayState extends MusicBeatState
 		while(ratingSplit[1].length < 2) //Less than 2 decimals in it, add decimals then
 			ratingSplit[1] += '0';
 
-		var shiftMult:Int = 1;
-		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
+		var shiftMult:Int = (FlxG.keys.pressed.SHIFT) ? 3 : 1;
 
 		if (!player.playingMusic)
 		{
@@ -319,7 +316,7 @@ class FreeplayState extends MusicBeatState
 			{
 				persistentUpdate = false;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				MusicBeatState.switchState(new MainMenuState());
+				FlxG.switchState(() -> new MainMenuState());
 			}
 		}
 
@@ -443,7 +440,7 @@ class FreeplayState extends MusicBeatState
 				Paths.freeGraphicsFromMemory();
 			}
 			LoadingState.prepareToSong();
-			LoadingState.loadAndSwitchState(new PlayState());
+			LoadingState.loadAndSwitchState(() -> new PlayState());
 			#if !SHOW_LOADING_SCREEN FlxG.sound.music.stop(); #end
 			stopMusicPlay = true;
 
@@ -489,8 +486,7 @@ class FreeplayState extends MusicBeatState
 
 	function changeDiff(change:Int = 0)
 	{
-		if (player.playingMusic)
-			return;
+		if (player.playingMusic) return;
 
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.list.length-1);
 		#if !switch
@@ -512,8 +508,7 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		if (player.playingMusic)
-			return;
+		if (player.playingMusic) return;
 
 		curSelected = FlxMath.wrap(curSelected + change, 0, songs.length-1);
 		_updateSongLastDifficulty();

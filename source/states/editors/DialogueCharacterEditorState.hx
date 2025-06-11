@@ -3,14 +3,14 @@ package states.editors;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import flash.net.FileFilter;
+import openfl.net.FileFilter;
 import haxe.Json;
 import lime.system.Clipboard;
 
 import objects.TypedAlphabet;
 
 import cutscenes.DialogueBoxPsych;
-import cutscenes.DialogueCharacter;
+import cutscenes.DialogueCharacterPsych;
 
 import states.editors.content.Prompt;
 
@@ -40,39 +40,41 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 	var offsetIdleText:FlxText;
 	var animText:FlxText;
 
-	var camGame:FlxCamera;
-	var camHUD:FlxCamera;
+	var camGame:PsychCamera;
+	var camHUD:PsychCamera;
 
 	var mainGroup:FlxSpriteGroup;
 	var hudGroup:FlxSpriteGroup;
 
-	var character:DialogueCharacter;
-	var ghostLoop:DialogueCharacter;
-	var ghostIdle:DialogueCharacter;
+	var character:DialogueCharacterPsych;
+	var ghostLoop:DialogueCharacterPsych;
+	var ghostIdle:DialogueCharacterPsych;
 
 	var curAnim:Int = 0;
 	var unsavedProgress:Bool = false;
 
-	override function create() {
+	override function create()
+	{
 		persistentUpdate = persistentDraw = true;
+
 		camGame = initPsychCamera();
 		camGame.bgColor = FlxColor.fromHSL(0, 0, 0.5);
-		camHUD = new FlxCamera();
+		camHUD = new PsychCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 		
 		mainGroup = new FlxSpriteGroup();
-		mainGroup.cameras = [camGame];
 		hudGroup = new FlxSpriteGroup();
+		mainGroup.cameras = [camGame];
 		hudGroup.cameras = [camGame];
 		add(mainGroup);
 		add(hudGroup);
 
-		character = new DialogueCharacter();
+		character = new DialogueCharacterPsych();
 		character.scrollFactor.set();
 		mainGroup.add(character);
 		
-		ghostLoop = new DialogueCharacter();
+		ghostLoop = new DialogueCharacterPsych();
 		ghostLoop.alpha = 0;
 		ghostLoop.color = FlxColor.RED;
 		ghostLoop.isGhost = true;
@@ -80,7 +82,7 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 		ghostLoop.cameras = [camGame];
 		mainGroup.add(ghostLoop);
 		
-		ghostIdle = new DialogueCharacter();
+		ghostIdle = new DialogueCharacterPsych();
 		ghostIdle.alpha = 0;
 		ghostIdle.color = FlxColor.BLUE;
 		ghostIdle.isGhost = true;
@@ -89,7 +91,6 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 		mainGroup.add(ghostIdle);
 
 		box = new FlxSprite(70, 370);
-		box.antialiasing = ClientPrefs.data.antialiasing;
 		box.frames = Paths.getSparrowAtlas('speech_bubble');
 		box.scrollFactor.set();
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);
@@ -359,12 +360,12 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 	private static var DEFAULT_TEXT:String = 'Lorem ipsum dolor sit amet';
 
 	function reloadCharacter() {
-		var charsArray:Array<DialogueCharacter> = [character, ghostLoop, ghostIdle];
+		var charsArray:Array<DialogueCharacterPsych> = [character, ghostLoop, ghostIdle];
 		for (char in charsArray) {
 			char.frames = Paths.getSparrowAtlas('dialogue/' + character.jsonFile.image);
 			char.jsonFile = character.jsonFile;
 			char.reloadAnimations();
-			char.setGraphicSize(Std.int(char.width * DialogueCharacter.DEFAULT_SCALE * character.jsonFile.scale));
+			char.setGraphicSize(Std.int(char.width * DialogueCharacterPsych.DEFAULT_SCALE * character.jsonFile.scale));
 			char.updateHitbox();
 		}
 		character.x = DialogueBoxPsych.LEFT_CHAR_X;
@@ -602,7 +603,7 @@ class DialogueCharacterEditorState extends MusicBeatState implements PsychUIEven
 			if(FlxG.keys.justPressed.ESCAPE) {
 				if(!unsavedProgress)
 				{
-					MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+					FlxG.switchState(() -> new states.editors.MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					transitioning = true;
 				}

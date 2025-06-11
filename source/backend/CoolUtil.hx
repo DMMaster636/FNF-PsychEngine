@@ -1,45 +1,56 @@
 package backend;
 
 import openfl.utils.Assets;
-import lime.utils.Assets as LimeAssets;
 
 class CoolUtil
 {
-	public static function checkForUpdates(url:String = null):String {
-		if (url == null || url.length == 0)
-			url = "https://raw.githubusercontent.com/ShadowMario/FNF-PsychEngine/main/gitVersion.txt";
+	public static function checkForUpdates(url:String = null):String
+	{
+		if(url == null || url.length == 0)
+			url = "https://raw.githubusercontent.com/DMMaster636/FNF-PsychEngine/main/gitVersion.txt";
+
 		var version:String = states.MainMenuState.psychEngineVersion.trim();
-		if(ClientPrefs.data.checkForUpdates) {
-			trace('checking for updates...');
+		if(ClientPrefs.data.checkForUpdates)
+		{
+			trace('Checking for updates...');
+
 			var http = new haxe.Http(url);
-			http.onData = function (data:String)
+			http.onData = function(data:String)
 			{
-				var newVersion:String = data.split('\n')[0].trim();
-				trace('version online: $newVersion, your version: $version');
-				if(newVersion != version) {
-					trace('versions arent matching! please update');
+				trace('Current Version: $version');
+				final newVersion:String = data.split('\n')[0].trim();
+				trace('Version Online: $newVersion');
+				if(newVersion != version)
+				{
+					trace('Update Found!');
 					version = newVersion;
 					http.onData = null;
 					http.onError = null;
 					http = null;
 				}
 			}
-			http.onError = function (error) {
+			http.onError = function(error)
+			{
 				trace('error: $error');
 			}
 			http.request();
 		}
 		return version;
 	}
-	inline public static function quantize(f:Float, snap:Float){
-		// changed so this actually works lol
+
+	inline public static function quantize(f:Float, snap:Float)
+	{
 		var m:Float = Math.fround(f * snap);
-		//trace(snap);
 		return (m / snap);
 	}
 
 	inline public static function capitalize(text:String)
 		return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+
+	public static function playSoundSafe(sound:flixel.system.FlxAssets.FlxSoundAsset, volume:Float = 1.0)
+	{
+		if(sound != null) FlxG.sound.play(sound, volume);
+	}
 
 	inline public static function coolTextFile(path:String):Array<String>
 	{
@@ -56,7 +67,7 @@ class CoolUtil
 	{
 		var hideChars = ~/[\t\n\r]/;
 		var color:String = hideChars.split(color).join('').trim();
-		if(color.startsWith('0x')) color = color.substring(color.length - 6);
+		if(color.startsWith('0x')) color = color.substring(color.length - (color.length >= 10 ? 8 : 6));
 
 		var colorNum:Null<FlxColor> = FlxColor.fromString(color);
 		if(colorNum == null) colorNum = FlxColor.fromString('#$color');
@@ -68,17 +79,15 @@ class CoolUtil
 		var daList:Array<String> = [];
 		daList = string.trim().split('\n');
 
-		for (i in 0...daList.length)
-			daList[i] = daList[i].trim();
+		for (i => line in daList)
+			daList[i] = line.trim();
 
 		return daList;
 	}
 
 	public static function floorDecimal(value:Float, decimals:Int):Float
 	{
-		if(decimals < 1)
-			return Math.floor(value);
-
+		if(decimals < 1) return Math.floor(value);
 		return Math.floor(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
 	}
 
@@ -118,66 +127,40 @@ class CoolUtil
 	{
 		var dumbArray:Array<Int> = [];
 		for (i in min...max) dumbArray.push(i);
-
 		return dumbArray;
 	}
 
-	inline public static function browserLoad(site:String) {
-		#if linux
-		Sys.command('/usr/bin/xdg-open', [site]);
-		#else
-		FlxG.openURL(site);
-		#end
-	}
-
-	inline public static function openFolder(folder:String, absolute:Bool = false) {
-		#if sys
-			if(!absolute) folder =  Sys.getCwd() + '$folder';
-
-			folder = folder.replace('/', '\\');
-			if(folder.endsWith('/')) folder.substr(0, folder.length - 1);
-
+	inline public static function browserLoad(site:String)
+	{
+		try
+		{
 			#if linux
-			var command:String = '/usr/bin/xdg-open';
+			Sys.command('/usr/bin/xdg-open $site &');
 			#else
-			var command:String = 'explorer.exe';
+			FlxG.openURL(site);
 			#end
-			Sys.command(command, [folder]);
-			trace('$command $folder');
-		#else
-			FlxG.error("Platform is not supported for CoolUtil.openFolder");
-		#end
-	}
-
-	/**
-		Helper Function to Fix Save Files for Flixel 5
-
-		-- EDIT: [November 29, 2023] --
-
-		this function is used to get the save path, period.
-		since newer flixel versions are being enforced anyways.
-		@crowplexus
-	**/
-	@:access(flixel.util.FlxSave.validate)
-	inline public static function getSavePath():String {
-		final company:String = FlxG.stage.application.meta.get('company');
-		// #if (flixel < "5.0.0") return company; #else
-		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
-		// #end
+		}
+		catch(e:Dynamic)
+		{
+			FlxG.log.warn("Couldn't open site!");
+		}
 	}
 
 	public static function setTextBorderFromString(text:FlxText, border:String)
 	{
-		switch(border.toLowerCase().trim())
+		text.borderStyle = switch(border.toLowerCase().trim())
 		{
-			case 'shadow':
-				text.borderStyle = SHADOW;
-			case 'outline':
-				text.borderStyle = OUTLINE;
-			case 'outline_fast', 'outlinefast':
-				text.borderStyle = OUTLINE_FAST;
-			default:
-				text.borderStyle = NONE;
-		}
+			case 'shadow': SHADOW;
+			case 'outline': OUTLINE;
+			case 'outline_fast', 'outline fast', 'outlinefast': OUTLINE_FAST;
+			default: NONE;
+		};
+	}
+
+	@:access(flixel.util.FlxSave.validate)
+	inline public static function getSavePath():String
+	{
+		final company:String = FlxG.stage.application.meta.get('company');
+		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
 	}
 }

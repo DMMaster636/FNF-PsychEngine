@@ -11,14 +11,19 @@ class AchievementsMenuState extends MusicBeatState
 
 	public var options:Array<Dynamic> = [];
 	public var grpOptions:FlxSpriteGroup;
+
 	public var nameText:FlxText;
 	public var descText:FlxText;
+
 	public var progressTxt:FlxText;
 	public var progressBar:Bar;
+	public var barTween:FlxTween = null;
 
 	var camFollow:FlxObject;
 
 	var MAX_PER_ROW:Int = 4;
+
+	var goingBack:Bool = false;
 
 	override function create()
 	{
@@ -41,7 +46,6 @@ class AchievementsMenuState extends MusicBeatState
 		add(camFollow);
 
 		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuBGBlue'));
-		menuBG.antialiasing = ClientPrefs.data.antialiasing;
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
 		menuBG.updateHitbox();
 		menuBG.screenCenter();
@@ -120,7 +124,7 @@ class AchievementsMenuState extends MusicBeatState
 		add(descText);
 		add(nameText);
 		
-		_changeSelection();
+		changeSelection();
 		super.create();
 		
 		FlxG.camera.follow(camFollow, null, 0.15);
@@ -145,7 +149,6 @@ class AchievementsMenuState extends MusicBeatState
 	public static function sortByID(Obj1:Dynamic, Obj2:Dynamic):Int
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.ID, Obj2.ID);
 
-	var goingBack:Bool = false;
 	override function update(elapsed:Float) {
 		if(!goingBack && options.length > 1)
 		{
@@ -167,7 +170,7 @@ class AchievementsMenuState extends MusicBeatState
 					if(curRow < oldRow) curSelected += rowSize;
 					else curSelected = curSelected -= rowSize;
 				}
-				_changeSelection();
+				changeSelection();
 			}
 
 			if(options.length > MAX_PER_ROW)
@@ -193,26 +196,23 @@ class AchievementsMenuState extends MusicBeatState
 						//trace('Pass 2: $curSelected');
 					}
 
-					_changeSelection();
+					changeSelection();
 				}
 			}
 			
 			if(controls.RESET && (options[curSelected].unlocked || options[curSelected].curProgress > 0))
-			{
 				openSubState(new ResetAchievementSubstate());
-			}
 		}
 
 		if (controls.BACK) {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			MusicBeatState.switchState(new MainMenuState());
+			FlxG.switchState(() -> new MainMenuState());
 			goingBack = true;
 		}
 		super.update(elapsed);
 	}
 
-	public var barTween:FlxTween = null;
-	function _changeSelection()
+	function changeSelection()
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 		var hasProgress = options[curSelected].maxProgress > 0;
@@ -284,11 +284,13 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		yesText.scrollFactor.set();
 		for(letter in yesText.letters) letter.color = FlxColor.RED;
 		add(yesText);
+
 		noText = new Alphabet(0, text.y + 120, Language.getPhrase('No'), true);
 		noText.screenCenter(X);
 		noText.x += 200;
 		noText.scrollFactor.set();
 		add(noText);
+
 		updateOptions();
 	}
 
@@ -303,7 +305,8 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 
 		super.update(elapsed);
 
-		if(controls.UI_LEFT_P || controls.UI_RIGHT_P) {
+		if(controls.UI_LEFT_P || controls.UI_RIGHT_P)
+		{
 			onYes = !onYes;
 			updateOptions();
 		}
@@ -322,7 +325,6 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 				option.name = state.nameText.text = '???';
 				if(option.maxProgress > 0) state.progressTxt.text = '0 / ' + option.maxProgress;
 				state.grpOptions.members[state.curSelected].loadGraphic(Paths.image('achievements/lockedachievement'));
-				state.grpOptions.members[state.curSelected].antialiasing = ClientPrefs.data.antialiasing;
 
 				if(state.progressBar.visible)
 				{
@@ -342,7 +344,8 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		}
 	}
 
-	function updateOptions() {
+	function updateOptions()
+	{
 		var scales:Array<Float> = [0.75, 1];
 		var alphas:Array<Float> = [0.6, 1.25];
 		var confirmInt:Int = onYes ? 1 : 0;

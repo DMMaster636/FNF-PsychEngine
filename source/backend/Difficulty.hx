@@ -66,7 +66,5 @@ class Difficulty
 	}
 
 	inline public static function getDefault():String
-	{
 		return defaultDifficulty;
-	}
 }

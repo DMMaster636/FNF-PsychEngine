@@ -172,8 +172,7 @@ class Tank extends BaseStage
 			boyfriendGroup.alpha = 1;
 			camHUD.visible = true;
 
-			if(audioPlaying != null)
-				audioPlaying.stop();
+			if(audioPlaying != null) audioPlaying.stop();
 
 			boyfriend.animation.finishCallback = null;
 			gf.animation.finishCallback = null;
@@ -332,7 +331,6 @@ class Tank extends BaseStage
 		pico.anim.onComplete.add(picoStressCycle);
 
 		boyfriendCutscene = new FlxSprite(boyfriend.x + 5, boyfriend.y + 20);
-		boyfriendCutscene.antialiasing = ClientPrefs.data.antialiasing;
 		boyfriendCutscene.frames = Paths.getSparrowAtlas('characters/BOYFRIEND');
 		boyfriendCutscene.animation.addByPrefix('idle', 'BF idle dance', 24, false);
 		boyfriendCutscene.animation.play('idle', true);

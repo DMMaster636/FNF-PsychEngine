@@ -29,6 +29,7 @@ class MusicPlayer extends FlxGroup
 	var playbackTxt:FlxText;
 
 	var wasPlaying:Bool;
+	var muteVocals:Bool = false;
 
 	var holdPitchTime:Float = 0;
 	var playbackRate(default, set):Float = 1;
@@ -63,8 +64,7 @@ class MusicPlayer extends FlxGroup
 			var text:FlxText = new FlxText();
 			text.setFormat(Paths.font('vcr.ttf'), 32, FlxColor.WHITE, CENTER);
 			text.text = '^';
-			if (i == 1)
-				text.flipY = true;
+			text.flipY = (i == 1);
 			text.visible = false;
 			playbackSymbols.push(text);
 			add(text);
@@ -85,10 +85,7 @@ class MusicPlayer extends FlxGroup
 	{
 		super.update(elapsed);
 
-		if (!playingMusic)
-		{
-			return;
-		}
+		if (!playingMusic) return;
 
 		var songName:String = instance.songs[FreeplayState.curSelected].songName;
 		if (playing && !wasPlaying)
@@ -100,24 +97,21 @@ class MusicPlayer extends FlxGroup
 
 		if (controls.UI_LEFT_P)
 		{
-			if (playing)
-				wasPlaying = true;
+			if (playing) wasPlaying = true;
 
 			pauseOrResume();
 
 			curTime = FlxG.sound.music.time - 1000;
 			instance.holdTime = 0;
 
-			if (curTime < 0)
-				curTime = 0;
+			if (curTime < 0) curTime = 0;
 
 			FlxG.sound.music.time = curTime;
 			setVocalsTime(curTime);
 		}
 		if (controls.UI_RIGHT_P)
 		{
-			if (playing)
-				wasPlaying = true;
+			if (playing) wasPlaying = true;
 
 			pauseOrResume();
 
@@ -135,9 +129,7 @@ class MusicPlayer extends FlxGroup
 		{
 			instance.holdTime += elapsed;
 			if(instance.holdTime > 0.5)
-			{
 				curTime += 40000 * elapsed * (controls.UI_LEFT ? -1 : 1);
-			}
 
 			var difference:Float = Math.abs(curTime - FlxG.sound.music.time);
 			if(curTime + difference > FlxG.sound.music.length) curTime = FlxG.sound.music.length;
@@ -191,23 +183,21 @@ class MusicPlayer extends FlxGroup
 
 		if (playing)
 		{
-			if(FreeplayState.vocals != null)
-				FreeplayState.vocals.volume = (FreeplayState.vocals.length > FlxG.sound.music.time) ? 0.8 : 0;
-			if(FreeplayState.opponentVocals != null)
-				FreeplayState.opponentVocals.volume = (FreeplayState.opponentVocals.length > FlxG.sound.music.time) ? 0.8 : 0;
-
-			if((FreeplayState.vocals != null && FreeplayState.vocals.length > FlxG.sound.music.time && Math.abs(FlxG.sound.music.time - FreeplayState.vocals.time) >= 25) ||
-			(FreeplayState.opponentVocals != null && FreeplayState.opponentVocals.length > FlxG.sound.music.time && Math.abs(FlxG.sound.music.time - FreeplayState.opponentVocals.time) >= 25))
-			{
-				pauseOrResume();
-				setVocalsTime(FlxG.sound.music.time);
-				pauseOrResume(true);
-			}
+			setVocalsVolume(muteVocals ? 0 : 0.8);
+			resyncVocals();
 		}
 
 		positionSong();
 		updateTimeTxt();
 		updatePlaybackTxt();
+	}
+
+	function setVocalsVolume(?volume:Float = 0.8)
+	{
+		if(FreeplayState.vocals != null)
+			FreeplayState.vocals.volume = (FreeplayState.vocals.length > FlxG.sound.music.time) ? volume : 0;
+		if(FreeplayState.opponentVocals != null)
+			FreeplayState.opponentVocals.volume = (FreeplayState.opponentVocals.length > FlxG.sound.music.time) ? volume : 0;
 	}
 
 	function setVocalsTime(time:Float)
@@ -216,6 +206,17 @@ class MusicPlayer extends FlxGroup
 			FreeplayState.vocals.time = time;
 		if (FreeplayState.opponentVocals != null && FreeplayState.opponentVocals.length > time)
 			FreeplayState.opponentVocals.time = time;
+	}
+
+	function resyncVocals()
+	{
+		if((FreeplayState.vocals != null && FreeplayState.vocals.length > FlxG.sound.music.time && Math.abs(FlxG.sound.music.time - FreeplayState.vocals.time) >= 25) ||
+		(FreeplayState.opponentVocals != null && FreeplayState.opponentVocals.length > FlxG.sound.music.time && Math.abs(FlxG.sound.music.time - FreeplayState.opponentVocals.time) >= 25))
+		{
+			pauseOrResume();
+			setVocalsTime(FlxG.sound.music.time);
+			pauseOrResume(true);
+		}
 	}
 
 	public function pauseOrResume(resume:Bool = false) 
@@ -282,9 +283,8 @@ class MusicPlayer extends FlxGroup
 
 	function updatePlaybackTxt()
 	{
-		var text = "";
-		if (playbackRate is Int)
-			text = playbackRate + '.00';
+		var text:String = "";
+		if (playbackRate is Int) text = playbackRate + '.00';
 		else
 		{
 			var playbackRate = Std.string(playbackRate);
@@ -299,18 +299,18 @@ class MusicPlayer extends FlxGroup
 	function positionSong() 
 	{
 		var length:Int = instance.songs[FreeplayState.curSelected].songName.length;
-		var shortName:Bool = length < 5; // Fix for song names like Ugh, Guns
+		var shortName:Bool = length < 5; // Fix for song names like Ugh, Guns, etc.
+
 		songTxt.x = FlxG.width - songTxt.width - 6;
-		if (shortName)
-			songTxt.x -= 10 * length - length;
+		if (shortName) songTxt.x -= 10 * length - length;
+
 		songBG.scale.x = FlxG.width - songTxt.x + 12;
-		if (shortName) 
-			songBG.scale.x += 6 * length;
+		if (shortName) songBG.scale.x += 6 * length;
 		songBG.x = FlxG.width - (songBG.scale.x / 2);
+
 		timeTxt.x = Std.int(songBG.x + (songBG.width / 2));
 		timeTxt.x -= timeTxt.width / 2;
-		if (shortName)
-			timeTxt.x -= length - 5;
+		if (shortName) timeTxt.x -= length - 5;
 
 		playbackBG.scale.x = playbackTxt.width + 30;
 		playbackBG.x = songBG.x - (songBG.scale.x / 2);
@@ -334,16 +334,14 @@ class MusicPlayer extends FlxGroup
 			text.x = playbackTxt.x + playbackTxt.width / 2 - 10;
 			text.y = playbackTxt.y;
 
-			if (i == 0)
-				text.y -= playbackTxt.height;
-			else
-				text.y += playbackTxt.height;
+			if (i == 0) text.y -= playbackTxt.height;
+			else text.y += playbackTxt.height;
 		}
 	}
 
 	function updateTimeTxt()
 	{
-		var text = FlxStringUtil.formatTime(FlxG.sound.music.time / 1000, false) + ' / ' + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000, false);
+		final text:String = FlxStringUtil.formatTime(FlxG.sound.music.time / 1000, false) + ' / ' + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000, false);
 		timeTxt.text = '< ' + text + ' >';
 	}
 
@@ -357,15 +355,8 @@ class MusicPlayer extends FlxGroup
 	}
 
 	function get_playing():Bool 
-	{
 		return FlxG.sound.music.playing;
-	}
 
-	function set_playbackRate(value:Float):Float 
-	{
-		var value = FlxMath.roundDecimal(value, 2);
-		if (value > 3) value = 3;
-		else if (value <= 0.25) value = 0.25;
-		return playbackRate = value;
-	}
+	function set_playbackRate(value:Float):Float
+		return playbackRate = FlxMath.bound(FlxMath.roundDecimal(value, 2), 0.25, 3);
 }

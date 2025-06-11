@@ -6,11 +6,10 @@ import haxe.Exception;
 import haxe.Json;
 
 #if LUA_ALLOWED
-import psychlua.FunkinLua;
+import scripting.FunkinLua;
 #end
 
-typedef Achievement =
-{
+typedef Achievement = {
 	var name:String;
 	var description:String;
 	@:optional var hidden:Bool;
@@ -29,7 +28,8 @@ enum abstract AchievementOp(String)
 	var ADD = 'add';
 }
 
-class Achievements {
+class Achievements
+{
 	public static function init()
 	{
 		createAchievement('friday_night_play',		{name: "Freaky on a Friday Night", description: "Play on a Friday... Night.", hidden: true});
@@ -79,7 +79,8 @@ class Achievements {
 
 		if(_originalLength < 0) init();
 
-		if(FlxG.save.data != null) {
+		if(FlxG.save.data != null)
+		{
 			if(FlxG.save.data.achievementsUnlocked != null)
 				achievementsUnlocked = FlxG.save.data.achievementsUnlocked;
 
@@ -145,7 +146,8 @@ class Achievements {
 	}
 
 	static var _lastUnlock:Int = -999;
-	public static function unlock(name:String, autoStartPopup:Bool = true):String {
+	public static function unlock(name:String, autoStartPopup:Bool = true):String
+	{
 		if(!achievements.exists(name))
 		{
 			FlxG.log.error('Achievement "$name" does not exists!');
@@ -183,7 +185,8 @@ class Achievements {
 	public static function get_showingPopups()
 		return _popups.length > 0;
 
-	public static function startPopup(achieve:String, endFunc:Void->Void = null) {
+	public static function startPopup(achieve:String, endFunc:Void->Void = null)
+	{
 		for (popup in _popups)
 		{
 			if(popup == null) continue;

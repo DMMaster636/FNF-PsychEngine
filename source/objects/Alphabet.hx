@@ -27,8 +27,8 @@ class Alphabet extends FlxSpriteGroup
 	public var scaleY(default, set):Float = 1;
 	public var rows:Int = 0;
 
-	public var distancePerItem:FlxPoint = new FlxPoint(20, 120);
-	public var startPosition:FlxPoint = new FlxPoint(0, 0); //for the calculations
+	public var distancePerItem:FlxPoint = FlxPoint.get(20, 120);
+	public var startPosition:FlxPoint = FlxPoint.get(0, 0); //for the calculations
 
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true)
 	{
@@ -167,10 +167,8 @@ class Alphabet extends FlxSpriteGroup
 		if (isMenuItem)
 		{
 			var lerpVal:Float = Math.exp(-elapsed * 9.6);
-			if(changeX)
-				x = FlxMath.lerp((targetY * distancePerItem.x) + startPosition.x, x, lerpVal);
-			if(changeY)
-				y = FlxMath.lerp((targetY * 1.3 * distancePerItem.y) + startPosition.y, y, lerpVal);
+			if(changeX) x = FlxMath.lerp((targetY * distancePerItem.x) + startPosition.x, x, lerpVal);
+			if(changeY) y = FlxMath.lerp((targetY * 1.3 * distancePerItem.y) + startPosition.y, y, lerpVal);
 		}
 		super.update(elapsed);
 	}
@@ -179,10 +177,8 @@ class Alphabet extends FlxSpriteGroup
 	{
 		if (isMenuItem)
 		{
-			if(changeX)
-				x = (targetY * distancePerItem.x) + startPosition.x;
-			if(changeY)
-				y = (targetY * 1.3 * distancePerItem.y) + startPosition.y;
+			if(changeX) x = (targetY * distancePerItem.x) + startPosition.x;
+			if(changeY) y = (targetY * 1.3 * distancePerItem.y) + startPosition.y;
 		}
 	}
 
@@ -342,7 +338,6 @@ class AlphaCharacter extends FlxSprite
 	{
 		super(x, y);
 		image = 'alphabet';
-		antialiasing = ClientPrefs.data.antialiasing;
 	}
 	
 	public var curLetter:Letter = null;

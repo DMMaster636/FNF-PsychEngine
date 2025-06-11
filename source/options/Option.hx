@@ -80,8 +80,7 @@ class Option
 
 		try
 		{
-			if(getValue() == null)
-				setValue(defaultValue);
+			if(getValue() == null) setValue(defaultValue);
 	
 			switch(type)
 			{
@@ -118,7 +117,8 @@ class Option
 			else keys.gamepad = value;
 			return value;
 		}
-		return Reflect.setProperty(ClientPrefs.data, variable, value);
+		Reflect.setProperty(ClientPrefs.data, variable, value);
+		return value;
 	}
 
 	var _name:String = null;

@@ -34,6 +34,8 @@ class MasterEditorMenu extends MusicBeatState
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
+		FlxG.mouse.visible = true;
+
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.scrollFactor.set();
 		bg.color = 0xFF353535;
@@ -72,55 +74,40 @@ class MasterEditorMenu extends MusicBeatState
 		#end
 		changeSelection();
 
-		FlxG.mouse.visible = false;
 		super.create();
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_UP_P)
-		{
-			changeSelection(-1);
-		}
-		if (controls.UI_DOWN_P)
-		{
-			changeSelection(1);
-		}
+		if (controls.UI_UP_P) changeSelection(-1);
+		if (controls.UI_DOWN_P) changeSelection(1);
+
 		#if MODS_ALLOWED
-		if(controls.UI_LEFT_P)
-		{
-			changeDirectory(-1);
-		}
-		if(controls.UI_RIGHT_P)
-		{
-			changeDirectory(1);
-		}
+		if(controls.UI_LEFT_P) changeDirectory(-1);
+		if(controls.UI_RIGHT_P) changeDirectory(1);
 		#end
 
-		if (controls.BACK)
-		{
-			MusicBeatState.switchState(new MainMenuState());
-		}
+		if (controls.BACK) FlxG.switchState(() -> new MainMenuState());
 
 		if (controls.ACCEPT)
 		{
 			switch(options[curSelected]) {
 				case 'Chart Editor'://felt it would be cool maybe
-					LoadingState.loadAndSwitchState(new ChartingState(), false);
+					LoadingState.loadAndSwitchState(() -> new ChartingState(), false);
 				case 'Character Editor':
-					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
+					LoadingState.loadAndSwitchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				case 'Stage Editor':
-					LoadingState.loadAndSwitchState(new StageEditorState());
+					LoadingState.loadAndSwitchState(() -> new StageEditorState());
 				case 'Week Editor':
-					MusicBeatState.switchState(new WeekEditorState());
+					FlxG.switchState(() -> new WeekEditorState());
 				case 'Menu Character Editor':
-					MusicBeatState.switchState(new MenuCharacterEditorState());
+					FlxG.switchState(() -> new MenuCharacterEditorState());
 				case 'Dialogue Editor':
-					LoadingState.loadAndSwitchState(new DialogueEditorState(), false);
+					LoadingState.loadAndSwitchState(() -> new DialogueEditorState(), false);
 				case 'Dialogue Portrait Editor':
-					LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), false);
+					LoadingState.loadAndSwitchState(() -> new DialogueCharacterEditorState(), false);
 				case 'Note Splash Editor':
-					MusicBeatState.switchState(new NoteSplashEditorState());
+					FlxG.switchState(() -> new NoteSplashEditorState());
 			}
 			FlxG.sound.music.volume = 0;
 			FreeplayState.destroyFreeplayVocals();

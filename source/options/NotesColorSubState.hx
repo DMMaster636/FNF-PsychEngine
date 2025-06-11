@@ -1,6 +1,5 @@
 package options;
 
-import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.display.shapes.FlxShapeCircle;
 import flixel.input.keyboard.FlxKey;
@@ -58,7 +57,6 @@ class NotesColorSubState extends MusicBeatSubstate
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFEA71FD;
 		bg.screenCenter();
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 
 		var grid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x33FFFFFF, 0x0));
@@ -456,7 +454,7 @@ class NotesColorSubState extends MusicBeatSubstate
 				}
 				else if (holdingOnObj == colorWheel)
 				{
-					var center:FlxPoint = new FlxPoint(colorWheel.x + colorWheel.width/2, colorWheel.y + colorWheel.height/2);
+					var center:FlxPoint = FlxPoint.get(colorWheel.x + colorWheel.width/2, colorWheel.y + colorWheel.height/2);
 					var mouse:FlxPoint = pointerFlxPoint();
 					var hue:Float = FlxMath.wrap(FlxMath.wrap(Std.int(mouse.degreesTo(center)), 0, 360) - 90, 0, 360);
 					var sat:Float = FlxMath.bound(mouse.dist(center) / colorWheel.width*2, 0, 1);
@@ -606,7 +604,6 @@ class NotesColorSubState extends MusicBeatSubstate
 		// respawn stuff
 		var res:Int = onPixel ? 160 : 17;
 		skinNote = new FlxSprite(48, 24).loadGraphic(Paths.image('noteColorMenu/' + (onPixel ? 'note' : 'notePixel')), true, res, res);
-		skinNote.antialiasing = ClientPrefs.data.antialiasing;
 		skinNote.setGraphicSize(68);
 		skinNote.updateHitbox();
 		skinNote.animation.add('anim', [0], 24, true);
@@ -618,7 +615,6 @@ class NotesColorSubState extends MusicBeatSubstate
 		for (i in 0...3)
 		{
 			var newNote:FlxSprite = new FlxSprite(230 + (100 * i), 100).loadGraphic(Paths.image('noteColorMenu/' + (!onPixel ? 'note' : 'notePixel')), true, res, res);
-			newNote.antialiasing = ClientPrefs.data.antialiasing;
 			newNote.setGraphicSize(85);
 			newNote.updateHitbox();
 			newNote.animation.add('anim', [i], 24, true);

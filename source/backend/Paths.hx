@@ -14,10 +14,14 @@ import openfl.system.System;
 import openfl.geom.Rectangle;
 
 import lime.utils.Assets;
-import flash.media.Sound;
+import openfl.media.Sound;
 
 import haxe.Json;
-
+ 
+#if flxanimate
+import flxanimate.data.SpriteMapData.FlxSpriteMap;
+import flxanimate.frames.FlxAnimateFrames;
+#end
 
 #if MODS_ALLOWED
 import backend.Mods;
@@ -29,7 +33,8 @@ class Paths
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
 	inline public static var VIDEO_EXT = "mp4";
 
-	public static function excludeAsset(key:String) {
+	public static function excludeAsset(key:String)
+	{
 		if (!dumpExclusions.contains(key))
 			dumpExclusions.push(key);
 	}
@@ -50,7 +55,8 @@ class Paths
 		}
 
 		// run the garbage collector for good measure lmfao
-		System.gc();
+		#if !html5 System.gc(); #end
+		#if cpp cpp.NativeGc.run(true); #end
 	}
 
 	// define the locally tracked assets
@@ -75,6 +81,7 @@ class Paths
 				currentTrackedSounds.remove(key);
 			}
 		}
+
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
 		#if !html5 openfl.Assets.cache.clear("songs"); #end
@@ -112,10 +119,9 @@ class Paths
 			//catch(haxe.Exception) {}
 		}
 
-		for (member in FlxG.state.members)
-			checkForGraphics(member);
+		for (member in FlxG.state.members) checkForGraphics(member);
 
-		if(FlxG.state.subState != null)
+		if (FlxG.state.subState != null)
 			for (member in FlxG.state.subState.members)
 				checkForGraphics(member);
 
@@ -178,6 +184,9 @@ class Paths
 	inline public static function getSharedPath(file:String = '')
 		return 'assets/shared/$file';
 
+	inline static public function file(file:String, type:AssetType = TEXT, ?folder:String)
+		return getPath(file, type, folder, true);
+
 	inline static public function txt(key:String, ?folder:String)
 		return getPath('data/$key.txt', TEXT, folder, true);
 
@@ -205,14 +214,19 @@ class Paths
 		return 'assets/videos/$key.$VIDEO_EXT';
 	}
 
-	inline static public function sound(key:String, ?modsAllowed:Bool = true):Sound
-		return returnSound('sounds/$key', modsAllowed);
+	inline static public function sound(key:String, ?modsAllowed:Bool = true, ?playBeep:Bool = true):Sound
+		return returnSound('sounds/$key', null, modsAllowed, playBeep);
 
-	inline static public function music(key:String, ?modsAllowed:Bool = true):Sound
-		return returnSound('music/$key', modsAllowed);
+	inline static public function music(key:String, ?modsAllowed:Bool = true, ?playBeep:Bool = true):Sound
+		return returnSound('music/$key', null, modsAllowed, playBeep);
 
-	inline static public function inst(song:String, ?modsAllowed:Bool = true):Sound
-		return returnSound('${formatToSongPath(song)}/Inst', 'songs', modsAllowed);
+	inline static public function inst(song:String, postfix:String = null, ?modsAllowed:Bool = true):Sound
+	{
+		var songKey:String = '${formatToSongPath(song)}/Inst';
+		if(postfix != null) songKey += '-' + postfix;
+		//trace('songKey test: $songKey');
+		return returnSound(songKey, 'songs', modsAllowed, true);
+	}
 
 	inline static public function voices(song:String, postfix:String = null, ?modsAllowed:Bool = true):Sound
 	{
@@ -280,6 +294,25 @@ class Paths
 		return graph;
 	}
 
+	static public function bitmap(key:String, ?parentFolder:String = null):BitmapData
+	{
+		key = Language.getFileTranslation('images/$key') + '.png';
+		var bitmap:BitmapData = null;
+		var file:String = getPath(key, IMAGE, parentFolder, true);
+		#if MODS_ALLOWED
+		if (FileSystem.exists(file))
+			bitmap = BitmapData.fromFile(file);
+		else #end if (OpenFlAssets.exists(file, IMAGE))
+			bitmap = OpenFlAssets.getBitmapData(file);
+
+		if (bitmap == null)
+		{
+			trace('Bitmap not found: $file | key: $key');
+			return null;
+		}
+		return bitmap;
+	}
+
 	inline static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
 		var path:String = getPath(key, TEXT, !ignoreMods);
@@ -300,7 +333,7 @@ class Paths
 		return 'assets/$folderKey';
 	}
 
-	public static function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false, ?parentFolder:String = null)
+	public static function fileExists(key:String, ?type:AssetType = TEXT, ?ignoreMods:Bool = false, ?parentFolder:String = null)
 	{
 		#if MODS_ALLOWED
 		if(!ignoreMods)
@@ -317,6 +350,14 @@ class Paths
 		}
 		#end
 		return (OpenFlAssets.exists(getPath(key, type, parentFolder, false)));
+	}
+
+	public static function fileExistsAbsolute(key:String, ?ignoreMods:Bool = false)
+	{
+		#if sys
+		if(!ignoreMods) return (FileSystem.exists(key));
+		#end
+		return (OpenFlAssets.exists(key));
 	}
 
 	static public function getAtlas(key:String, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxAtlasFrames
@@ -350,7 +391,6 @@ class Paths
 	
 	static public function getMultiAtlas(keys:Array<String>, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxAtlasFrames
 	{
-		
 		var parentFrames:FlxAtlasFrames = Paths.getAtlas(keys[0].trim());
 		if(keys.length > 1)
 		{
@@ -360,8 +400,7 @@ class Paths
 			for (i in 1...keys.length)
 			{
 				var extraFrames:FlxAtlasFrames = Paths.getAtlas(keys[i].trim(), parentFolder, allowGPU);
-				if(extraFrames != null)
-					parentFrames.addAtlas(extraFrames, true);
+				if(extraFrames != null) parentFrames.addAtlas(extraFrames, true);
 			}
 		}
 		return parentFrames;
@@ -369,7 +408,6 @@ class Paths
 
 	inline static public function getSparrowAtlas(key:String, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxAtlasFrames
 	{
-		if(key.contains('psychic')) trace(key, parentFolder, allowGPU);
 		var imageLoaded:FlxGraphic = image(key, parentFolder, allowGPU);
 		#if MODS_ALLOWED
 		var xmlExists:Bool = false;
@@ -509,6 +547,8 @@ class Paths
 			animationJson = File.getContent(animationJson);
 		}
 
+		var frames:FlxAnimateFrames = new FlxAnimateFrames();
+
 		// is folder or image path
 		if(Std.isOfType(folderOrImg, String))
 		{
@@ -527,6 +567,7 @@ class Paths
 						changedImage = true;
 						changedAtlasJson = true;
 						folderOrImg = image('$originalPath/spritemap$st');
+						loadAnimateSpriteMap(frames, spriteJson, folderOrImg);
 						break;
 					}
 				}
@@ -535,6 +576,7 @@ class Paths
 					//trace('found Sprite PNG');
 					changedImage = true;
 					folderOrImg = image('$originalPath/spritemap$st');
+					loadAnimateSpriteMap(frames, spriteJson, folderOrImg);
 					break;
 				}
 			}
@@ -544,6 +586,7 @@ class Paths
 				//trace('Changing folderOrImg to FlxGraphic');
 				changedImage = true;
 				folderOrImg = image(originalPath);
+				loadAnimateSpriteMap(frames, spriteJson, folderOrImg);
 			}
 
 			if(!changedAnimJson)
@@ -557,7 +600,14 @@ class Paths
 		//trace(folderOrImg);
 		//trace(spriteJson);
 		//trace(animationJson);
-		spr.loadAtlasEx(folderOrImg, spriteJson, animationJson);
+ 		spr.loadSeparateAtlas(animationJson, frames);
+	}
+
+ 	public static function loadAnimateSpriteMap(frames:FlxAnimateFrames, spritemap:FlxSpriteMap, ?image:FlxGraphicAsset):FlxAtlasFrames
+ 	{
+ 		var spritemapFrames:FlxAtlasFrames = FlxAnimateFrames.fromSpriteMap(spritemap, image);
+ 		if(spritemapFrames != null) frames.addAtlas(spritemapFrames);
+ 		return spritemapFrames;
 	}
 	#end
 }

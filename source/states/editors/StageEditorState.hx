@@ -3,10 +3,9 @@ package states.editors;
 import backend.StageData;
 import backend.PsychCamera;
 import objects.Character;
-import psychlua.LuaUtils;
+import scripting.LuaUtils;
 
 import flixel.FlxObject;
-import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.math.FlxRect;
 import flixel.util.FlxDestroyUtil;
@@ -20,8 +19,8 @@ import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 
-import psychlua.ModchartSprite;
-import flash.net.FileFilter;
+import scripting.ModchartSprite;
+import openfl.net.FileFilter;
 
 import states.editors.content.Prompt;
 import states.editors.content.PreloadListSubState;
@@ -34,10 +33,11 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var gf:Character;
 	var dad:Character;
 	var boyfriend:Character;
+
 	var stageJson:StageFile;
 
-	var camGame:FlxCamera;
-	public var camHUD:FlxCamera;
+	var camGame:PsychCamera;
+	public var camHUD:PsychCamera;
 
 	var UI_stagebox:PsychUIBox;
 	var UI_box:PsychUIBox;
@@ -68,7 +68,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		Paths.clearUnusedMemory();
 
 		camGame = initPsychCamera();
-		camHUD = new FlxCamera();
+		camHUD = new PsychCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
@@ -103,7 +103,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		screenUI();
 		spriteCreatePopup();
 		editorUI();
-		
+
 		add(camFollow);
 		updateSpriteList();
 
@@ -127,11 +127,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var showSelectionQuad:Bool = true;
 	function addHelpScreen()
 	{
-		#if FLX_DEBUG
-		var btn = 'F3';
-		#else
-		var btn = 'F2';
-		#end
+		final btn = #if FLX_DEBUG 'F3' #else 'F2' #end;
 
 		var str:Array<String> = ["E/Q - Camera Zoom In/Out",
 			"J/K/L/I - Move Camera",
@@ -575,7 +571,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 
 	function editorUI()
 	{
-		UI_box = new PsychUIBox(FlxG.width - 225, 10, 200, 400, ['Meta', 'Data', 'Object']);
+		UI_box = new PsychUIBox(FlxG.width - 225, 10, 200, 400, ['Meta', 'Extra Data', 'Data', 'Object']);
 		UI_box.cameras = [camHUD];
 		UI_box.scrollFactor.set();
 		add(UI_box);
@@ -587,10 +583,108 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		add(UI_stagebox);
 		UI_box.y += UI_stagebox.y + UI_stagebox.height;
 
+		addExtraDataTab();
 		addDataTab();
 		addObjectTab();
 		addMetaTab();
 		addStageTab();
+	}
+
+	var useStageCamCheckBox:PsychUICheckBox;
+	var camPosDadStepperX:PsychUINumericStepper;
+	var camPosDadStepperY:PsychUINumericStepper;
+	var camPosGfStepperX:PsychUINumericStepper;
+	var camPosGfStepperY:PsychUINumericStepper;
+	var camPosBfStepperX:PsychUINumericStepper;
+	var camPosBfStepperY:PsychUINumericStepper;
+
+	function addExtraDataTab()
+	{
+		var tab_group = UI_box.getTab('Extra Data').menu;
+
+		var saveButton:PsychUIButton = new PsychUIButton(UI_box.width - 90, UI_box.height - 50, 'Save', function() {
+			saveData();
+		});
+		tab_group.add(saveButton);
+
+		var objX = 10;
+		var objY = 20;
+		useStageCamCheckBox = new PsychUICheckBox(objX, objY, 'Use Stage Cam Positions?', 100);
+		useStageCamCheckBox.onClick = function()
+		{
+			stageJson.useStageCamPosition = useStageCamCheckBox.checked;
+			if(focusRadioGroup.checked > -1)
+			{
+				var point = focusOnTarget(focusRadioGroup.labels[focusRadioGroup.checked]);
+				camFollow.setPosition(point.x, point.y);
+			}
+		};
+		useStageCamCheckBox.checked = !gf.visible;
+
+		objY += 30;
+		tab_group.add(new FlxText(objX, objY - 18, 100, 'Camera Positions:'));
+
+		objY += 20;
+		tab_group.add(new FlxText(objX, objY - 18, 100, 'Opponent:'));
+
+		var cx:Float = 0;
+		var cy:Float = 0;
+		if(stageJson.stage_cam_opponent != null && stageJson.stage_cam_opponent.length > 1)
+		{
+			cx = stageJson.stage_cam_opponent[0];
+			cy = stageJson.stage_cam_opponent[0];
+		}
+		camPosDadStepperX = new PsychUINumericStepper(objX, objY, 50, cx, -10000, 10000, 0);
+		camPosDadStepperY = new PsychUINumericStepper(objX + 80, objY, 50, cy, -10000, 10000, 0);
+		camPosDadStepperX.onValueChange = camPosDadStepperY.onValueChange = function() {
+			if(stageJson.stage_cam_opponent == null) stageJson.stage_cam_opponent = [0, 0];
+			stageJson.stage_cam_opponent[0] = camPosDadStepperX.value;
+			stageJson.stage_cam_opponent[1] = camPosDadStepperY.value;
+			_updateCamera();
+		};
+
+		objY += 38;
+		var cx:Float = 0;
+		var cy:Float = 0;
+		if(stageJson.stage_cam_player != null && stageJson.stage_cam_player.length > 1)
+		{
+			cx = stageJson.stage_cam_player[0];
+			cy = stageJson.stage_cam_player[0];
+		}
+		tab_group.add(new FlxText(objX, objY - 18, 100, 'Boyfriend:'));
+		camPosBfStepperX = new PsychUINumericStepper(objX, objY, 50, cx, -10000, 10000, 0);
+		camPosBfStepperY = new PsychUINumericStepper(objX + 80, objY, 50, cy, -10000, 10000, 0);
+		camPosBfStepperX.onValueChange = camPosBfStepperY.onValueChange = function() {
+			if(stageJson.stage_cam_player == null) stageJson.stage_cam_player = [0, 0];
+			stageJson.stage_cam_player[0] = camPosBfStepperX.value;
+			stageJson.stage_cam_player[1] = camPosBfStepperY.value;
+			_updateCamera();
+		};
+
+		objY += 38;
+		var cx:Float = 0;
+		var cy:Float = 0;
+		if(stageJson.stage_cam_gf != null && stageJson.stage_cam_gf.length > 1)
+		{
+			cx = stageJson.stage_cam_gf[0];
+			cy = stageJson.stage_cam_gf[0];
+		}
+		tab_group.add(new FlxText(objX, objY - 18, 100, 'Girlfriend:'));
+		camPosGfStepperX = new PsychUINumericStepper(objX, objY, 50, cx, -10000, 10000, 0);
+		camPosGfStepperY = new PsychUINumericStepper(objX + 80, objY, 50, cy, -10000, 10000, 0);
+		camPosGfStepperX.onValueChange = camPosGfStepperY.onValueChange = function() {
+			if(stageJson.stage_cam_gf == null) stageJson.stage_cam_gf = [0, 0];
+			stageJson.stage_cam_gf[0] = camPosGfStepperX.value;
+			stageJson.stage_cam_gf[1] = camPosGfStepperY.value;
+			_updateCamera();
+		};
+
+		tab_group.add(camPosDadStepperX);
+		tab_group.add(camPosDadStepperY);
+		tab_group.add(camPosBfStepperX);
+		tab_group.add(camPosBfStepperY);
+		tab_group.add(camPosGfStepperX);
+		tab_group.add(camPosGfStepperY);
 	}
 
 	var directoryDropDown:PsychUIDropDownMenu;
@@ -629,7 +723,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			stageJson.directory = selected;
 			saveObjectsToJson();
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
-			MusicBeatState.switchState(new StageEditorState(lastLoadedStage, stageJson));
+			FlxG.switchState(() -> new StageEditorState(lastLoadedStage, stageJson));
 		});
 		directoryDropDown.selectedLabel = stageJson.directory;
 
@@ -767,6 +861,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 	var flipYCheckBox:PsychUICheckBox;
 	var lowQualityCheckbox:PsychUICheckBox;
 	var highQualityCheckbox:PsychUICheckBox;
+
+	var blendDropDown:PsychUIDropDownMenu;
 
 	function getSelected(blockReserved:Bool = true)
 	{
@@ -914,13 +1010,12 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			var selected = getSelected();
 			if(selected != null)
 			{
-				if(selected.type != 'square')
-					selected.antialiasing = antialiasingCheckbox.checked;
-				else
+				if(selected.type == 'square')
 				{
 					antialiasingCheckbox.checked = false;
 					selected.antialiasing = false;
 				}
+				else selected.antialiasing = antialiasingCheckbox.checked;
 			}
 		};
 		tab_group.add(antialiasingCheckbox);
@@ -936,9 +1031,22 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		};
 		tab_group.add(angleStepper);
 
+		final blendList:Array<String> = [
+			'normal', 'add', 'alpha', 'darken', 'difference', 'erase', 'hardlight', 'invert',
+			'layer', 'lighten', 'multiply', 'overlay', 'screen', 'shader', 'subtract'
+		];
+		tab_group.add(new FlxText(objX + 90, objY - 18, 80, 'Blend Mode:'));
+		blendDropDown = new PsychUIDropDownMenu(objX + 90, objY, blendList, function(sel:Int, value:String) {
+			// blend mode
+			var selected = getSelected();
+			if(selected != null)
+				selected.blend = value;
+		});
+		blendDropDown.selectedLabel = blendList[0];
+
 		function updateFlip()
 		{
-			//flip X and flip Y
+			// flip X and flip Y
 			var selected = getSelected();
 			if(selected != null)
 			{
@@ -983,6 +1091,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		highQualityCheckbox.onClick = recalcFilter;
 		tab_group.add(lowQualityCheckbox);
 		tab_group.add(highQualityCheckbox);
+		tab_group.add(blendDropDown);
 	}
 
 	var oppDropdown:PsychUIDropDownMenu;
@@ -1105,8 +1214,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			#end
 
 			stageJson = StageData.getStageFile(lastLoadedStage);
-			updateSpriteList();
 			updateStageDataUI();
+			updateSpriteList();
 			reloadCharacters();
 			reloadStageDropDown();
 		});
@@ -1118,8 +1227,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 			#end
 
 			stageJson = StageData.dummy();
-			updateSpriteList();
 			updateStageDataUI();
+			updateSpriteList();
 			reloadCharacters();
 		});
 		dummyStage.normalStyle.bgColor = FlxColor.RED;
@@ -1140,8 +1249,8 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 				#if DISCORD_ALLOWED
 				DiscordClient.changePresence('Stage Editor', 'Stage: ' + lastLoadedStage);
 				#end
-				updateSpriteList();
 				updateStageDataUI();
+				updateSpriteList();
 				reloadCharacters();
 				reloadStageDropDown();
 			}
@@ -1250,6 +1359,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		scrollStepperY.value = selected.scroll[1];
 		angleStepper.value = selected.angle;
 		alphaStepper.value = selected.alpha;
+		blendDropDown.selectedLabel = selected.blend;
 
 		// Checkboxes
 		antialiasingCheckbox.checked = selected.antialiasing;
@@ -1351,7 +1461,7 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		{
 			if(!unsavedProgress)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				FlxG.switchState(() -> new states.editors.MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 			else openSubState(new ExitConfirmationPrompt());
@@ -1505,32 +1615,56 @@ class StageEditorState extends MusicBeatState implements PsychUIEventHandler.Psy
 		switch(target)
 		{
 			case 'boyfriend':
-				focusPoint.x += boyfriend.getMidpoint().x - boyfriend.cameraPosition[0] - 100;
-				focusPoint.y += boyfriend.getMidpoint().y + boyfriend.cameraPosition[1] - 100;
-				if(stageJson.camera_boyfriend != null && stageJson.camera_boyfriend.length > 1)
+				if(stageJson.useStageCamPosition && stageJson.stage_cam_player != null && stageJson.stage_cam_player.length > 1)
 				{
-					focusPoint.x += stageJson.camera_boyfriend[0];
-					focusPoint.y += stageJson.camera_boyfriend[1];
+					focusPoint.x += stageJson.stage_cam_player[0];
+					focusPoint.y += stageJson.stage_cam_player[1];
+				}
+				else
+				{
+					focusPoint.x += boyfriend.getMidpoint().x - boyfriend.cameraPosition[0] - 100;
+					focusPoint.y += boyfriend.getMidpoint().y + boyfriend.cameraPosition[1] - 100;
+					if(stageJson.camera_boyfriend != null && stageJson.camera_boyfriend.length > 1)
+					{
+						focusPoint.x += stageJson.camera_boyfriend[0];
+						focusPoint.y += stageJson.camera_boyfriend[1];
+					}
 				}
 			case 'dad':
-				focusPoint.x += dad.getMidpoint().x + dad.cameraPosition[0] + 150;
-				focusPoint.y += dad.getMidpoint().y + dad.cameraPosition[1] - 100;
-				if(stageJson.camera_opponent != null && stageJson.camera_opponent.length > 1)
+				if(stageJson.useStageCamPosition && stageJson.stage_cam_opponent != null && stageJson.stage_cam_opponent.length > 1)
 				{
-					focusPoint.x += stageJson.camera_opponent[0];
-					focusPoint.y += stageJson.camera_opponent[1];
+					focusPoint.x += stageJson.stage_cam_opponent[0];
+					focusPoint.y += stageJson.stage_cam_opponent[1];
+				}
+				else
+				{
+					focusPoint.x += dad.getMidpoint().x + dad.cameraPosition[0] + 150;
+					focusPoint.y += dad.getMidpoint().y + dad.cameraPosition[1] - 100;
+					if(stageJson.camera_opponent != null && stageJson.camera_opponent.length > 1)
+					{
+						focusPoint.x += stageJson.camera_opponent[0];
+						focusPoint.y += stageJson.camera_opponent[1];
+					}
 				}
 			case 'gf':
-				if(gf.visible)
+				if(stageJson.useStageCamPosition && stageJson.stage_cam_gf != null && stageJson.stage_cam_gf.length > 1)
 				{
-					focusPoint.x += gf.getMidpoint().x + gf.cameraPosition[0];
-					focusPoint.y += gf.getMidpoint().y + gf.cameraPosition[1];
+					focusPoint.x += stageJson.stage_cam_gf[0];
+					focusPoint.y += stageJson.stage_cam_gf[1];
 				}
-
-				if(stageJson.camera_girlfriend != null && stageJson.camera_girlfriend.length > 1)
+				else
 				{
-					focusPoint.x += stageJson.camera_girlfriend[0];
-					focusPoint.y += stageJson.camera_girlfriend[1];
+					if(gf.visible)
+					{
+						focusPoint.x += gf.getMidpoint().x + gf.cameraPosition[0];
+						focusPoint.y += gf.getMidpoint().y + gf.cameraPosition[1];
+					}
+
+					if(stageJson.camera_girlfriend != null && stageJson.camera_girlfriend.length > 1)
+					{
+						focusPoint.x += stageJson.camera_girlfriend[0];
+						focusPoint.y += stageJson.camera_girlfriend[1];
+					}
 				}
 		}
 		return focusPoint;
@@ -1865,6 +1999,12 @@ class StageEditorMetaSprite
 		sprite.color = CoolUtil.colorFromString(v);
 		return (color = v);
 	}
+	public var blend(default, set):String = 'normal';
+	function set_blend(v:String)
+	{
+		sprite.blend = LuaUtils.blendModeFromString(v);
+		return (blend = v);
+	}
 	public var image(default, set):String = 'unknown';
 	function set_image(v:String)
 	{
@@ -1895,7 +2035,7 @@ class StageEditorMetaSprite
 	public var antialiasing(default, set):Bool = true;
 	function set_antialiasing(v:Bool)
 	{
-		sprite.antialiasing = (v && ClientPrefs.data.antialiasing);
+		sprite.antialiasing = v;
 		return (antialiasing = v);
 	}
 
@@ -1927,7 +2067,7 @@ class StageEditorMetaSprite
 		switch(this.type)
 		{
 			case 'sprite', 'square', 'animatedSprite':
-				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'filters', 'antialiasing'])
+				for (v in ['name', 'image', 'scale', 'scroll', 'color', 'blend', 'filters', 'antialiasing'])
 				{
 					var dat:Dynamic = Reflect.field(data, v);
 					if(dat != null) Reflect.setField(this, v, dat);
@@ -1955,6 +2095,7 @@ class StageEditorMetaSprite
 				obj.alpha = alpha;
 				obj.angle = angle;
 				obj.color = color;
+				obj.blend = blend;
 				obj.filters = filters;
 
 				if(type != 'square')
@@ -1999,7 +2140,7 @@ class StageEditorAnimationSubstate extends MusicBeatSubstate {
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
 
 	var UI_animationbox:PsychUIBox;
-	var camHUD:FlxCamera = cast(FlxG.state, StageEditorState).camHUD;
+	var camHUD:PsychCamera = cast(FlxG.state, StageEditorState).camHUD;
 	public function new()
 	{
 		super();

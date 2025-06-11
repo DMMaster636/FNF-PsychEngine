@@ -51,8 +51,7 @@ class PsychJsonPrinter extends JsonPrinter
 		for (i in 0...len) {
 			var f = fields[i];
 			var value = Reflect.field(v, f);
-			if (Reflect.isFunction(value))
-				continue;
+			if (Reflect.isFunction(value)) continue;
 			if (first)
 			{
 				nind++;
@@ -83,8 +82,7 @@ class PsychJsonPrinter extends JsonPrinter
 			}
 			quote(f);
 			addChar(':'.code);
-			if (pretty)
-				addChar(' '.code);
+			if (pretty) addChar(' '.code);
 
 			var doContain:Bool = _ignoreTab.contains(f);
 			if(doContain) _singleLineCheckNext = true;
@@ -109,8 +107,7 @@ class PsychJsonPrinter extends JsonPrinter
 	}
 
 	override function write(k:Dynamic, v:Dynamic) {
-		if (replacer != null)
-			v = replacer(k, v);
+		if (replacer != null) v = replacer(k, v);
 		switch (Type.typeof(v)) {
 			case TUnknown:
 				add('"???"');

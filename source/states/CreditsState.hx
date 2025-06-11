@@ -2,6 +2,19 @@ package states;
 
 import objects.AttachedSprite;
 
+typedef CreditsFile = {
+	var mod_name:String;
+	var credits:Array<CreditsData>;
+}
+
+typedef CreditsData = {
+	var name:String;
+	var icon:String;
+	var description:String;
+	var link:String;
+	var color:String;
+}
+
 class CreditsState extends MusicBeatState
 {
 	var curSelected:Int = -1;
@@ -14,8 +27,12 @@ class CreditsState extends MusicBeatState
 	var descText:FlxText;
 	var intendedColor:FlxColor;
 	var descBox:AttachedSprite;
+	var moveTween:FlxTween = null;
+	var holdTime:Float = 0;
 
 	var offsetThing:Float = -75;
+
+	var quitting:Bool = false;
 
 	override function create()
 	{
@@ -26,7 +43,6 @@ class CreditsState extends MusicBeatState
 
 		persistentUpdate = true;
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 		bg.screenCenter();
 		
@@ -37,39 +53,39 @@ class CreditsState extends MusicBeatState
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
 
-		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+		// Name - Icon name - Description - Link - BG Color
+		var defaultList:Array<Array<String>> = [
 			["Psych Engine Team"],
-			["Shadow Mario",		"shadowmario",		"Main Programmer and Head of Psych Engine",					"https://ko-fi.com/shadowmario",	"444444"],
-			["Riveren",				"riveren",			"Main Artist/Animator of Psych Engine",						"https://x.com/riverennn",			"14967B"],
+			["Shadow Mario",				"shadowmario",		"Main Programmer and Head of Psych Engine",						"https://ko-fi.com/shadowmario",				"444444"],
+			["Riveren",						"riveren",			"Main Artist/Animator of Psych Engine",							"https://x.com/riverennn",						"14967B"],
 			[""],
 			["Former Engine Members"],
-			["bb-panzu",			"bb",				"Ex-Programmer of Psych Engine",							"https://x.com/bbsub3",				"3E813A"],
+			["bb-panzu",					"bb",				"Ex-Programmer of Psych Engine",								"https://x.com/bbsub3",							"3E813A"],
 			[""],
 			["Engine Contributors"],
-			["crowplexus",			"crowplexus",	"Linux Support, HScript Iris, Input System v3, and Other PRs",	"https://twitter.com/IamMorwen",	"CFCFCF"],
-			["Kamizeta",			"kamizeta",			"Creator of Pessy, Psych Engine's mascot.",				"https://www.instagram.com/cewweey/",	"D21C11"],
-			["MaxNeton",			"maxneton",			"Loading Screen Easter Egg Artist/Animator.",	"https://bsky.app/profile/maxneton.bsky.social","3C2E4E"],
-			["Keoiki",				"keoiki",			"Note Splash Animations and Latin Alphabet",				"https://x.com/Keoiki_",			"D2D2D2"],
-			["SqirraRNG",			"sqirra",			"Crash Handler and Base code for\nChart Editor's Waveform",	"https://x.com/gedehari",			"E1843A"],
-			["EliteMasterEric",		"mastereric",		"Runtime Shaders support and Other PRs",					"https://x.com/EliteMasterEric",	"FFBD40"],
-			["MAJigsaw77",			"majigsaw",			".MP4 Video Loader Library (hxvlc)",						"https://x.com/MAJigsaw77",			"5F5F5F"],
-			["iFlicky",				"flicky",			"Composer of Psync and Tea Time\nAnd some sound effects",	"https://x.com/flicky_i",			"9E29CF"],
-			["KadeDev",				"kade",				"Fixed some issues on Chart Editor and Other PRs",			"https://x.com/kade0912",			"64A250"],
-			["superpowers04",		"superpowers04",	"LUA JIT Fork",												"https://x.com/superpowers04",		"B957ED"],
-			["CheemsAndFriends",	"cheems",			"Creator of FlxAnimate",									"https://x.com/CheemsnFriendos",	"E1E1E1"],
+			["crowplexus",					"crowplexus",		"Linux Support, HScript Iris, Input System v3, and Other PRs",	"https://twitter.com/IamMorwen",				"CFCFCF"],
+			["Kamizeta",					"kamizeta",			"Creator of Pessy, Psych Engine's mascot.",						"https://www.instagram.com/cewweey/",			"D21C11"],
+			["MaxNeton",					"maxneton",			"Loading Screen Easter Egg Artist/Animator.",					"https://bsky.app/profile/maxneton.bsky.social","3C2E4E"],
+			["Keoiki",						"keoiki",			"Note Splash Animations and Latin Alphabet",					"https://x.com/Keoiki_",						"D2D2D2"],
+			["SqirraRNG",					"sqirra",			"Crash Handler and Base code for\nChart Editor's Waveform",		"https://x.com/gedehari",						"E1843A"],
+			["EliteMasterEric",				"mastereric",		"Runtime Shaders support and Other PRs",						"https://x.com/EliteMasterEric",				"FFBD40"],
+			["MAJigsaw77",					"majigsaw",			".MP4 Video Loader Library (hxvlc)",							"https://x.com/MAJigsaw77",						"5F5F5F"],
+			["iFlicky",						"flicky",			"Composer of Psync and Tea Time\nAnd some sound effects",		"https://x.com/flicky_i",						"9E29CF"],
+			["KadeDev",						"kade",				"Fixed some issues on Chart Editor and Other PRs",				"https://x.com/kade0912",						"64A250"],
+			["superpowers04",				"superpowers04",	"LUA JIT Fork",													"https://x.com/superpowers04",					"B957ED"],
+			["CheemsAndFriends",			"cheems",			"Creator of FlxAnimate",										"https://x.com/CheemsnFriendos",				"E1E1E1"],
 			[""],
 			["Funkin' Crew"],
-			["ninjamuffin99",		"ninjamuffin99",	"Programmer of Friday Night Funkin'",						"https://x.com/ninja_muffin99",		"CF2D2D"],
-			["PhantomArcade",		"phantomarcade",	"Animator of Friday Night Funkin'",							"https://x.com/PhantomArcade3K",	"FADC45"],
-			["evilsk8r",			"evilsk8r",			"Artist of Friday Night Funkin'",							"https://x.com/evilsk8r",			"5ABD4B"],
-			["kawaisprite",			"kawaisprite",		"Composer of Friday Night Funkin'",							"https://x.com/kawaisprite",		"378FC7"],
-			[""],
+			["ninjamuffin99",				"ninjamuffin99",	"Programmer of Friday Night Funkin'",							"https://x.com/ninja_muffin99",					"CF2D2D"],
+			["PhantomArcade",				"phantomarcade",	"Animator of Friday Night Funkin'",								"https://x.com/PhantomArcade3K",				"FADC45"],
+			["evilsk8r",					"evilsk8r",			"Artist of Friday Night Funkin'",								"https://x.com/evilsk8r",						"5ABD4B"],
+			["kawaisprite",					"kawaisprite",		"Composer of Friday Night Funkin'",								"https://x.com/kawaisprite",					"378FC7"],
+			[""],		
 			["Psych Engine Discord"],
-			["Join the Psych Ward!", "discord", "", "https://discord.gg/2ka77eMXDv", "5165F6"]
+			["Join the Psych Ward!",		"discord",			"", 															"https://discord.gg/2ka77eMXDv",				"5165F6"]
 		];
-		
-		for(i in defaultList)
-			creditsStuff.push(i);
+
+		for(i in defaultList) creditsStuff.push(i);
 	
 		for (i => credit in creditsStuff)
 		{
@@ -111,10 +127,8 @@ class CreditsState extends MusicBeatState
 		
 		descBox = new AttachedSprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
-		descBox.xAdd = -10;
-		descBox.yAdd = -10;
-		descBox.alphaMult = 0.6;
-		descBox.alpha = 0.6;
+		descBox.xAdd = descBox.yAdd = -10;
+		descBox.alphaMult = descBox.alpha = 0.6;
 		add(descBox);
 
 		descText = new FlxText(50, FlxG.height + offsetThing - 25, 1180, "", 32);
@@ -126,61 +140,61 @@ class CreditsState extends MusicBeatState
 
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
+
 		changeSelection();
 		super.create();
 	}
 
-	var quitting:Bool = false;
-	var holdTime:Float = 0;
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music.volume < 0.7)
-		{
 			FlxG.sound.music.volume += 0.5 * elapsed;
-		}
 
 		if(!quitting)
 		{
 			if(creditsStuff.length > 1)
 			{
-				var shiftMult:Int = 1;
-				if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
+				var shiftMult:Int = (FlxG.keys.pressed.SHIFT) ? 3 : 1;
 
-				var upP = controls.UI_UP_P;
-				var downP = controls.UI_DOWN_P;
-
-				if (upP)
+				if (controls.UI_UP_P)
 				{
 					changeSelection(-shiftMult);
 					holdTime = 0;
 				}
-				if (downP)
+				if (controls.UI_DOWN_P)
 				{
 					changeSelection(shiftMult);
 					holdTime = 0;
 				}
 
-				if(controls.UI_DOWN || controls.UI_UP)
+				if(controls.UI_UP || controls.UI_DOWN)
 				{
 					var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
 					holdTime += elapsed;
 					var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
 
 					if(holdTime > 0.5 && checkNewHold - checkLastHold > 0)
-					{
 						changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
-					}
+				}
+
+				if(FlxG.mouse.wheel != 0)
+				{
+					FlxG.sound.play(Paths.sound('scrollMenu'), 0.2);
+					changeSelection(-shiftMult * FlxG.mouse.wheel, false);
 				}
 			}
 
-			if(controls.ACCEPT && (creditsStuff[curSelected][3] == null || creditsStuff[curSelected][3].length > 4)) {
+			if(controls.ACCEPT && (creditsStuff[curSelected][3] == null || creditsStuff[curSelected][3].length > 4))
+			{
+				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 				CoolUtil.browserLoad(creditsStuff[curSelected][3]);
 			}
+
 			if (controls.BACK)
 			{
-				FlxG.sound.play(Paths.sound('cancelMenu'));
-				MusicBeatState.switchState(new MainMenuState());
 				quitting = true;
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+				FlxG.switchState(() -> new MainMenuState());
 			}
 		}
 		
@@ -195,19 +209,16 @@ class CreditsState extends MusicBeatState
 					item.screenCenter(X);
 					item.x = FlxMath.lerp(item.x - 70, lastX, lerpVal);
 				}
-				else
-				{
-					item.x = FlxMath.lerp(200 + -40 * Math.abs(item.targetY), item.x, lerpVal);
-				}
+				else item.x = FlxMath.lerp(200 + -40 * Math.abs(item.targetY), item.x, lerpVal);
 			}
 		}
+
 		super.update(elapsed);
 	}
 
-	var moveTween:FlxTween = null;
-	function changeSelection(change:Int = 0)
+	function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		if(change != 0 && playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		do
 		{
 			curSelected = FlxMath.wrap(curSelected + change, 0, creditsStuff.length - 1);
@@ -226,12 +237,8 @@ class CreditsState extends MusicBeatState
 		for (num => item in grpOptions.members)
 		{
 			item.targetY = num - curSelected;
-			if(!unselectableCheck(num)) {
-				item.alpha = 0.6;
-				if (item.targetY == 0) {
-					item.alpha = 1;
-				}
-			}
+			if(!unselectableCheck(num))
+				item.alpha = (item.targetY == 0) ? 1 : 0.6;
 		}
 
 		descText.text = creditsStuff[curSelected][2];
@@ -253,7 +260,7 @@ class CreditsState extends MusicBeatState
 	function pushModCreditsToList(folder:String)
 	{
 		var creditsFile:String = Paths.mods(folder + '/data/credits.txt');
-		
+
 		#if TRANSLATIONS_ALLOWED
 		//trace('/data/credits-${ClientPrefs.data.language}.txt');
 		var translatedCredits:String = Paths.mods(folder + '/data/credits-${ClientPrefs.data.language}.txt');
@@ -273,7 +280,6 @@ class CreditsState extends MusicBeatState
 	}
 	#end
 
-	private function unselectableCheck(num:Int):Bool {
+	private function unselectableCheck(num:Int):Bool
 		return creditsStuff[num].length <= 1;
-	}
 }

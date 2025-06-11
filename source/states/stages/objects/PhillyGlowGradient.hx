@@ -1,5 +1,7 @@
 package states.stages.objects;
 
+import backend.animation.PsychAnimationController;
+
 class PhillyGlowGradient extends FlxSprite
 {
 	public var originalY:Float;
@@ -8,13 +10,14 @@ class PhillyGlowGradient extends FlxSprite
 	public function new(x:Float, y:Float)
 	{
 		super(x, y);
+
+		animation = new PsychAnimationController(this);
 		originalY = y;
 
 		loadGraphic(Paths.image('philly/gradient')); //This shit was refusing to properly load FlxGradient so fuck it
 		scrollFactor.set(0, 0.75);
 		setGraphicSize(2000, originalHeight);
 		updateHitbox();
-		antialiasing = ClientPrefs.data.antialiasing;
 	}
 
 	override function update(elapsed:Float)

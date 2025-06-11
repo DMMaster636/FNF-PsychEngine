@@ -1,5 +1,7 @@
 package states.stages.objects;
 
+import backend.animation.PsychAnimationController;
+
 class PhillyGlowParticle extends FlxSprite
 {
 	var lifeTime:Float = 0;
@@ -10,8 +12,9 @@ class PhillyGlowParticle extends FlxSprite
 		super(x, y);
 		this.color = color;
 
+		animation = new PsychAnimationController(this);
+
 		loadGraphic(Paths.image('philly/particle'));
-		antialiasing = ClientPrefs.data.antialiasing;
 		start();
 	}
 

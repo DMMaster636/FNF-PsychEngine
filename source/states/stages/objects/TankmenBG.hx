@@ -2,6 +2,8 @@ package states.stages.objects;
 
 import flixel.graphics.frames.FlxAtlasFrames;
 
+import backend.animation.PsychAnimationController;
+
 class TankmenBG extends FlxSprite
 {
 	public static var animationNotes:Array<Dynamic> = [];
@@ -18,12 +20,13 @@ class TankmenBG extends FlxSprite
 		goingRight = facingRight;
 		super(x, y);
 
+		animation = new PsychAnimationController(this);
+
 		frames = Paths.getSparrowAtlas('tankmanKilled1');
 		animation.addByPrefix('run', 'tankman running', 24, true);
 		animation.addByPrefix('shot', 'John Shot ' + FlxG.random.int(1, 2), 24, false);
 		animation.play('run');
 		animation.curAnim.curFrame = FlxG.random.int(0, animation.curAnim.frames.length - 1);
-		antialiasing = ClientPrefs.data.antialiasing;
 
 		scale.set(0.8, 0.8);
 		updateHitbox();

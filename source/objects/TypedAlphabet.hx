@@ -35,9 +35,8 @@ class TypedAlphabet extends Alphabet
 			{
 				showCharacterUpTo(_curLetter + 1);
 				if(!playedSound && sound != '' && (delay > 0.025 || _curLetter % 2 == 0))
-				{
 					FlxG.sound.play(Paths.sound(sound), volume);
-				}
+
 				playedSound = true;
 
 				_curLetter++;

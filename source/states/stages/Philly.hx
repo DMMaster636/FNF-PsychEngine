@@ -107,7 +107,7 @@ class Philly extends BaseStage
 				if(flValue1 == null || flValue1 <= 0) flValue1 = 0;
 				var lightId:Int = Math.round(flValue1);
 
-				var chars:Array<Character> = [boyfriend, gf, dad];
+				var characterGroups = [boyfriendGroup, gfGroup, dadGroup];
 				switch(lightId)
 				{
 					case 0:
@@ -126,9 +126,12 @@ class Philly extends BaseStage
 							phillyGlowParticles.visible = false;
 							curLightEvent = -1;
 
-							for (who in chars)
+							for (characterGroup in characterGroups)
 							{
-								who.color = FlxColor.WHITE;
+								for (character in characterGroup)
+								{
+									character.color = FlxColor.WHITE;
+								}
 							}
 							phillyStreet.color = FlxColor.WHITE;
 						}
@@ -163,10 +166,14 @@ class Philly extends BaseStage
 						if(!ClientPrefs.data.flashing) charColor.saturation *= 0.5;
 						else charColor.saturation *= 0.75;
 
-						for (who in chars)
+						for (characterGroup in characterGroups)
 						{
-							who.color = charColor;
+							for (character in characterGroup)
+							{
+								character.color = charColor;
+							}
 						}
+
 						phillyGlowParticles.forEachAlive(function(particle:PhillyGlowParticle)
 						{
 							particle.color = color;

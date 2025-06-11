@@ -3,11 +3,13 @@ package backend;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
-import flixel.input.gamepad.FlxGamepadManager;
 
-class InputFormatter {
-	public static function getKeyName(key:FlxKey):String {
-		switch (key) {
+class InputFormatter
+{
+	public static function getKeyName(key:FlxKey):String
+	{
+		switch (key)
+		{
 			case BACKSPACE:
 				return "BckSpc";
 			case CONTROL:
@@ -108,6 +110,7 @@ class InputFormatter {
 		switch(key)
 		{
 			// Analogs
+			// Left
 			case LEFT_STICK_DIGITAL_LEFT:
 				return "Left";
 			case LEFT_STICK_DIGITAL_RIGHT:
@@ -123,6 +126,7 @@ class InputFormatter {
 					default: return "Analog Click";
 				}
 
+			// Right
 			case RIGHT_STICK_DIGITAL_LEFT:
 				return "C. Left";
 			case RIGHT_STICK_DIGITAL_RIGHT:

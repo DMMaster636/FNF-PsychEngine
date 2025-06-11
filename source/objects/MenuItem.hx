@@ -3,26 +3,25 @@ package objects;
 class MenuItem extends FlxSprite
 {
 	public var targetY:Float = 0;
+	public var flashColor:FlxColor = 0xFF33FFFF;
 
-	public function new(x:Float, y:Float, weekName:String = '')
-	{
-		super(x, y);
-		loadGraphic(Paths.image('storymenu/' + weekName));
-		antialiasing = ClientPrefs.data.antialiasing;
-		//trace('Test added: ' + WeekData.getWeekNumber(weekNum) + ' (' + weekNum + ')');
-	}
-
-	public var isFlashing(default, set):Bool = false;
-	private var _flashingElapsed:Float = 0;
-	final _flashColor = 0xFF33FFFF;
+	private var flashingElapsed:Float = 0;
 	final flashes_ps:Int = 6;
 
-	public function set_isFlashing(value:Bool = true):Bool
+	public var isFlashing(default, set):Bool = false;
+	public function set_isFlashing(value:Bool):Bool
 	{
-		isFlashing = value;
-		_flashingElapsed = 0;
-		color = (isFlashing) ? _flashColor : FlxColor.WHITE;
-		return isFlashing;
+		flashingElapsed = 0;
+		color = value ? flashColor : FlxColor.WHITE;
+		return isFlashing = value;
+	}
+
+	public function new(x:Float, y:Float, weekName:String = '', ?flashColor:FlxColor = 0xFF33FFFF)
+	{
+		super(x, y);
+
+		loadGraphic(Paths.image('storymenu/' + weekName));
+		this.flashColor = flashColor;
 	}
 
 	override function update(elapsed:Float)
@@ -31,8 +30,8 @@ class MenuItem extends FlxSprite
 
 		if (isFlashing)
 		{
-			_flashingElapsed += elapsed;
-			color = (Math.floor(_flashingElapsed * FlxG.updateFramerate * flashes_ps) % 2 == 0) ? _flashColor : FlxColor.WHITE;
+			flashingElapsed += elapsed;
+			color = (Math.floor(flashingElapsed * FlxG.updateFramerate * flashes_ps) % 2 == 0) ? flashColor : FlxColor.WHITE;
 		}
 	}
 }

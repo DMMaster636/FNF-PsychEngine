@@ -29,7 +29,6 @@ class Template extends BaseStage
 		// Code here
 	}
 
-	
 	override function countdownTick(count:Countdown, num:Int)
 	{
 		switch(count)
@@ -88,7 +87,7 @@ class Template extends BaseStage
 	{
 		switch(eventName)
 		{
-			case "My Event":
+			case 'My Event':
 		}
 	}
 	override function eventPushed(event:objects.Note.EventNote)
@@ -96,7 +95,7 @@ class Template extends BaseStage
 		// used for preloading assets used on events that doesn't need different assets based on its values
 		switch(event.event)
 		{
-			case "My Event":
+			case 'My Event':
 				//precacheImage('myImage') //preloads images/myImage.png
 				//precacheSound('mySound') //preloads sounds/mySound.ogg
 				//precacheMusic('myMusic') //preloads music/myMusic.ogg
@@ -107,7 +106,7 @@ class Template extends BaseStage
 		// used for preloading assets used on events where its values affect what assets should be preloaded
 		switch(event.event)
 		{
-			case "My Event":
+			case 'My Event':
 				switch(event.value1)
 				{
 					// If value 1 is "blah blah", it will preload these assets:

@@ -10,7 +10,7 @@ class ExitConfirmationPrompt extends Prompt
 		super('There\'s unsaved progress,\nare you sure you want to exit?', function()
 		{
 			FlxG.mouse.visible = false;
-			MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+			FlxG.switchState(() -> new states.editors.MasterEditorMenu());
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			if(finishCallback != null) finishCallback();
 		}, 'Exit');
@@ -98,8 +98,7 @@ class BasePrompt extends MusicBeatSubstate
 		titleText.cameras = cameras;
 		add(titleText);
 		
-		if(onCreate != null)
-			onCreate(this);
+		if(onCreate != null) onCreate(this);
 		super.create();
 	}
 
@@ -115,8 +114,7 @@ class BasePrompt extends MusicBeatSubstate
 			return;
 		}
 
-		if(onUpdate != null)
-			onUpdate(this, elapsed);
+		if(onUpdate != null) onUpdate(this, elapsed);
 	}
 
 	override function destroy()

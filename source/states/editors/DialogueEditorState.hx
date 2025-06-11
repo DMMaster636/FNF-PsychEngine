@@ -3,18 +3,18 @@ package states.editors;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import flash.net.FileFilter;
+import openfl.net.FileFilter;
 import haxe.Json;
 
 import objects.TypedAlphabet;
 
 import cutscenes.DialogueBoxPsych;
-import cutscenes.DialogueCharacter;
+import cutscenes.DialogueCharacterPsych;
 import states.editors.content.Prompt;
 
 class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
 {
-	var character:DialogueCharacter;
+	var character:DialogueCharacterPsych;
 	var box:FlxSprite;
 	var daText:TypedAlphabet;
 
@@ -30,7 +30,7 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 		FlxG.camera.bgColor = FlxColor.fromHSL(0, 0, 0.5);
 
 		defaultLine = {
-			portrait: DialogueCharacter.DEFAULT_CHARACTER,
+			portrait: DialogueCharacterPsych.DEFAULT_CHARACTER,
 			expression: 'talk',
 			text: DEFAULT_TEXT,
 			boxState: DEFAULT_BUBBLETYPE,
@@ -44,12 +44,11 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 			]
 		};
 		
-		character = new DialogueCharacter();
+		character = new DialogueCharacterPsych();
 		character.scrollFactor.set();
 		add(character);
 
 		box = new FlxSprite(70, 370);
-		box.antialiasing = ClientPrefs.data.antialiasing;
 		box.frames = Paths.getSparrowAtlas('speech_bubble');
 		box.scrollFactor.set();
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);
@@ -103,7 +102,7 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 	function addDialogueLineUI() {
 		var tab_group = UI_box.getTab('Dialogue Line').menu;
 
-		characterInputText = new PsychUIInputText(10, 20, 80, DialogueCharacter.DEFAULT_CHARACTER, 8);
+		characterInputText = new PsychUIInputText(10, 20, 80, DialogueCharacterPsych.DEFAULT_CHARACTER, 8);
 		speedStepper = new PsychUINumericStepper(10, characterInputText.y + 40, 0.005, 0.05, 0, 0.5, 3);
 
 		angryCheckbox = new PsychUICheckBox(speedStepper.x + 120, speedStepper.y, "Angry Textbox", 200);
@@ -166,11 +165,8 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 			case 'left':
 				box.flipX = true;
 			case 'center':
-				if(isAngry) {
-					anim = 'center-angry';
-				} else {
-					anim = 'center';
-				}
+				if(isAngry) anim = 'center-angry';
+				else anim = 'center';
 		}
 		box.animation.play(anim, true);
 		DialogueBoxPsych.updateBoxOffsets(box);
@@ -180,7 +176,7 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 		character.frames = Paths.getSparrowAtlas('dialogue/' + character.jsonFile.image);
 		character.jsonFile = character.jsonFile;
 		character.reloadAnimations();
-		character.setGraphicSize(Std.int(character.width * DialogueCharacter.DEFAULT_SCALE * character.jsonFile.scale));
+		character.setGraphicSize(Std.int(character.width * DialogueCharacterPsych.DEFAULT_SCALE * character.jsonFile.scale));
 		character.updateHitbox();
 		character.x = DialogueBoxPsych.LEFT_CHAR_X;
 		character.y = DialogueBoxPsych.DEFAULT_CHAR_Y;
@@ -314,7 +310,7 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 			if(FlxG.keys.justPressed.ESCAPE) {
 				if(!unsavedProgress)
 				{
-					MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+					FlxG.switchState(() -> new states.editors.MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					transitioning = true;
 				}
@@ -407,9 +403,7 @@ class DialogueEditorState extends MusicBeatState implements PsychUIEventHandler.
 		if(character.animation.curAnim != null) {
 			var speed:Float = speedStepper.value;
 			var rate:Float = 24 - (((speed - 0.05) / 5) * 480);
-			if(rate < 12) rate = 12;
-			else if(rate > 48) rate = 48;
-			character.animation.curAnim.frameRate = rate;
+			character.animation.curAnim.frameRate = FlxMath.bound(rate, 12, 48);
 		}
 	}
 

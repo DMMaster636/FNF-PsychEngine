@@ -2,7 +2,6 @@ package states.editors;
 
 import flixel.graphics.FlxGraphic;
 
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import flixel.util.FlxDestroyUtil;
 
 import openfl.net.FileReference;
@@ -46,8 +45,8 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var animsTxt:FlxText;
 	var curAnim = 0;
 
-	private var camEditor:FlxCamera;
-	private var camHUD:FlxCamera;
+	private var camEditor:PsychCamera;
+	private var camHUD:PsychCamera;
 
 	var UI_box:PsychUIBox;
 	var UI_characterbox:PsychUIBox;
@@ -73,7 +72,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		FlxG.sound.music.stop();
 		camEditor = initPsychCamera();
 
-		camHUD = new FlxCamera();
+		FlxG.sound.playMusic(Paths.music('artistic-expression'), 0);
+		FlxG.sound.music.fadeIn(1.2, 0, 0.7);
+
+		camHUD = new PsychCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
@@ -83,13 +85,11 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		add(silhouettes);
 
 		var dad:FlxSprite = new FlxSprite(dadPosition.x, dadPosition.y).loadGraphic(Paths.image('editors/silhouetteDad'));
-		dad.antialiasing = ClientPrefs.data.antialiasing;
 		dad.active = false;
 		dad.offset.set(-4, 1);
 		silhouettes.add(dad);
 
 		var boyfriend:FlxSprite = new FlxSprite(bfPosition.x, bfPosition.y + 350).loadGraphic(Paths.image('editors/silhouetteBF'));
-		boyfriend.antialiasing = ClientPrefs.data.antialiasing;
 		boyfriend.active = false;
 		boyfriend.offset.set(-6, 2);
 		silhouettes.add(boyfriend);
@@ -109,9 +109,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 		addCharacter();
 
-		cameraFollowPointer = new FlxSprite().loadGraphic(FlxGraphic.fromClass(GraphicCursorCross));
+		cameraFollowPointer = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(flixel.system.debug.Icon.cross));
 		cameraFollowPointer.setGraphicSize(40, 40);
 		cameraFollowPointer.updateHitbox();
+		cameraFollowPointer.antialiasing = false;
 
 		healthBar = new Bar(30, FlxG.height - 75);
 		healthBar.scrollFactor.set();
@@ -527,9 +528,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			}
 
 			var lastAnim:String = (character.animationsArray[curAnim] != null) ? character.animationsArray[curAnim].anim : '';
-			var lastOffsets:Array<Int> = [0, 0];
+			var lastOffsets:Array<Float> = [0, 0];
 			for (anim in character.animationsArray)
-				if(animationInputText.text == anim.anim) {
+				if(animationInputText.text == anim.anim)
+				{
 					lastOffsets = anim.offsets;
 					if(character.hasAnimation(animationInputText.text))
 					{
@@ -655,10 +657,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		noAntialiasingCheckBox = new PsychUICheckBox(flipXCheckBox.x, flipXCheckBox.y + 40, "No Antialiasing", 80);
 		noAntialiasingCheckBox.checked = character.noAntialiasing;
 		noAntialiasingCheckBox.onClick = function() {
-			character.antialiasing = false;
-			if(!noAntialiasingCheckBox.checked && ClientPrefs.data.antialiasing) {
-				character.antialiasing = true;
-			}
+			character.antialiasing = !noAntialiasingCheckBox.checked;
 			character.noAntialiasing = noAntialiasingCheckBox.checked;
 		};
 
@@ -736,6 +735,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 				character.jsonScale = sender.value;
 				character.scale.set(character.jsonScale, character.jsonScale);
 				character.updateHitbox();
+				if(anims.length > 0) character.playAnim(anims[curAnim].anim, true);
 				updatePointerPos(false);
 				unsavedProgress = true;
 			}
@@ -980,8 +980,8 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		var anim = anims[curAnim];
 		if(changedOffset && anim != null && anim.offsets != null)
 		{
-			anim.offsets[0] = Std.int(character.offset.x);
-			anim.offsets[1] = Std.int(character.offset.y);
+			anim.offsets[0] = character.offset.x;
+			anim.offsets[1] = character.offset.y;
 
 			character.addOffset(anim.anim, character.offset.x, character.offset.y);
 			updateText();
@@ -1054,15 +1054,17 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			{
 				if(!unsavedProgress)
 				{
-					MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+					camEditor.bgColor = 0xFF000000;
+					FlxG.switchState(() -> new states.editors.MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				}
 				else openSubState(new ExitConfirmationPrompt());
 			}
 			else
 			{
+				camEditor.bgColor = 0xFF000000;
 				FlxG.mouse.visible = false;
-				MusicBeatState.switchState(new PlayState());
+				FlxG.switchState(() -> new PlayState());
 			}
 			return;
 		}
@@ -1301,7 +1303,6 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		};
 
 		var data:String = PsychJsonPrinter.print(json, ['offsets', 'position', 'healthbar_colors', 'camera_position', 'indices']);
-
 		if (data.length > 0)
 		{
 			_file = new FileReference();

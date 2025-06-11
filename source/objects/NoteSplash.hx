@@ -2,7 +2,6 @@ package objects;
 
 import backend.animation.PsychAnimationController;
 import shaders.RGBPalette;
-import flixel.system.FlxAssets.FlxShader;
 
 typedef RGB = {
 	r:Null<Int>,
@@ -63,7 +62,7 @@ class NoteSplash extends FlxSprite
 		config = null;
 		maxAnims = 0;
 
-		if(splash == null)
+		if(splash == null || splash.length < 1)
 		{
 			splash = defaultNoteSplash + getSplashSkinPostfix();
 			if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) splash = PlayState.SONG.splashSkin;
@@ -88,7 +87,7 @@ class NoteSplash extends FlxSprite
 			this.config = configs.get(path);
 			for (anim in this.config.animations)
 			{
-				if (anim.noteData % 4 == 0)
+				if (anim.noteData % Note.colArray.length == 0)
 					maxAnims++;
 			}
 			return;
@@ -110,7 +109,7 @@ class NoteSplash extends FlxSprite
 				{
 					var anim:NoteSplashAnim = Reflect.field(config.animations, i);
 					tempConfig.animations.set(i, anim);
-					if (anim.noteData % 4 == 0)
+					if (anim.noteData % Note.colArray.length == 0)
 						maxAnims++;
 				}
 
@@ -261,7 +260,11 @@ class NoteSplash extends FlxSprite
 							else if (i == 2) tempShader.b = color;
 						}
 					}
-					else tempShader.copyValues(Note.globalRgbShaders[noteData % Note.colArray.length]);
+					else 
+					{
+						if (note != null) tempShader.copyValues(note.rgbShader.parent);
+						else tempShader.copyValues(Note.globalRgbShaders[noteData % Note.colArray.length]);
+					}
 
 					if (note != null)
 					{
@@ -287,16 +290,19 @@ class NoteSplash extends FlxSprite
 			offset.y += offsets[1];
 		}
 
-		animation.finishCallback = function(name:String) {
+		animation.finishCallback = function(name:String)
+		{
 			kill();
 			spawned = false;
 		}
 
 		alpha = ClientPrefs.data.splashAlpha;
-		if (note != null) alpha = note.noteSplashData.a;
-
 		antialiasing = ClientPrefs.data.antialiasing;
-		if (note != null) antialiasing = note.noteSplashData.antialiasing;
+		if (note != null)
+		{
+			alpha = note.noteSplashData.a;
+			antialiasing = (note.noteSplashData.antialiasing && ClientPrefs.data.antialiasing);
+		}
 		if (PlayState.isPixelStage && config.allowPixel) antialiasing = false;
 
 		var minFps:Int = 22;
@@ -350,11 +356,8 @@ class NoteSplash extends FlxSprite
 
 		if (babyArrow != null)
 		{
-			if (copyX)
-				x = babyArrow.x - Note.swagWidth * 0.95;
-
-			if (copyY)
-				y = babyArrow.y - Note.swagWidth;
+			if (copyX) x = babyArrow.x - Note.swagWidth * 0.95;
+			if (copyY) y = babyArrow.y - Note.swagWidth;
 		}
 		super.update(elapsed);
 	}
@@ -488,27 +491,36 @@ class PixelSplashShader extends FlxShader
 		uniform float mult;
 		uniform vec2 uBlocksize;
 
+		vec4 applyColorTransform(vec4 color) {
+		    if (color.a == 0.) {
+		        return vec4(0.);
+		    }
+		    if (!hasTransform) {
+		        return color;
+		    }
+		    if (!hasColorTransform) {
+		        return color * openfl_Alphav;
+		    }
+
+		    color = vec4(color.rgb / color.a, color.a);
+		    color = clamp(openfl_ColorOffsetv + color * openfl_ColorMultiplierv, 0., 1.);
+
+		    if (color.a > 0.) {
+		        return vec4(color.rgb * color.a * openfl_Alphav, color.a * openfl_Alphav);
+		    }
+		    return vec4(0.);
+		}
+
 		vec4 flixel_texture2DCustom(sampler2D bitmap, vec2 coord) {
 			vec2 blocks = openfl_TextureSize / uBlocksize;
-			vec4 color = flixel_texture2D(bitmap, floor(coord * blocks) / blocks);
-			if (!hasTransform) {
+			vec4 color = texture2D(bitmap, floor(coord * blocks) / blocks);
+			if (color.a == 0.0) {
 				return color;
 			}
 
-			if (color.a == 0.0 || mult == 0.0) {
-				return color * openfl_Alphav;
-			}
-
-			vec4 newColor = color;
-			newColor.rgb = min(color.r * r + color.g * g + color.b * b, vec3(1.0));
-			newColor.a = color.a;
-
-			color = mix(color, newColor, mult);
-
-			if (color.a > 0.0) {
-				return vec4(color.rgb, color.a);
-			}
-			return vec4(0.0, 0.0, 0.0, 0.0);
+			vec3 rgbMix = mix(color.rgb, vec3(color.r * r + color.g * g + color.b * b), mult);
+			color.rgb = min(rgbMix, color.a);
+			return applyColorTransform(color);
 		}')
 
 	@:glFragmentSource('

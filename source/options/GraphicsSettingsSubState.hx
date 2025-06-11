@@ -29,8 +29,8 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 			'If unchecked, disables anti-aliasing, increases performance\nat the cost of sharper visuals.',
 			'antialiasing',
 			BOOL);
-		option.onChange = onChangeAntiAliasing; //Changing onChange is only needed if you want to make a special interaction after it changes the value
 		addOption(option);
+		option.onChange = onChangeAntiAliasing; //Changing onChange is only needed if you want to make a special interaction after it changes the value
 		antialiasingOption = optionsArray.length-1;
 
 		var option:Option = new Option('Shaders', //Name
@@ -53,8 +53,8 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
-		option.minValue = 60;
-		option.maxValue = 240;
+		option.minValue = 30;
+		option.maxValue = 360;
 		option.defaultValue = Std.int(FlxMath.bound(refreshRate, option.minValue, option.maxValue));
 		option.displayFormat = '%v FPS';
 		option.onChange = onChangeFramerate;
@@ -66,12 +66,13 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 
 	function onChangeAntiAliasing()
 	{
+		FlxG.game.stage.quality = ClientPrefs.data.antialiasing ? BEST : LOW;
+		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
 		for (sprite in members)
 		{
 			var sprite:FlxSprite = cast sprite;
-			if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+			if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText))
 				sprite.antialiasing = ClientPrefs.data.antialiasing;
-			}
 		}
 	}
 

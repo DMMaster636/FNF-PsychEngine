@@ -19,11 +19,10 @@ class ErrorState extends MusicBeatState
 	public var errorText:FlxText;
 	override function create()
 	{
-		var bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = FlxColor.GRAY;
-		bg.antialiasing = ClientPrefs.data.antialiasing;
-		add(bg);
 		bg.screenCenter();
+		add(bg);
 
 		errorText = new FlxText(0, 0, FlxG.width - 300, errorMsg, 32);
 		errorText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -31,6 +30,7 @@ class ErrorState extends MusicBeatState
 		errorText.borderSize = 2;
 		errorText.screenCenter();
 		add(errorText);
+
 		super.create();
 	}
 
@@ -39,10 +39,8 @@ class ErrorState extends MusicBeatState
 		errorSine += 180 * elapsed;
 		errorText.alpha = 1 - Math.sin((Math.PI * errorSine) / 180);
 
-		if(controls.ACCEPT && acceptCallback != null)
-			acceptCallback();
-		else if(controls.BACK && backCallback != null)
-			backCallback();
+		if(controls.ACCEPT && acceptCallback != null) acceptCallback();
+		else if(controls.BACK && backCallback != null) backCallback();
 
 		super.update(elapsed);
 	}

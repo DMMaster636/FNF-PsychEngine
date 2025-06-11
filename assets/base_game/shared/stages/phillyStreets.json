@@ -14,10 +14,6 @@
 	"camera_speed": 1,
 
 	"preload": {
-		"images/abot/": 3,
-		"images/abot/systemEyes/": 3,
-		"images/abot/abotSystem/": 3,
-
 		"images/SpraycanPile": 3,
 		"images/phillyStreets/phillyConstruction": 3,
 		"images/phillyStreets/phillyHighwayLights": 3,

@@ -5,6 +5,10 @@ import objects.StrumNote;
 import objects.NoteSplash;
 import objects.Alphabet;
 
+#if desktop
+import hxwindowmode.WindowColorMode;
+#end
+
 class VisualsSettingsSubState extends BaseOptionsMenu
 {
 	var noteOptionID:Int = -1;
@@ -79,17 +83,40 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = playNoteSplashes;
 
-		var option:Option = new Option('Hide HUD',
-			'If checked, hides most HUD elements.',
-			'hideHud',
-			BOOL);
-		addOption(option);
-		
 		var option:Option = new Option('Time Bar:',
 			"What should the Time Bar display?",
 			'timeBarType',
 			STRING,
 			['Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
+		addOption(option);
+
+		var option:Option = new Option('Health Bar Opacity',
+			'How much transparent should the health bar and icons be.',
+			'healthBarAlpha',
+			PERCENT);
+		option.scrollSpeed = 1.6;
+		option.minValue = 0.0;
+		option.maxValue = 1;
+		option.changeValue = 0.1;
+		option.decimals = 1;
+		addOption(option);
+
+		var option:Option = new Option('Score Text Grow on Hit',
+			"If unchecked, disables the Score text growing everytime you hit a note.",
+			'scoreZoom',
+			BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Combo Stacking',
+			"If unchecked, Ratings and Combos won't stack, saving on System Memory and making them easier to read.",
+			'comboStacking',
+			BOOL);
+		addOption(option);
+
+		var option:Option = new Option('Hide HUD',
+			'If checked, hides most HUD elements.',
+			'hideHud',
+			BOOL);
 		addOption(option);
 
 		var option:Option = new Option('Flashing Lights',
@@ -104,32 +131,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			BOOL);
 		addOption(option);
 
-		var option:Option = new Option('Score Text Grow on Hit',
-			"If unchecked, disables the Score text growing\neverytime you hit a note.",
-			'scoreZoom',
-			BOOL);
-		addOption(option);
-
-		var option:Option = new Option('Health Bar Opacity',
-			'How much transparent should the health bar and icons be.',
-			'healthBarAlpha',
-			PERCENT);
-		option.scrollSpeed = 1.6;
-		option.minValue = 0.0;
-		option.maxValue = 1;
-		option.changeValue = 0.1;
-		option.decimals = 1;
-		addOption(option);
-		
-		#if !mobile
-		var option:Option = new Option('FPS Counter',
-			'If unchecked, hides FPS Counter.',
-			'showFPS',
-			BOOL);
-		addOption(option);
-		option.onChange = onChangeFPSCounter;
-		#end
-		
 		var option:Option = new Option('Pause Music:',
 			"What song do you prefer for the Pause Screen?",
 			'pauseMusic',
@@ -153,14 +154,27 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			BOOL);
 		addOption(option);
 		#end
-
-		var option:Option = new Option('Combo Stacking',
-			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read",
-			'comboStacking',
+		
+		#if !mobile
+		var option:Option = new Option('FPS Counter',
+			'If unchecked, hides FPS Counter.',
+			'showFPS',
 			BOOL);
 		addOption(option);
+		option.onChange = onChangeFPSCounter;
+		#end
+
+		#if desktop
+		var option:Option = new Option('Dark Window Border',
+			'If checked, makes the window border dark.',
+			'darkBorder',
+			BOOL);
+		addOption(option);
+		option.onChange = onChangeWindowBorder;
+		#end
 
 		super();
+
 		add(notes);
 		add(splashes);
 	}
@@ -252,6 +266,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
 
 			var anim:String = splash.playDefaultAnim();
+
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
 
@@ -292,6 +307,14 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		if(Main.fpsVar != null)
 			Main.fpsVar.visible = ClientPrefs.data.showFPS;
+	}
+	#end
+
+	#if desktop
+	function onChangeWindowBorder()
+	{
+		WindowColorMode.setWindowColorMode(ClientPrefs.data.darkBorder);
+		WindowColorMode.redrawWindowHeader();
 	}
 	#end
 }

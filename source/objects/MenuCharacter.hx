@@ -19,6 +19,8 @@ class MenuCharacter extends FlxSprite
 	public var hasConfirmAnimation:Bool = false;
 	private static var DEFAULT_CHARACTER:String = 'bf';
 
+	public var imageFile:String = null;
+
 	public function new(x:Float, character:String = 'bf')
 	{
 		super(x);
@@ -26,7 +28,8 @@ class MenuCharacter extends FlxSprite
 		changeCharacter(character);
 	}
 
-	public function changeCharacter(?character:String = 'bf') {
+	public function changeCharacter(?character:String = 'bf')
+	{
 		if(character == null) character = '';
 		if(character == this.character) return;
 
@@ -41,7 +44,8 @@ class MenuCharacter extends FlxSprite
 		alpha = 1;
 
 		hasConfirmAnimation = false;
-		switch(character) {
+		switch(character)
+		{
 			case '':
 				visible = false;
 				dontPlayAnim = true;
@@ -49,11 +53,7 @@ class MenuCharacter extends FlxSprite
 				var characterPath:String = 'images/menucharacters/' + character + '.json';
 
 				var path:String = Paths.getPath(characterPath, TEXT);
-				#if MODS_ALLOWED
-				if (!FileSystem.exists(path))
-				#else
-				if (!Assets.exists(path))
-				#end
+				if (!Paths.fileExistsAbsolute(path))
 				{
 					path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER + '.json'); //If a character couldn't be found, change him to BF just to prevent a crash
 					color = FlxColor.BLACK;
@@ -63,18 +63,15 @@ class MenuCharacter extends FlxSprite
 				var charFile:MenuCharacterFile = null;
 				try
 				{
-					#if MODS_ALLOWED
-					charFile = Json.parse(File.getContent(path));
-					#else
-					charFile = Json.parse(Assets.getText(path));
-					#end
+					charFile = Json.parse(#if MODS_ALLOWED File.getContent(path) #else Assets.getText(path) #end);
 				}
 				catch(e:Dynamic)
 				{
 					trace('Error loading menu character file of "$character": $e');
 				}
 
-				frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+				imageFile = charFile.image;
+				frames = Paths.getSparrowAtlas('menucharacters/' + imageFile);
 				animation.addByPrefix('idle', charFile.idle_anim, 24);
 
 				var confirmAnim:String = charFile.confirm_anim;

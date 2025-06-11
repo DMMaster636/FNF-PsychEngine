@@ -3,11 +3,13 @@ package states.stages;
 import flixel.addons.effects.FlxTrail;
 import states.stages.objects.*;
 import substates.GameOverSubstate;
-import cutscenes.DialogueBox;
+import cutscenes.DialogueBoxOld;
 import openfl.utils.Assets as OpenFlAssets;
+import shaders.WiggleEffect;
 
 class SchoolEvil extends BaseStage
 {
+	var swagShader:WiggleEffect = null;
 	override function create()
 	{
 		var _song = PlayState.SONG;
@@ -15,19 +17,42 @@ class SchoolEvil extends BaseStage
 		if(_song.gameOverLoop == null || _song.gameOverLoop.trim().length < 1) GameOverSubstate.loopSoundName = 'gameOver-pixel';
 		if(_song.gameOverEnd == null || _song.gameOverEnd.trim().length < 1) GameOverSubstate.endSoundName = 'gameOverEnd-pixel';
 		if(_song.gameOverChar == null || _song.gameOverChar.trim().length < 1) GameOverSubstate.characterName = 'bf-pixel-dead';
-		
-		var posX = 400;
-		var posY = 200;
 
-		var bg:BGSprite;
 		if(!ClientPrefs.data.lowQuality)
-			bg = new BGSprite('weeb/animatedEvilSchool', posX, posY, 0.8, 0.9, ['background 2'], true);
-		else
-			bg = new BGSprite('weeb/animatedEvilSchool_low', posX, posY, 0.8, 0.9);
+		{
+			if(!ClientPrefs.data.shaders)
+			{
+				var bg:BGSprite = new BGSprite('weeb/animatedEvilSchool', 400, 200, 0.8, 0.9, ['background 2'], true);
+				bg.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
+				bg.antialiasing = false;
+				add(bg);
+			}
+			else
+			{
+				swagShader = new WiggleEffect();
+				swagShader.waveSpeed = 2;
+				swagShader.waveFrequency = 4;
+				swagShader.waveAmplitude = 0.017;
 
-		bg.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
-		bg.antialiasing = false;
-		add(bg);
+				var bgSchool:BGSprite = new BGSprite('weeb/weebSchool', 400, 200, 0.6, 0.9);
+				bgSchool.antialiasing = false;
+				bgSchool.shader = swagShader.shader;
+				add(bgSchool);
+
+				var bgStreet:BGSprite = new BGSprite('weeb/weebStreet', 400, 200, 0.95, 0.95);
+				bgStreet.antialiasing = false;
+				bgStreet.shader = swagShader.shader;
+				add(bgStreet);
+			}
+		}
+		else
+		{
+			var bg:BGSprite = new BGSprite('weeb/animatedEvilSchool_low', 400, 200, 0.8, 0.9);
+			bg.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
+			bg.antialiasing = false;
+			add(bg);
+		}
+
 		setDefaultGF('gf-pixel');
 
 		FlxG.sound.playMusic(Paths.music('LunchboxScary'), 0);
@@ -38,6 +63,7 @@ class SchoolEvil extends BaseStage
 			setStartCallback(schoolIntro);
 		}
 	}
+
 	override function createPost()
 	{
 		var trail:FlxTrail = new FlxTrail(dad, null, 4, 24, 0.3, 0.069);
@@ -81,30 +107,18 @@ class SchoolEvil extends BaseStage
 		}
 	}
 
-	var doof:DialogueBox = null;
+	var doof:DialogueBoxOld = null;
 	function initDoof()
 	{
 		var file:String = Paths.txt('$songName/${songName}Dialogue_${ClientPrefs.data.language}'); //Checks for vanilla/Senpai dialogue
-		#if MODS_ALLOWED
-		if (!FileSystem.exists(file))
-		#else
-		if (!OpenFlAssets.exists(file))
-		#end
-		{
-			file = Paths.txt('$songName/${songName}Dialogue');
-		}
-
-		#if MODS_ALLOWED
-		if (!FileSystem.exists(file))
-		#else
-		if (!OpenFlAssets.exists(file))
-		#end
+		if(!Paths.fileExistsAbsolute(file)) file = Paths.txt('$songName/${songName}Dialogue');
+		if(!Paths.fileExistsAbsolute(file))
 		{
 			startCountdown();
 			return;
 		}
 
-		doof = new DialogueBox(false, CoolUtil.coolTextFile(file));
+		doof = new DialogueBoxOld(false, CoolUtil.coolTextFile(file));
 		doof.cameras = [camHUD];
 		doof.scrollFactor.set();
 		doof.finishThing = startCountdown;
@@ -115,6 +129,7 @@ class SchoolEvil extends BaseStage
 	function schoolIntro():Void
 	{
 		inCutscene = true;
+
 		var red:FlxSprite = new FlxSprite(-100, -100).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFFff1b31);
 		red.scrollFactor.set();
 		add(red);
@@ -138,10 +153,7 @@ class SchoolEvil extends BaseStage
 				new FlxTimer().start(0.3, function(swagTimer:FlxTimer)
 				{
 					senpaiEvil.alpha += 0.15;
-					if (senpaiEvil.alpha < 1)
-					{
-						swagTimer.reset();
-					}
+					if (senpaiEvil.alpha < 1) swagTimer.reset();
 					else
 					{
 						senpaiEvil.animation.play('idle');

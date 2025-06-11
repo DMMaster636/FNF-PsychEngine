@@ -20,8 +20,8 @@ class MusicBeatSubstate extends FlxSubState
 
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
-	private var controls(get, never):Controls;
 
+	private var controls(get, never):Controls;
 	inline function get_controls():Controls
 		return Controls.instance;
 
@@ -76,7 +76,7 @@ class MusicBeatSubstate extends FlxSubState
 			{
 				stepsToDo += Math.round(getBeatsOnSection() * 4);
 				if(stepsToDo > curStep) break;
-				
+
 				curSection++;
 			}
 		}
@@ -101,8 +101,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	public function stepHit():Void
 	{
-		if (curStep % 4 == 0)
-			beatHit();
+		if (curStep % 4 == 0) beatHit();
 	}
 
 	public function beatHit():Void

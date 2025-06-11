@@ -1,28 +1,26 @@
 package shaders;
 
 // STOLEN FROM HAXEFLIXEL DEMO LOL
-import flixel.system.FlxAssets.FlxShader;
-
-enum WiggleEffectType
+enum abstract WiggleEffectType(Int)
 {
-	DREAMY;
-	WAVY;
-	HEAT_WAVE_HORIZONTAL;
-	HEAT_WAVE_VERTICAL;
-	FLAG;
+	var DREAMY = 0;
+	var WAVY = 1;
+	var HEAT_WAVE_HORIZONTAL = 2;
+	var HEAT_WAVE_VERTICAL = 3;
+	var FLAG = 4;
 }
 
 class WiggleEffect
 {
 	public var shader(default, null):WiggleShader = new WiggleShader();
-	public var effectType(default, set):WiggleEffectType = DREAMY;
+	public var effectType(default, set):WiggleEffectType = 0;
 	public var waveSpeed(default, set):Float = 0;
 	public var waveFrequency(default, set):Float = 0;
 	public var waveAmplitude(default, set):Float = 0;
 
 	public function new():Void
 	{
-		shader.uTime.value = [0];
+		shader.uTime.value[0] = 0;
 	}
 
 	public function update(elapsed:Float):Void
@@ -38,7 +36,7 @@ class WiggleEffect
 	function set_effectType(v:WiggleEffectType):WiggleEffectType
 	{
 		effectType = v;
-		shader.effectType.value = [WiggleEffectType.getConstructors().indexOf(Std.string(v))];
+		shader.effectType.value[0] = WiggleEffectType.getConstructors().indexOf(Std.string(v));
 		return v;
 	}
 
@@ -70,25 +68,19 @@ class WiggleShader extends FlxShader
 		#pragma header
 		//uniform float tx, ty; // x,y waves phase
 		uniform float uTime;
-		
-		const int EFFECT_TYPE_DREAMY = 0;
-		const int EFFECT_TYPE_WAVY = 1;
-		const int EFFECT_TYPE_HEAT_WAVE_HORIZONTAL = 2;
-		const int EFFECT_TYPE_HEAT_WAVE_VERTICAL = 3;
-		const int EFFECT_TYPE_FLAG = 4;
-		
+
 		uniform int effectType;
-		
+
 		/**
 		 * How fast the waves move over time
 		 */
 		uniform float uSpeed;
-		
+
 		/**
 		 * Number of waves over time
 		 */
 		uniform float uFrequency;
-		
+
 		/**
 		 * How much the pixels are going to stretch over the waves
 		 */
@@ -98,31 +90,31 @@ class WiggleShader extends FlxShader
 		{
 			float x = 0.0;
 			float y = 0.0;
-			
-			if (effectType == EFFECT_TYPE_DREAMY) 
+
+			if (effectType == 0) 
 			{
 				float offsetX = sin(pt.y * uFrequency + uTime * uSpeed) * uWaveAmplitude;
                 pt.x += offsetX; // * (pt.y - 1.0); // <- Uncomment to stop bottom part of the screen from moving
 			}
-			else if (effectType == EFFECT_TYPE_WAVY) 
+			else if (effectType == 1) 
 			{
 				float offsetY = sin(pt.x * uFrequency + uTime * uSpeed) * uWaveAmplitude;
 				pt.y += offsetY; // * (pt.y - 1.0); // <- Uncomment to stop bottom part of the screen from moving
 			}
-			else if (effectType == EFFECT_TYPE_HEAT_WAVE_HORIZONTAL)
+			else if (effectType == 2)
 			{
 				x = sin(pt.x * uFrequency + uTime * uSpeed) * uWaveAmplitude;
 			}
-			else if (effectType == EFFECT_TYPE_HEAT_WAVE_VERTICAL)
+			else if (effectType == 3)
 			{
 				y = sin(pt.y * uFrequency + uTime * uSpeed) * uWaveAmplitude;
 			}
-			else if (effectType == EFFECT_TYPE_FLAG)
+			else if (effectType == 4)
 			{
 				y = sin(pt.y * uFrequency + 10.0 * pt.x + uTime * uSpeed) * uWaveAmplitude;
 				x = sin(pt.x * uFrequency + 5.0 * pt.y + uTime * uSpeed) * uWaveAmplitude;
 			}
-			
+
 			return vec2(pt.x + x, pt.y + y);
 		}
 
